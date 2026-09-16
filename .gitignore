@@ -1,0 +1,33 @@
+﻿# OS & Temp
+.DS_Store
+Thumbs.db
+*.log
+screenshot_*.png
+moto_*.png
+
+# Sensitive credentials
+.env
+!.env.example
+
+# Node.js
+node_modules/
+dist/
+
+# Flutter / Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+build/
+android/.gradle/
+android/app/build/
+android/local.properties
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+
+# IDEs
+.idea/
+.vscode/
+*.iml
