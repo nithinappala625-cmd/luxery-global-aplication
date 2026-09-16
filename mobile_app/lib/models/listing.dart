@@ -173,7 +173,7 @@ class LuxuryListing {
 
   String get coverImageUrl {
     if (images.isEmpty) {
-      return 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=1200&auto=format&fit=crop';
+      return 'https://images.unsplash.com/photo-1524805444758-089113d48a6d?q=80&w=1200&auto=format&fit=crop';
     }
     final cover = images.firstWhere((img) => img.isCover, orElse: () => images.first);
     return cover.originalUrl;

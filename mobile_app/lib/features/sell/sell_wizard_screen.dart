@@ -51,7 +51,7 @@ class _SellWizardScreenState extends ConsumerState<SellWizardScreen> {
   // Step 6: Photos (Simulated Cloudflare R2 Presigned Direct Upload)
   final List<String> _uploadedImageUrls = [
     'https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=1200&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1569263979104-865ab7cd8d17?q=80&w=1200&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?q=80&w=1200&auto=format&fit=crop',
   ];
   bool _isUploadingToR2 = false;
 
