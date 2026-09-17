@@ -530,7 +530,10 @@ class _SellWizardScreenState extends ConsumerState<SellWizardScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('TECHNICAL SPECIFICATIONS', style: LuxuryTypography.editorialHeading2),
+            Expanded(
+              child: Text('TECHNICAL SPECIFICATIONS', style: LuxuryTypography.editorialHeading2),
+            ),
+            const SizedBox(width: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
