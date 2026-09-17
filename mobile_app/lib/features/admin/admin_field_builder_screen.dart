@@ -172,6 +172,7 @@ class _AdminFieldBuilderScreenState extends ConsumerState<AdminFieldBuilderScree
                         children: [
                           Expanded(
                             child: LuxuryTextField(
+                              label: 'OPTION LABEL',
                               controller: _newOptionController,
                               hintText: 'Add option (e.g. Platinum 950)...',
                             ),
@@ -282,9 +283,9 @@ class _AdminFieldBuilderScreenState extends ConsumerState<AdminFieldBuilderScree
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: LuxuryAppBar(
+      appBar: const LuxuryAppBar(
         title: 'DYNAMIC FIELD BUILDER',
-        showBackButton: true,
+        showBack: true,
       ),
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: isDark ? LuxuryColors.champagne : LuxuryColors.deepForestGreen,
