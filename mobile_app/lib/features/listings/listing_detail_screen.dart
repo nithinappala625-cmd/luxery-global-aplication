@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../core/constants/colors.dart';
 import '../../core/constants/typography.dart';
 import '../../core/widgets/luxury_app_bar.dart';
@@ -354,56 +355,64 @@ class _ListingDetailScreenState extends ConsumerState<ListingDetailScreen> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF141414) : const Color(0xFFFAF8F5),
-                        borderRadius: BorderRadius.circular(2),
-                        border: Border.all(
-                          color: isDark ? LuxuryColors.borderDark : LuxuryColors.borderLight,
-                          width: 0.8,
+                    InkWell(
+                      onTap: () => context.push('/seller/${listing.sellerId}'),
+                      child: Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: isDark ? const Color(0xFF141414) : const Color(0xFFFAF8F5),
+                          borderRadius: BorderRadius.circular(2),
+                          border: Border.all(
+                            color: isDark ? LuxuryColors.borderDark : LuxuryColors.borderLight,
+                            width: 0.8,
+                          ),
                         ),
-                      ),
-                      child: Row(
-                        children: [
-                          if (listing.seller?.avatarUrl != null)
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(2),
-                              child: LuxuryImage(
-                                imageUrl: listing.seller!.avatarUrl!,
-                                width: 48,
-                                height: 48,
+                        child: Row(
+                          children: [
+                            if (listing.seller?.avatarUrl != null)
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(2),
+                                child: LuxuryImage(
+                                  imageUrl: listing.seller!.avatarUrl!,
+                                  width: 48,
+                                  height: 48,
+                                ),
+                              ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Text(
+                                        listing.seller!.name,
+                                        style: LuxuryTypography.editorialHeading3.copyWith(
+                                          fontSize: 15,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 6),
+                                      const Icon(Icons.verified, size: 14, color: LuxuryColors.champagne),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 3),
+                                  Text(
+                                    '${listing.seller!.sellerType.replaceAll('_', ' ').toUpperCase()} • ${listing.seller!.city ?? ''}',
+                                    style: LuxuryTypography.microCaps.copyWith(
+                                      color: LuxuryColors.mutedGrey,
+                                      fontSize: 9,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          const SizedBox(width: 14),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Text(
-                                      listing.seller!.name,
-                                      style: LuxuryTypography.editorialHeading3.copyWith(
-                                        fontSize: 15,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 6),
-                                    const Icon(Icons.verified, size: 14, color: LuxuryColors.champagne),
-                                  ],
-                                ),
-                                const SizedBox(height: 3),
-                                Text(
-                                  '${listing.seller!.sellerType.replaceAll('_', ' ').toUpperCase()} • ${listing.seller!.city ?? ''}',
-                                  style: LuxuryTypography.microCaps.copyWith(
-                                    color: LuxuryColors.mutedGrey,
-                                    fontSize: 9,
-                                  ),
-                                ),
-                              ],
+                            Icon(
+                              Icons.arrow_forward_ios,
+                              size: 14,
+                              color: isDark ? LuxuryColors.champagne : LuxuryColors.charcoal,
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ],

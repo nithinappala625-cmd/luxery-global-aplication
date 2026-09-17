@@ -68,6 +68,10 @@ class ListingsNotifier extends StateNotifier<List<LuxuryListing>> {
     ];
   }
 
+  void removeListing(String listingId) {
+    state = state.where((item) => item.id != listingId).toList();
+  }
+
   void incrementViewCount(String listingId) {
     state = [
       for (final item in state)

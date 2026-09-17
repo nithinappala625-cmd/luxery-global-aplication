@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../features/admin/admin_dashboard_screen.dart';
+import '../features/admin/admin_field_builder_screen.dart';
 import '../features/auctions/auctions_screen.dart';
 import '../features/discover/discover_screen.dart';
 import '../features/home/home_screen.dart';
@@ -9,6 +10,8 @@ import '../features/navigation/main_scaffold.dart';
 import '../features/profile/profile_screen.dart';
 import '../features/sell/sell_wizard_screen.dart';
 import '../features/sell/seller_dashboard_screen.dart';
+import '../features/sell/seller_registration_screen.dart';
+import '../features/seller_profile/seller_profile_screen.dart';
 import '../features/wishlist/wishlist_screen.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
@@ -86,6 +89,19 @@ final appRouter = GoRouter(
     ),
     GoRoute(
       parentNavigatorKey: _rootNavigatorKey,
+      path: '/seller/register',
+      builder: (context, state) => const SellerRegistrationScreen(),
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: '/seller/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id'] ?? '';
+        return SellerProfileScreen(sellerId: id);
+      },
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
       path: '/wishlist',
       builder: (context, state) => const WishlistScreen(),
     ),
@@ -93,6 +109,11 @@ final appRouter = GoRouter(
       parentNavigatorKey: _rootNavigatorKey,
       path: '/admin',
       builder: (context, state) => const AdminDashboardScreen(),
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: '/admin/fields',
+      builder: (context, state) => const AdminFieldBuilderScreen(),
     ),
   ],
 );

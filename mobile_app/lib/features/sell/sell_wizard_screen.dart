@@ -9,9 +9,12 @@ import '../../core/widgets/luxury_button.dart';
 import '../../core/widgets/luxury_price.dart';
 import '../../core/widgets/luxury_text_field.dart';
 import '../../models/listing.dart';
-import '../../providers/auth_provider.dart';
+import '../../models/seller.dart';
 import '../../providers/categories_provider.dart';
 import '../../providers/listings_provider.dart';
+import '../../providers/attributes_provider.dart';
+import '../../providers/seller_provider.dart';
+import 'widgets/dynamic_attribute_form.dart';
 
 class SellWizardScreen extends ConsumerStatefulWidget {
   const SellWizardScreen({super.key});
@@ -33,11 +36,9 @@ class _SellWizardScreenState extends ConsumerState<SellWizardScreen> {
   final _conditionController = TextEditingController(text: 'Pristine / Collector Grade');
   final _descriptionController = TextEditingController();
 
-  // Step 3: Specifications
-  final _spec1KeyController = TextEditingController(text: 'Reference / Model ID');
-  final _spec1ValController = TextEditingController();
-  final _spec2KeyController = TextEditingController(text: 'Material / Hull / Engine');
-  final _spec2ValController = TextEditingController();
+  // Step 3: Dynamic Category Specifications
+  final GlobalKey<DynamicAttributeFormState> _dynamicFormKey = GlobalKey<DynamicAttributeFormState>();
+  Map<String, dynamic> _dynamicAttributes = {};
 
   // Step 4: Price & Currency
   final _priceController = TextEditingController();
@@ -60,7 +61,6 @@ class _SellWizardScreenState extends ConsumerState<SellWizardScreen> {
 
   // Step 8: Seller Info
   final _sellerOrgController = TextEditingController(text: 'Monaco Private Heritage Salons');
-  String _sellerType = 'boutique_dealer';
 
   bool _isSubmitting = false;
 
@@ -84,10 +84,6 @@ class _SellWizardScreenState extends ConsumerState<SellWizardScreen> {
     _yearController.dispose();
     _conditionController.dispose();
     _descriptionController.dispose();
-    _spec1KeyController.dispose();
-    _spec1ValController.dispose();
-    _spec2KeyController.dispose();
-    _spec2ValController.dispose();
     _priceController.dispose();
     _unlockFeeController.dispose();
     _cityController.dispose();
@@ -97,6 +93,10 @@ class _SellWizardScreenState extends ConsumerState<SellWizardScreen> {
   }
 
   void _nextStep() {
+    if (_currentStep == 2) {
+      final valid = _dynamicFormKey.currentState?.validate(context) ?? true;
+      if (!valid) return;
+    }
     if (_currentStep < 9) {
       setState(() => _currentStep++);
     }
@@ -118,9 +118,35 @@ class _SellWizardScreenState extends ConsumerState<SellWizardScreen> {
       orElse: () => categories.first,
     );
 
+    final currentSeller = ref.read(currentSellerProfileProvider);
+    final sellerId = currentSeller?.id ?? 'seller-001';
+
+    final List<ListingSpecification> dynamicSpecs = [];
+    _dynamicAttributes.forEach((k, v) {
+      if (v != null) {
+        String displayVal = v.toString();
+        if (v is List) {
+          displayVal = v.join(', ');
+        }
+        dynamicSpecs.add(ListingSpecification(
+          key: k.replaceAll('_', ' ').toUpperCase(),
+          value: displayVal,
+          group: 'Specifications',
+        ));
+      }
+    });
+
+    if (dynamicSpecs.isEmpty) {
+      dynamicSpecs.add(const ListingSpecification(
+        key: 'AUTHENTICITY',
+        value: 'Curator Inspected & Certified',
+        group: 'Specifications',
+      ));
+    }
+
     final newListing = LuxuryListing(
       id: 'l-${DateTime.now().millisecondsSinceEpoch}',
-      sellerId: ref.read(authProvider)?.id ?? '00000000-0000-0000-0000-000000000001',
+      sellerId: sellerId,
       categoryId: category.id,
       categoryName: category.name,
       brandName: _brandController.text.isNotEmpty ? _brandController.text : 'Bespoke Manufacture',
@@ -149,10 +175,19 @@ class _SellWizardScreenState extends ConsumerState<SellWizardScreen> {
           sortOrder: e.key + 1,
         );
       }).toList(),
-      specifications: [
-        ListingSpecification(key: _spec1KeyController.text, value: _spec1ValController.text.isNotEmpty ? _spec1ValController.text : 'Authentic Factory Model', group: 'General'),
-        ListingSpecification(key: _spec2KeyController.text, value: _spec2ValController.text.isNotEmpty ? _spec2ValController.text : 'Masterpiece Craftsmanship', group: 'Technical'),
-      ],
+      specifications: dynamicSpecs,
+      seller: currentSeller != null
+          ? SellerSnippet(
+              id: currentSeller.id,
+              name: currentSeller.displayName,
+              sellerType: currentSeller.sellerType.code.toLowerCase(),
+              avatarUrl: currentSeller.profilePhoto,
+              city: currentSeller.city,
+              country: currentSeller.country,
+              reputationScore: currentSeller.reputationScore,
+              isVerified: currentSeller.verificationStatus == VerificationStatus.verified,
+            )
+          : null,
       createdAt: DateTime.now(),
     );
 
@@ -482,36 +517,48 @@ class _SellWizardScreenState extends ConsumerState<SellWizardScreen> {
     );
   }
 
-  // Step 3: Specifications
+  // Step 3: Dynamic Category Specifications
   Widget _buildStep3Specifications() {
+    final categories = ref.watch(categoriesProvider);
+    final activeCatId = _selectedCategoryId ?? (categories.isNotEmpty ? categories.first.id : 'c1000000-0000-0000-0000-000000000001');
+    final activeCat = categories.firstWhere((c) => c.id == activeCatId, orElse: () => categories.first);
+    final attributeDefinitions = ref.watch(categoryAttributesProvider(activeCatId));
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('TECHNICAL SPECIFICATIONS', style: LuxuryTypography.editorialHeading2),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text('TECHNICAL SPECIFICATIONS', style: LuxuryTypography.editorialHeading2),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: LuxuryColors.champagne.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(2),
+              ),
+              child: Text(
+                activeCat.name.toUpperCase(),
+                style: LuxuryTypography.microCaps.copyWith(
+                  color: LuxuryColors.champagne,
+                  fontSize: 8.5,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ],
+        ),
         const SizedBox(height: 6),
-        Text('Define exact parameters relevant to this asset category.',
+        Text('Curatorial specifications driven dynamically for ${activeCat.name}. All required fields must be supplied before submission.',
             style: LuxuryTypography.bodySmall.copyWith(color: LuxuryColors.mutedGrey)),
         const SizedBox(height: 20),
-        LuxuryTextField(
-          controller: _spec1KeyController,
-          label: 'SPECIFICATION ATTRIBUTE 1',
-        ),
-        const SizedBox(height: 8),
-        LuxuryTextField(
-          controller: _spec1ValController,
-          label: 'SPECIFICATION VALUE 1',
-          hintText: 'e.g. 11.93 m (39 ft 2 in) / 41 mm Platinum',
-        ),
-        const SizedBox(height: 18),
-        LuxuryTextField(
-          controller: _spec2KeyController,
-          label: 'SPECIFICATION ATTRIBUTE 2',
-        ),
-        const SizedBox(height: 8),
-        LuxuryTextField(
-          controller: _spec2ValController,
-          label: 'SPECIFICATION VALUE 2',
-          hintText: 'e.g. 2x Yanmar 40 HP Diesel / Caliber CH 29-535',
+        DynamicAttributeForm(
+          key: _dynamicFormKey,
+          definitions: attributeDefinitions,
+          initialValues: _dynamicAttributes,
+          onChanged: (vals) {
+            _dynamicAttributes = vals;
+          },
         ),
       ],
     );
@@ -747,34 +794,148 @@ class _SellWizardScreenState extends ConsumerState<SellWizardScreen> {
 
   // Step 8: Seller Info
   Widget _buildStep8SellerInfo() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final currentSeller = ref.watch(currentSellerProfileProvider);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('CUSTODIAN / SELLER PROFILE', style: LuxuryTypography.editorialHeading2),
+        Text('ACCREDITED SALON / SELLER PROFILE', style: LuxuryTypography.editorialHeading2),
         const SizedBox(height: 6),
-        Text('Private seller details are never publicly revealed until unlocked by a verified buyer.',
+        Text('Every consigned asset belongs to an accredited salon or collector profile. Inventory is never anonymous.',
             style: LuxuryTypography.bodySmall.copyWith(color: LuxuryColors.mutedGrey)),
         const SizedBox(height: 20),
-        LuxuryTextField(
-          controller: _sellerOrgController,
-          label: 'LEGAL ENTITY / SALON / OWNER DISPLAY',
-          hintText: 'Monaco Private Heritage Salons',
-        ),
-        const SizedBox(height: 16),
-        Text(
-          'SELLER CLASSIFICATION',
-          style: LuxuryTypography.microCaps.copyWith(color: LuxuryColors.champagne),
-        ),
-        const SizedBox(height: 8),
-        DropdownButtonFormField<String>(
-          value: _sellerType,
-          items: const [
-            DropdownMenuItem(value: 'private_collector', child: Text('Private Collector')),
-            DropdownMenuItem(value: 'boutique_dealer', child: Text('Boutique Dealer')),
-            DropdownMenuItem(value: 'authorized_dealer', child: Text('Authorized Heritage Dealer')),
-          ],
-          onChanged: (val) => setState(() => _sellerType = val ?? 'boutique_dealer'),
-        ),
+        if (currentSeller == null) ...[
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: isDark ? LuxuryColors.darkCard : LuxuryColors.pureWhite,
+              border: Border.all(color: LuxuryColors.rejectionRed.withOpacity(0.4)),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.warning_amber_rounded, color: LuxuryColors.champagne, size: 24),
+                    const SizedBox(width: 8),
+                    Text(
+                      'SELLER PROFILE REQUIRED',
+                      style: LuxuryTypography.microCaps.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: LuxuryColors.champagne,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'To consign assets on Maison Du Luxe, your entity or collector profile must be accredited.',
+                  style: LuxuryTypography.bodySmall,
+                ),
+                const SizedBox(height: 16),
+                LuxuryButton(
+                  text: 'CREATE SELLER PROFILE',
+                  variant: LuxuryButtonVariant.gold,
+                  onPressed: () => context.push('/seller/register'),
+                ),
+              ],
+            ),
+          ),
+        ] else ...[
+          Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              color: isDark ? LuxuryColors.darkCard : LuxuryColors.pureWhite,
+              border: Border.all(
+                color: isDark ? LuxuryColors.champagne.withOpacity(0.4) : LuxuryColors.deepForestGreen.withOpacity(0.4),
+                width: 1.2,
+              ),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    VerificationBadge(
+                      isVerified: currentSeller.verificationStatus == VerificationStatus.verified,
+                      customLabel: currentSeller.verificationStatus.label.toUpperCase(),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: isDark ? LuxuryColors.borderDark : LuxuryColors.champagneLight,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                      child: Text(
+                        currentSeller.verificationLevel.label.toUpperCase(),
+                        style: LuxuryTypography.microCaps.copyWith(
+                          color: isDark ? LuxuryColors.champagne : LuxuryColors.charcoal,
+                          fontSize: 8.5,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  currentSeller.displayName,
+                  style: LuxuryTypography.editorialHeading2.copyWith(fontSize: 18),
+                ),
+                if (currentSeller.legalName != null && currentSeller.legalName!.isNotEmpty) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    currentSeller.legalName!,
+                    style: LuxuryTypography.bodySmall.copyWith(color: LuxuryColors.mutedGrey),
+                  ),
+                ],
+                const SizedBox(height: 6),
+                Text(
+                  '${currentSeller.city}, ${currentSeller.country} • Member since ${currentSeller.createdAt.year}',
+                  style: LuxuryTypography.bodySmall.copyWith(color: LuxuryColors.mutedGrey),
+                ),
+                const Divider(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'CONCIERGE CONTACT',
+                      style: LuxuryTypography.microCaps.copyWith(color: LuxuryColors.mutedGrey),
+                    ),
+                    Text(
+                      currentSeller.email,
+                      style: LuxuryTypography.bodySmall.copyWith(fontWeight: FontWeight.w600),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'ACTIVE PORTFOLIO',
+                      style: LuxuryTypography.microCaps.copyWith(color: LuxuryColors.mutedGrey),
+                    ),
+                    Text(
+                      '${currentSeller.activeListingsCount} Listed Assets',
+                      style: LuxuryTypography.bodySmall.copyWith(fontWeight: FontWeight.w600),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          LuxuryButton(
+            text: 'VIEW / EDIT SALON PROFILE',
+            variant: LuxuryButtonVariant.secondary,
+            onPressed: () => context.push('/seller/${currentSeller.id}'),
+          ),
+        ],
       ],
     );
   }
@@ -820,7 +981,7 @@ class _SellWizardScreenState extends ConsumerState<SellWizardScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                _titleController.text.isNotEmpty ? _titleController.text : 'Bali 4.0 Catamaran',
+                _titleController.text.isNotEmpty ? _titleController.text : 'Asset Title',
                 style: LuxuryTypography.editorialHeading3,
               ),
               const SizedBox(height: 4),
@@ -834,6 +995,41 @@ class _SellWizardScreenState extends ConsumerState<SellWizardScreen> {
                 currency: _selectedCurrency,
                 size: LuxuryPriceSize.large,
               ),
+              if (_dynamicAttributes.isNotEmpty) ...[
+                const Divider(height: 24),
+                Text(
+                  'CURATED SPECIFICATIONS',
+                  style: LuxuryTypography.microCaps.copyWith(
+                    color: isDark ? LuxuryColors.champagne : LuxuryColors.deepForestGreen,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 6,
+                  children: _dynamicAttributes.entries.map((entry) {
+                    final displayVal = entry.value is List ? (entry.value as List).join(', ') : entry.value.toString();
+                    return Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: isDark ? LuxuryColors.pureBlack : LuxuryColors.champagneLight,
+                        borderRadius: BorderRadius.circular(2),
+                        border: Border.all(
+                          color: isDark ? LuxuryColors.borderDark : LuxuryColors.borderLight,
+                        ),
+                      ),
+                      child: Text(
+                        '${entry.key.replaceAll('_', ' ').toUpperCase()}: $displayVal',
+                        style: LuxuryTypography.microCaps.copyWith(
+                          fontSize: 8.5,
+                          color: isDark ? LuxuryColors.pureWhite : LuxuryColors.charcoal,
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ],
             ],
           ),
         ),

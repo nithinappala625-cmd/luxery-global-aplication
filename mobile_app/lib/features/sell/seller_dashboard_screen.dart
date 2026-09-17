@@ -8,7 +8,9 @@ import '../../core/widgets/luxury_badge.dart';
 import '../../core/widgets/luxury_image.dart';
 import '../../core/widgets/luxury_price.dart';
 import '../../models/listing.dart';
+import '../../models/seller.dart';
 import '../../providers/listings_provider.dart';
+import '../../providers/seller_provider.dart';
 
 class SellerDashboardScreen extends ConsumerStatefulWidget {
   const SellerDashboardScreen({super.key});
@@ -37,6 +39,7 @@ class _SellerDashboardScreenState extends ConsumerState<SellerDashboardScreen>
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final allListings = ref.watch(allListingsProvider);
+    final currentSeller = ref.watch(currentSellerProfileProvider);
 
     final activeListings = allListings.where((l) => l.status == 'verified').toList();
     final pendingListings = allListings.where((l) => l.status == 'pending_review').toList();
@@ -48,6 +51,12 @@ class _SellerDashboardScreenState extends ConsumerState<SellerDashboardScreen>
         title: 'SALON PORTFOLIO',
         actions: [
           IconButton(
+            tooltip: 'Dynamic Field Builder',
+            icon: const Icon(Icons.tune_outlined, size: 22),
+            onPressed: () => context.push('/admin/fields'),
+          ),
+          IconButton(
+            tooltip: 'Consign Asset',
             icon: const Icon(Icons.add, size: 24),
             onPressed: () => context.push('/sell/new'),
           ),
@@ -68,6 +77,98 @@ class _SellerDashboardScreenState extends ConsumerState<SellerDashboardScreen>
       ),
       body: Column(
         children: [
+          // Accredited Salon Header Strip
+          if (currentSeller != null)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              decoration: BoxDecoration(
+                color: isDark ? LuxuryColors.pureBlack : const Color(0xFFF7F5F0),
+                border: Border(
+                  bottom: BorderSide(
+                    color: isDark ? LuxuryColors.borderDark : LuxuryColors.borderLight,
+                  ),
+                ),
+              ),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 14,
+                    backgroundImage: NetworkImage(currentSeller.profilePhoto ?? 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=100&auto=format&fit=crop'),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                currentSeller.displayName.toUpperCase(),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: LuxuryTypography.microCaps.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 9.5,
+                                  letterSpacing: 1.1,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            VerificationBadge(
+                              isVerified: currentSeller.verificationStatus == VerificationStatus.verified,
+                              customLabel: currentSeller.verificationStatus.label.toUpperCase(),
+                            ),
+                          ],
+                        ),
+                        Text(
+                          '${currentSeller.verificationLevel.label} • ${currentSeller.city}, ${currentSeller.country}',
+                          style: LuxuryTypography.bodySmall.copyWith(color: LuxuryColors.mutedGrey, fontSize: 10),
+                        ),
+                      ],
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () => context.push('/seller/${currentSeller.id}'),
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    child: Text(
+                      'SALON PROFILE',
+                      style: LuxuryTypography.microCaps.copyWith(
+                        color: isDark ? LuxuryColors.champagne : LuxuryColors.deepForestGreen,
+                        fontSize: 8.5,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            )
+          else
+            Container(
+              padding: const EdgeInsets.all(12),
+              color: LuxuryColors.rejectionRed.withOpacity(0.1),
+              child: Row(
+                children: [
+                  const Icon(Icons.info_outline, size: 18, color: LuxuryColors.champagne),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Accreditation required to consign luxury assets.',
+                      style: LuxuryTypography.bodySmall.copyWith(fontSize: 11),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () => context.push('/seller/register'),
+                    child: const Text('ACCREDIT', style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                ],
+              ),
+            ),
+
           // Portfolio KPI / Analytics Summary Banner
           Container(
             padding: const EdgeInsets.all(16),
@@ -245,7 +346,7 @@ class _SellerDashboardScreenState extends ConsumerState<SellerDashboardScreen>
                 color: isDark ? LuxuryColors.borderDark : LuxuryColors.borderLight,
                 height: 1,
               ),
-              // Seller Actions Bar: Edit, Pause, Mark Sold, Delete
+              // Seller Actions Bar: Preview, Pause, Mark Sold, Delete
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 child: Row(
@@ -257,8 +358,19 @@ class _SellerDashboardScreenState extends ConsumerState<SellerDashboardScreen>
                       onTap: () => context.push('/listing/${item.id}'),
                     ),
                     _buildActionButton(
+                      icon: Icons.pause_circle_outline,
+                      label: item.status == 'draft' ? 'RESUME' : 'PAUSE',
+                      onTap: () {
+                        final newStatus = item.status == 'draft' ? 'pending_review' : 'draft';
+                        ref.read(allListingsProvider.notifier).updateListingStatus(item.id, newStatus);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(newStatus == 'draft' ? 'Listing paused.' : 'Listing submitted for review.')),
+                        );
+                      },
+                    ),
+                    _buildActionButton(
                       icon: Icons.check_circle_outline,
-                      label: 'MARK SOLD',
+                      label: 'SOLD',
                       onTap: () {
                         ref.read(allListingsProvider.notifier).updateListingStatus(item.id, 'sold');
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -267,12 +379,12 @@ class _SellerDashboardScreenState extends ConsumerState<SellerDashboardScreen>
                       },
                     ),
                     _buildActionButton(
-                      icon: Icons.pause_circle_outline,
-                      label: 'PAUSE',
+                      icon: Icons.delete_outline,
+                      label: 'ARCHIVE',
                       onTap: () {
-                        ref.read(allListingsProvider.notifier).updateListingStatus(item.id, 'draft');
+                        ref.read(allListingsProvider.notifier).removeListing(item.id);
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Listing paused & saved to drafts.')),
+                          const SnackBar(content: Text('Asset archived from salon.')),
                         );
                       },
                     ),

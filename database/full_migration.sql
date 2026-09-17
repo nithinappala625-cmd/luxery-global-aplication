@@ -614,3 +614,335 @@ INSERT INTO listing_specifications (listing_id, spec_key, spec_value, spec_group
 ('l1000000-0000-0000-0000-000000000004', 'Certification', 'GIA Dossier + Graff Certificate', 'Provenance', 5),
 ('l1000000-0000-0000-0000-000000000004', 'Metal', 'Platinum 950 & 18k Yellow Gold', 'Mounting', 6)
 ON CONFLICT (listing_id, spec_key) DO NOTHING;
+-- ==============================================================================
+-- 04_SELLER_AND_DYNAMIC_ATTRIBUTES.SQL
+-- Decoupled Seller System, Subtype Profiles, Seller Verifications,
+-- and Category-Specific Dynamic Attribute System
+-- ==============================================================================
+
+-- 1. ENUMS FOR SELLER AND VERIFICATION
+DO  BEGIN
+    CREATE TYPE seller_type_enum AS ENUM (
+        'INDIVIDUAL_SELLER',
+        'DEALER',
+        'BROKER',
+        'AUCTION_HOUSE',
+        'JEWELLERY_DEALER',
+        'WATCH_DEALER',
+        'CAR_DEALER',
+        'YACHT_BROKER',
+        'OTHER'
+    );
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END ;
+
+DO  BEGIN
+    CREATE TYPE seller_verification_status_enum AS ENUM (
+        'UNVERIFIED',
+        'PENDING',
+        'VERIFIED',
+        'REJECTED',
+        'SUSPENDED'
+    );
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END ;
+
+DO  BEGIN
+    CREATE TYPE seller_verification_level_enum AS ENUM (
+        'LEVEL_0', -- Unverified
+        'LEVEL_1', -- Contact Verified
+        'LEVEL_2', -- Identity / Business Verified
+        'LEVEL_3'  -- Professionally Curated / Accredited Partner
+    );
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END ;
+
+DO  BEGIN
+    CREATE TYPE attribute_data_type_enum AS ENUM (
+        'TEXT',
+        'LONG_TEXT',
+        'NUMBER',
+        'DECIMAL',
+        'BOOLEAN',
+        'DATE',
+        'SELECT',
+        'MULTI_SELECT',
+        'CURRENCY',
+        'URL',
+        'EMAIL',
+        'PHONE'
+    );
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END ;
+
+DO  BEGIN
+    CREATE TYPE media_visibility_enum AS ENUM (
+        'PUBLIC',
+        'PRIVATE',
+        'ADMIN_ONLY'
+    );
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END ;
+
+-- 2. SELLER PROFILES TABLE
+CREATE TABLE IF NOT EXISTS seller_profiles_v2 (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID UNIQUE NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+    seller_type seller_type_enum NOT NULL DEFAULT 'INDIVIDUAL_SELLER',
+    display_name TEXT NOT NULL,
+    legal_name TEXT,
+    profile_photo TEXT,
+    cover_photo TEXT,
+    bio TEXT,
+    country TEXT NOT NULL,
+    state_province TEXT,
+    city TEXT NOT NULL,
+    address TEXT,
+    email TEXT NOT NULL,
+    phone TEXT,
+    whatsapp TEXT,
+    website TEXT,
+    years_experience INT DEFAULT 0,
+    year_established INT,
+    preferred_contact_method TEXT DEFAULT 'IN_APP',
+    languages JSONB DEFAULT '[\"English\"]'::jsonb,
+    categories_sold JSONB DEFAULT '[]'::jsonb,
+    verification_status seller_verification_status_enum NOT NULL DEFAULT 'PENDING',
+    verification_level seller_verification_level_enum NOT NULL DEFAULT 'LEVEL_0',
+    is_active BOOLEAN NOT NULL DEFAULT true,
+    reputation_score NUMERIC(3, 2) DEFAULT 5.00,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 3. BUSINESS PROFILES (DEALERS / RETAILERS)
+CREATE TABLE IF NOT EXISTS business_profiles (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    seller_id UUID UNIQUE NOT NULL REFERENCES seller_profiles_v2(id) ON DELETE CASCADE,
+    legal_name TEXT NOT NULL,
+    trading_name TEXT,
+    business_type TEXT NOT NULL DEFAULT 'Dealer',
+    registration_country TEXT NOT NULL,
+    registration_number TEXT, -- Sensitive: Not public
+    tax_number TEXT,          -- Sensitive: Not public
+    website TEXT,
+    business_email TEXT,
+    business_phone TEXT,
+    business_address TEXT,
+    year_established INT,
+    number_of_employees TEXT,
+    description TEXT,
+    brands_represented JSONB DEFAULT '[]'::jsonb,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 4. BROKER PROFILES
+CREATE TABLE IF NOT EXISTS broker_profiles (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    seller_id UUID UNIQUE NOT NULL REFERENCES seller_profiles_v2(id) ON DELETE CASCADE,
+    agency_name TEXT,
+    specialization TEXT NOT NULL,
+    years_experience INT DEFAULT 0,
+    has_owner_representation_authorization BOOLEAN NOT NULL DEFAULT false,
+    authorization_ref TEXT,
+    authorization_doc_url TEXT,
+    authorization_expires_at DATE,
+    description TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 5. AUCTION HOUSE PROFILES
+CREATE TABLE IF NOT EXISTS auction_house_profiles (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    seller_id UUID UNIQUE NOT NULL REFERENCES seller_profiles_v2(id) ON DELETE CASCADE,
+    legal_name TEXT NOT NULL,
+    display_name TEXT NOT NULL,
+    registration_country TEXT NOT NULL,
+    business_address TEXT,
+    website TEXT,
+    upcoming_auction_info TEXT,
+    specializations JSONB DEFAULT '[]'::jsonb,
+    description TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 6. SELLER VERIFICATIONS (TRACKS VERIFICATION REVIEW HISTORY)
+CREATE TABLE IF NOT EXISTS seller_verifications (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    seller_id UUID NOT NULL REFERENCES seller_profiles_v2(id) ON DELETE CASCADE,
+    verification_type TEXT NOT NULL, -- 'EMAIL', 'PHONE', 'IDENTITY', 'BUSINESS', 'BROKER', 'AUCTION_HOUSE', 'DOCUMENT'
+    status TEXT NOT NULL DEFAULT 'PENDING', -- 'NOT_STARTED', 'PENDING', 'VERIFIED', 'REJECTED', 'REQUIRES_UPDATE'
+    document_id TEXT,
+    reviewed_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
+    review_notes TEXT,
+    submitted_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    reviewed_at TIMESTAMPTZ,
+    expires_at TIMESTAMPTZ
+);
+
+-- 7. SELLER MEDIA (CLOUDFLARE R2 PRIVATE & PUBLIC MEDIA)
+CREATE TABLE IF NOT EXISTS seller_media (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    seller_id UUID NOT NULL REFERENCES seller_profiles_v2(id) ON DELETE CASCADE,
+    media_type TEXT NOT NULL, -- 'PROFILE_PHOTO', 'COVER_PHOTO', 'LOGO', 'SHOWROOM', 'OFFICE', 'CERTIFICATE', 'DOCUMENT'
+    storage_key TEXT NOT NULL,
+    media_url TEXT NOT NULL,
+    visibility media_visibility_enum NOT NULL DEFAULT 'PUBLIC',
+    mime_type TEXT NOT NULL,
+    file_size BIGINT,
+    display_order INT DEFAULT 0,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 8. DYNAMIC ATTRIBUTE DEFINITIONS (NO HARD-CODED COLUMNS)
+CREATE TABLE IF NOT EXISTS attribute_definitions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    category_id UUID NOT NULL REFERENCES categories(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    slug TEXT NOT NULL,
+    label TEXT NOT NULL,
+    description TEXT,
+    data_type attribute_data_type_enum NOT NULL DEFAULT 'TEXT',
+    unit TEXT, -- 'carats', 'mm', 'meters', 'hp', 'hrs', 'km'
+    required BOOLEAN NOT NULL DEFAULT false,
+    seller_editable BOOLEAN NOT NULL DEFAULT true,
+    admin_only BOOLEAN NOT NULL DEFAULT false,
+    display_order INT NOT NULL DEFAULT 0,
+    filterable BOOLEAN NOT NULL DEFAULT false,
+    searchable BOOLEAN NOT NULL DEFAULT false,
+    active BOOLEAN NOT NULL DEFAULT true,
+    options JSONB DEFAULT '[]'::jsonb, -- Array of strings for SELECT / MULTI_SELECT
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE(category_id, slug)
+);
+
+-- 9. LISTING ATTRIBUTES (STORES DYNAMIC VALUES FOR EACH LISTING)
+CREATE TABLE IF NOT EXISTS listing_attributes (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    listing_id UUID NOT NULL REFERENCES listings(id) ON DELETE CASCADE,
+    attribute_definition_id UUID NOT NULL REFERENCES attribute_definitions(id) ON DELETE CASCADE,
+    value_text TEXT,
+    value_number NUMERIC(16, 4),
+    value_boolean BOOLEAN,
+    value_date DATE,
+    value_json JSONB,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE(listing_id, attribute_definition_id)
+);
+
+-- 10. DOCUMENT REQUIREMENTS (CONFIGURABLE LEGAL/VERIFICATION REQUIREMENTS)
+CREATE TABLE IF NOT EXISTS document_requirements (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    seller_type seller_type_enum NOT NULL,
+    country TEXT, -- NULL for all countries
+    category_id UUID REFERENCES categories(id) ON DELETE CASCADE,
+    document_type TEXT NOT NULL,
+    label TEXT NOT NULL,
+    required BOOLEAN NOT NULL DEFAULT true,
+    active BOOLEAN NOT NULL DEFAULT true,
+    description TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Indexes for lightning fast dynamic querying
+CREATE INDEX IF NOT EXISTS idx_seller_profiles_v2_user ON seller_profiles_v2(user_id);
+CREATE INDEX IF NOT EXISTS idx_seller_profiles_v2_status ON seller_profiles_v2(verification_status);
+CREATE INDEX IF NOT EXISTS idx_attribute_definitions_cat ON attribute_definitions(category_id, active, display_order);
+CREATE INDEX IF NOT EXISTS idx_listing_attributes_listing ON listing_attributes(listing_id);
+CREATE INDEX IF NOT EXISTS idx_listing_attributes_def ON listing_attributes(attribute_definition_id);
+-- ==============================================================================
+-- 05_SEED_DYNAMIC_ATTRIBUTES.SQL
+-- Seed Dynamic Attribute Definitions for the 4 Launch Categories
+-- ==============================================================================
+
+-- ==========================================
+-- 1. LUXURY WATCHES ATTRIBUTES
+-- ==========================================
+INSERT INTO attribute_definitions (category_id, name, slug, label, description, data_type, unit, required, filterable, searchable, display_order, options)
+VALUES
+('c1000000-0000-0000-0000-000000000001', 'Reference Number', 'reference_number', 'Reference Number', 'Manufacturer official reference code', 'TEXT', NULL, true, true, true, 1, '[]'::jsonb),
+('c1000000-0000-0000-0000-000000000001', 'Movement', 'movement', 'Movement Type', 'Horological caliber movement mechanism', 'SELECT', NULL, true, true, true, 2, '[\"Automatic\", \"Manual\", \"Quartz\", \"Solar\", \"Spring Drive\", \"Tourbillon\", \"Other\"]'::jsonb),
+('c1000000-0000-0000-0000-000000000001', 'Case Material', 'case_material', 'Case Material', 'Primary alloy or precious metal', 'SELECT', NULL, true, true, true, 3, '[\"Stainless Steel\", \"950 Platinum\", \"18k Yellow Gold\", \"18k White Gold\", \"18k Rose/Pink Gold\", \"Titanium\", \"Ceramic\", \"Carbon Composite\", \"Bronze\", \"Other\"]'::jsonb),
+('c1000000-0000-0000-0000-000000000001', 'Case Diameter', 'case_diameter', 'Case Diameter', 'Case diameter excluding crown', 'NUMBER', 'mm', true, true, false, 4, '[]'::jsonb),
+('c1000000-0000-0000-0000-000000000001', 'Dial Color', 'dial_color', 'Dial Color', 'Dial hue and finishing', 'SELECT', NULL, true, true, true, 5, '[\"Black\", \"Blue\", \"Silver/White\", \"Salmon\", \"Green\", \"Champagne\", \"Meteorite\", \"Skeleton/Openworked\", \"Other\"]'::jsonb),
+('c1000000-0000-0000-0000-000000000001', 'Strap / Bracelet', 'bracelet_material', 'Strap / Bracelet Material', 'Bracelet or strap composition', 'SELECT', NULL, false, true, false, 6, '[\"Integrated Steel Bracelet\", \"Alligator Leather\", \"Calfskin Leather\", \"Rubber / Oysterflex\", \"Gold Bracelet\", \"Platinum Bracelet\", \"NATO Fabric\", \"Other\"]'::jsonb),
+('c1000000-0000-0000-0000-000000000001', 'Complications', 'complications', 'Complications', 'Special horological complications', 'MULTI_SELECT', NULL, false, true, true, 7, '[\"Chronograph\", \"Date\", \"GMT / Dual Time\", \"Moonphase\", \"Perpetual Calendar\", \"Annual Calendar\", \"Tourbillon\", \"Minute Repeater\", \"World Time\", \"Power Reserve Indicator\"]'::jsonb),
+('c1000000-0000-0000-0000-000000000001', 'Water Resistance', 'water_resistance', 'Water Resistance', 'Depth rating', 'NUMBER', 'meters', false, true, false, 8, '[]'::jsonb),
+('c1000000-0000-0000-0000-000000000001', 'Power Reserve', 'power_reserve', 'Power Reserve', 'Autonomous runtime hours', 'NUMBER', 'hours', false, false, false, 9, '[]'::jsonb),
+('c1000000-0000-0000-0000-000000000001', 'Box & Papers', 'box_and_papers', 'Box & Papers Provenance', 'Accompanying accessories', 'SELECT', NULL, true, true, false, 10, '[\"Full Set (Original Box & Papers)\", \"Papers Only\", \"Box Only\", \"Watch Only (Archive Extract Available)\", \"Service Papers Only\"]'::jsonb),
+('c1000000-0000-0000-0000-000000000001', 'Serial Number', 'serial_number', 'Serial Number (Confidential)', 'Serial number stored privately for verification', 'TEXT', NULL, false, false, false, 11, '[]'::jsonb)
+ON CONFLICT (category_id, slug) DO NOTHING;
+
+-- ==========================================
+-- 2. FINE JEWELLERY & DIAMONDS ATTRIBUTES
+-- ==========================================
+INSERT INTO attribute_definitions (category_id, name, slug, label, description, data_type, unit, required, filterable, searchable, display_order, options)
+VALUES
+('c1000000-0000-0000-0000-000000000002', 'Jewellery Type', 'jewellery_type', 'Jewellery Classification', 'Type of jewellery piece', 'SELECT', NULL, true, true, true, 1, '[\"Ring\", \"Necklace\", \"Earrings\", \"Bracelet\", \"Bangle\", \"Pendant\", \"Brooch\", \"Tiara\", \"Cuff\", \"High Jewellery Set\", \"Other\"]'::jsonb),
+('c1000000-0000-0000-0000-000000000002', 'Primary Material', 'primary_material', 'Precious Metal / Material', 'Mounting and setting metal', 'SELECT', NULL, true, true, true, 2, '[\"Platinum 950\", \"18k Yellow Gold\", \"18k White Gold\", \"18k Rose Gold\", \"Platinum & Gold Combination\", \"Fine Silver\", \"Titanium\", \"Other\"]'::jsonb),
+('c1000000-0000-0000-0000-000000000002', 'Gemstone Type', 'gemstone_type', 'Primary Gemstone', 'Primary natural stone', 'SELECT', NULL, true, true, true, 3, '[\"Diamond\", \"Ruby\", \"Emerald\", \"Sapphire\", \"Fancy Colored Diamond\", \"Paraiba Tourmaline\", \"Alexandrite\", \"Natural Pearl\", \"Other Gemstone\", \"No Gemstone (Gold/Metal Only)\"]'::jsonb),
+('c1000000-0000-0000-0000-000000000002', 'Diamond Origin', 'diamond_origin', 'Diamond Origin Classification', 'Natural or laboratory grown', 'SELECT', NULL, true, true, false, 4, '[\"Natural Earth-Mined\", \"Laboratory Grown\", \"Not Applicable\"]'::jsonb),
+('c1000000-0000-0000-0000-000000000002', 'Carat Weight', 'carat_weight', 'Center Stone Carat Weight', 'Total carat weight of center stone', 'DECIMAL', 'carats', true, true, false, 5, '[]'::jsonb),
+('c1000000-0000-0000-0000-000000000002', 'Diamond Shape / Cut', 'diamond_shape', 'Gemstone Shape & Cut', 'Geometric cut profile', 'SELECT', NULL, false, true, true, 6, '[\"Round Brilliant\", \"Cushion\", \"Emerald Cut\", \"Radiant\", \"Oval\", \"Pear Shape\", \"Marquise\", \"Heart\", \"Asscher\", \"Bespoke / Fancy\"]'::jsonb),
+('c1000000-0000-0000-0000-000000000002', 'Color Grade', 'color_grade', 'Color Grade', 'GIA D-Z or Fancy Colored rating', 'SELECT', NULL, false, true, false, 7, '[\"D (Colorless)\", \"E (Colorless)\", \"F (Colorless)\", \"G (Near Colorless)\", \"H (Near Colorless)\", \"Fancy Vivid Yellow\", \"Fancy Intense Yellow\", \"Fancy Pink\", \"Fancy Blue\", \"Fancy Green\", \"Other Fancy Color\"]'::jsonb),
+('c1000000-0000-0000-0000-000000000002', 'Clarity Grade', 'clarity_grade', 'Clarity Grade', 'Gemological clarity rating', 'SELECT', NULL, false, true, false, 8, '[\"FL (Flawless)\", \"IF (Internally Flawless)\", \"VVS1\", \"VVS2\", \"VS1\", \"VS2\", \"SI1\", \"SI2\"]'::jsonb),
+('c1000000-0000-0000-0000-000000000002', 'Cut Grade', 'cut_grade', 'Cut Grade', 'Proportions and brilliance', 'SELECT', NULL, false, true, false, 9, '[\"Excellent\", \"Very Good\", \"Good\", \"Fair\"]'::jsonb),
+('c1000000-0000-0000-0000-000000000002', 'Polish & Symmetry', 'polish_symmetry', 'Polish & Symmetry Finish', 'Triple Excellent standard', 'SELECT', NULL, false, false, false, 10, '[\"Triple Excellent (3EX)\", \"Excellent\", \"Very Good\", \"Good\"]'::jsonb),
+('c1000000-0000-0000-0000-000000000002', 'Fluorescence', 'fluorescence', 'Fluorescence', 'Reaction under UV light', 'SELECT', NULL, false, false, false, 11, '[\"None / Inert\", \"Faint\", \"Medium Blue\", \"Strong Blue\"]'::jsonb),
+('c1000000-0000-0000-0000-000000000002', 'Certification Available', 'is_certified', 'Official Certification Available', 'Independent laboratory dossier available', 'BOOLEAN', NULL, true, true, false, 12, '[]'::jsonb),
+('c1000000-0000-0000-0000-000000000002', 'Certificate Laboratory', 'certificate_lab', 'Grading Laboratory', 'Issuing gemological authority', 'SELECT', NULL, false, true, true, 13, '[\"GIA (Gemological Institute of America)\", \"IGI (International Gemological Institute)\", \"HRD Antwerp\", \"Gübelin Gem Lab\", \"SSEF Swiss Gemmological Institute\", \"GCAL\", \"Other\"]'::jsonb),
+('c1000000-0000-0000-0000-000000000002', 'Certificate Number', 'certificate_number', 'Certificate / Report Number', 'Unique report identifier', 'TEXT', NULL, false, false, true, 14, '[]'::jsonb)
+ON CONFLICT (category_id, slug) DO NOTHING;
+
+-- ==========================================
+-- 3. LUXURY & EXOTIC CARS ATTRIBUTES
+-- ==========================================
+INSERT INTO attribute_definitions (category_id, name, slug, label, description, data_type, unit, required, filterable, searchable, display_order, options)
+VALUES
+('c1000000-0000-0000-0000-000000000003', 'Make', 'make', 'Manufacturer / Make', 'Automotive marquee', 'TEXT', NULL, true, true, true, 1, '[]'::jsonb),
+('c1000000-0000-0000-0000-000000000003', 'Model', 'model', 'Model Name', 'Vehicle model designation', 'TEXT', NULL, true, true, true, 2, '[]'::jsonb),
+('c1000000-0000-0000-0000-000000000003', 'Variant', 'variant', 'Variant / Trim / Spec', 'Special trim or edition package', 'TEXT', NULL, false, true, true, 3, '[]'::jsonb),
+('c1000000-0000-0000-0000-000000000003', 'VIN / Chassis Number', 'vin_number', 'VIN / Chassis Number (Confidential)', '17-character VIN stored privately', 'TEXT', NULL, false, false, false, 4, '[]'::jsonb),
+('c1000000-0000-0000-0000-000000000003', 'Mileage', 'mileage', 'Odometer Mileage', 'Verified distance traveled', 'NUMBER', 'km', true, true, false, 5, '[]'::jsonb),
+('c1000000-0000-0000-0000-000000000003', 'Engine Type', 'engine_type', 'Engine Configuration', 'Engine displacement & cylinder layout', 'SELECT', NULL, true, true, true, 6, '[\"Naturally Aspirated V12\", \"Twin-Turbo V8\", \"Naturally Aspirated Flat-6\", \"Quad-Turbo W16\", \"Hybrid V8 + Triple Electric\", \"Pure Electric (EV)\", \"Twin-Turbo V6\", \"Naturally Aspirated V10\", \"Other\"]'::jsonb),
+('c1000000-0000-0000-0000-000000000003', 'Power Output', 'power_output', 'Total Power Output', 'Brake horsepower / PS', 'NUMBER', 'bhp', true, true, false, 7, '[]'::jsonb),
+('c1000000-0000-0000-0000-000000000003', 'Fuel Type', 'fuel_type', 'Fuel Type', 'Propulsion energy source', 'SELECT', NULL, true, true, false, 8, '[\"Petrol / Gasoline\", \"Plug-in Hybrid (PHEV)\", \"Hybrid\", \"All-Electric (BEV)\", \"Diesel\", \"Other\"]'::jsonb),
+('c1000000-0000-0000-0000-000000000003', 'Transmission', 'transmission', 'Transmission', 'Gearbox system', 'SELECT', NULL, true, true, false, 9, '[\"Dual-Clutch Automatic (PDK/DCT)\", \"Manual (Gated 6-Speed)\", \"Sequential Racing Box\", \"Automatic (Torque Converter)\", \"Single-Speed EV Direct\", \"Other\"]'::jsonb),
+('c1000000-0000-0000-0000-000000000003', 'Drivetrain', 'drivetrain', 'Drivetrain Configuration', 'Wheel drive configuration', 'SELECT', NULL, false, true, false, 10, '[\"Rear-Wheel Drive (RWD)\", \"All-Wheel Drive (AWD)\", \"Four-Wheel Drive (4WD)\", \"Front-Wheel Drive (FWD)\"]'::jsonb),
+('c1000000-0000-0000-0000-000000000003', 'Exterior Color', 'exterior_color', 'Exterior Paint / Livery', 'Factory paint name or bespoke PTS', 'TEXT', NULL, true, true, true, 11, '[]'::jsonb),
+('c1000000-0000-0000-0000-000000000003', 'Interior Color', 'interior_color', 'Interior Upholstery', 'Leather / Alcantara specifications', 'TEXT', NULL, false, false, false, 12, '[]'::jsonb),
+('c1000000-0000-0000-0000-000000000003', 'Previous Owners', 'previous_owners', 'Number of Previous Owners', 'Ownership history count', 'NUMBER', 'owners', false, true, false, 13, '[]'::jsonb),
+('c1000000-0000-0000-0000-000000000003', 'Accident History', 'accident_history', 'Accident / Damage History', 'Structural integrity history', 'SELECT', NULL, true, true, false, 14, '[\"Clean (Zero Accident History)\", \"Minor Cosmetic Blemish Restored\", \"Repaired with Official Records\"]'::jsonb)
+ON CONFLICT (category_id, slug) DO NOTHING;
+
+-- ==========================================
+-- 4. YACHTS & MARINE ATTRIBUTES
+-- ==========================================
+INSERT INTO attribute_definitions (category_id, name, slug, label, description, data_type, unit, required, filterable, searchable, display_order, options)
+VALUES
+('c1000000-0000-0000-0000-000000000004', 'Vessel Name', 'vessel_name', 'Vessel Name', 'Official boat or yacht title', 'TEXT', NULL, true, true, true, 1, '[]'::jsonb),
+('c1000000-0000-0000-0000-000000000004', 'Builder / Shipyard', 'builder', 'Builder / Shipyard', 'Naval manufacturer or shipyard', 'TEXT', NULL, true, true, true, 2, '[]'::jsonb),
+('c1000000-0000-0000-0000-000000000004', 'Vessel Type', 'vessel_type', 'Vessel Classification', 'Naval architecture type', 'SELECT', NULL, true, true, true, 3, '[\"Motor Yacht\", \"Sailing Yacht\", \"Catamaran (Sail)\", \"Power Catamaran\", \"Superyacht (40m+)\", \"Sportfly / Open Cruiser\", \"Explorer / Expedition\", \"Classic / Heritage Wooden\"]'::jsonb),
+('c1000000-0000-0000-0000-000000000004', 'Length Overall (LOA)', 'length_overall', 'Length Overall (LOA)', 'Total length from bow to stern', 'DECIMAL', 'meters', true, true, false, 4, '[]'::jsonb),
+('c1000000-0000-0000-0000-000000000004', 'Beam', 'beam', 'Beam Width', 'Maximum vessel width', 'DECIMAL', 'meters', true, false, false, 5, '[]'::jsonb),
+('c1000000-0000-0000-0000-000000000004', 'Draft', 'draft', 'Draft Depth', 'Water depth required to float', 'DECIMAL', 'meters', false, false, false, 6, '[]'::jsonb),
+('c1000000-0000-0000-0000-000000000004', 'Hull Material', 'hull_material', 'Hull Construction Material', 'Hull composite or alloy', 'SELECT', NULL, true, true, false, 7, '[\"GRP / Fiberglass\", \"Carbon Fiber Composite\", \"Aluminium\", \"Steel\", \"Wood / Composite\", \"Kevlar Reinforcement\"]'::jsonb),
+('c1000000-0000-0000-0000-000000000004', 'Engine Manufacturer', 'engine_make', 'Engine Manufacturer', 'Marine propulsion make', 'SELECT', NULL, true, true, true, 8, '[\"MTU\", \"Yanmar\", \"Caterpillar\", \"Volvo Penta\", \"MAN\", \"Cummins\", \"Mercury Racing\", \"Electric Pods\", \"Other\"]'::jsonb),
+('c1000000-0000-0000-0000-000000000004', 'Engine Hours', 'engine_hours', 'Engine Running Hours', 'Total operating hours logged', 'NUMBER', 'hours', true, true, false, 9, '[]'::jsonb),
+('c1000000-0000-0000-0000-000000000004', 'Cruising Speed', 'cruising_speed', 'Cruising Speed', 'Economic cruise speed', 'NUMBER', 'knots', false, true, false, 10, '[]'::jsonb),
+('c1000000-0000-0000-0000-000000000004', 'Maximum Speed', 'maximum_speed', 'Maximum Speed', 'Top velocity', 'NUMBER', 'knots', false, true, false, 11, '[]'::jsonb),
+('c1000000-0000-0000-0000-000000000004', 'Guest Cabins', 'guest_cabins', 'Guest Cabins Count', 'Staterooms count', 'NUMBER', 'cabins', true, true, false, 12, '[]'::jsonb),
+('c1000000-0000-0000-0000-000000000004', 'Heads / Bathrooms', 'heads_count', 'Heads / En-suite Bathrooms', 'Total bathrooms on board', 'NUMBER', 'heads', false, false, false, 13, '[]'::jsonb),
+('c1000000-0000-0000-0000-000000000004', 'VAT Status', 'vat_status', 'VAT / Tax Status', 'European or global maritime VAT compliance', 'SELECT', NULL, true, true, false, 14, '[\"VAT Paid\", \"VAT Not Paid\", \"Commercial Exemption\", \"Export Scheme Eligible\"]'::jsonb)
+ON CONFLICT (category_id, slug) DO NOTHING;

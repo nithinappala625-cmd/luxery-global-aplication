@@ -9,6 +9,8 @@ import { AuctionsModule } from './modules/auctions/auctions.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { ContactUnlocksModule } from './modules/contact-unlocks/contact-unlocks.module';
 import { AdminModule } from './modules/admin/admin.module';
+import { SellersModule } from './modules/sellers/sellers.module';
+import { AttributesModule } from './modules/attributes/attributes.module';
 
 @Module({
   imports: [
@@ -24,6 +26,8 @@ import { AdminModule } from './modules/admin/admin.module';
     PaymentsModule,
     ContactUnlocksModule,
     AdminModule,
+    SellersModule,
+    AttributesModule,
   ],
 })
 export class AppModule {}
