@@ -1164,4 +1164,96 @@ CREATE TABLE IF NOT EXISTS founding_sellers (
     approved_at TIMESTAMPTZ
 );
 
+-- ==============================================================================
+-- 13. ULTRA-LUXURY REAL ESTATE & PRIVATE ISLANDS
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS real_estate_listings (
+    id TEXT PRIMARY KEY,
+    title TEXT NOT NULL,
+    estate_type TEXT NOT NULL,
+    city TEXT NOT NULL,
+    country TEXT NOT NULL,
+    price_inr NUMERIC(16, 2) NOT NULL,
+    price_display TEXT NOT NULL,
+    plot_area_sq_ft NUMERIC(14, 2) NOT NULL,
+    built_up_area_sq_ft NUMERIC(14, 2) NOT NULL,
+    bedrooms INT NOT NULL,
+    bathrooms INT NOT NULL,
+    has_helipad BOOLEAN NOT NULL DEFAULT false,
+    has_private_marina BOOLEAN NOT NULL DEFAULT false,
+    has_armored_security_vault BOOLEAN NOT NULL DEFAULT false,
+    sovereign_freehold BOOLEAN NOT NULL DEFAULT true,
+    media_urls JSONB NOT NULL DEFAULT '[]'::jsonb,
+    highlights JSONB NOT NULL DEFAULT '[]'::jsonb,
+    description TEXT NOT NULL,
+    architectural_style TEXT,
+    seller_id TEXT NOT NULL,
+    seller_name TEXT NOT NULL,
+    verified_listing BOOLEAN NOT NULL DEFAULT true,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- ==============================================================================
+-- 14. HIGH-SECURITY LUXURY LOCKERS & ARMORED VAULTS
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS luxury_lockers (
+    id TEXT PRIMARY KEY,
+    title TEXT NOT NULL,
+    manufacturer TEXT NOT NULL,
+    vault_type TEXT NOT NULL,
+    security_rating TEXT NOT NULL,
+    locking_mechanism TEXT NOT NULL,
+    fire_rating_hours NUMERIC(4, 1) NOT NULL,
+    exterior_finish TEXT,
+    watch_winders_count INT NOT NULL DEFAULT 0,
+    weight_kg NUMERIC(8, 2) NOT NULL,
+    dimensions TEXT NOT NULL,
+    price_inr NUMERIC(16, 2) NOT NULL,
+    price_display TEXT NOT NULL,
+    media_urls JSONB NOT NULL DEFAULT '[]'::jsonb,
+    specifications JSONB NOT NULL DEFAULT '[]'::jsonb,
+    description TEXT NOT NULL,
+    seller_id TEXT NOT NULL,
+    seller_name TEXT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- ==============================================================================
+-- 15. ELITE CREW & AVIATION COMMAND
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS elite_crew_profiles (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    role TEXT NOT NULL,
+    credentials TEXT NOT NULL,
+    experience_years INT NOT NULL,
+    total_hours_or_miles INT NOT NULL,
+    languages JSONB NOT NULL DEFAULT '[]'::jsonb,
+    day_rate_inr NUMERIC(12, 2) NOT NULL,
+    day_rate_display TEXT NOT NULL,
+    monthly_retainer_inr NUMERIC(12, 2) NOT NULL,
+    monthly_retainer_display TEXT NOT NULL,
+    avatar_url TEXT NOT NULL,
+    bio TEXT NOT NULL,
+    verified_badge BOOLEAN NOT NULL DEFAULT true,
+    past_deployments JSONB NOT NULL DEFAULT '[]'::jsonb,
+    security_clearance TEXT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS crew_booking_requests (
+    id TEXT PRIMARY KEY,
+    crew_id TEXT REFERENCES elite_crew_profiles(id) ON DELETE CASCADE,
+    client_name TEXT NOT NULL,
+    client_contact TEXT NOT NULL,
+    service_type TEXT NOT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    operational_base TEXT NOT NULL,
+    special_instructions TEXT,
+    estimated_total_inr NUMERIC(14, 2) NOT NULL,
+    status TEXT NOT NULL DEFAULT 'PENDING_REVIEW',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 

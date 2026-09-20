@@ -16,6 +16,14 @@ class LuxeDriveScreen extends ConsumerStatefulWidget {
 
 class _LuxeDriveScreenState extends ConsumerState<LuxeDriveScreen> {
   final List<String> _cities = ['All', 'Mumbai', 'New Delhi', 'Bangalore', 'Hyderabad', 'Goa', 'Dubai Marina'];
+  final List<String> _occasions = [
+    'All Fleet',
+    'VIP Weddings & Marriages',
+    'Red Carpet Galas',
+    'Armored VIP Convoys',
+    'Supercar Track Days',
+  ];
+  String _selectedOccasion = 'All Fleet';
 
   void _openBookingSheet(RentalVehicle car) {
     DateTime startDate = DateTime.now().add(const Duration(days: 1));
@@ -207,17 +215,70 @@ class _LuxeDriveScreenState extends ConsumerState<LuxeDriveScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final state = ref.watch(rentalsProvider);
 
+    final filteredFleet = state.filteredFleet.where((car) {
+      if (_selectedOccasion == 'All Fleet') return true;
+      if (_selectedOccasion == 'VIP Weddings & Marriages') {
+        return car.brand.contains('Rolls-Royce') || car.brand.contains('Bentley') || car.brand.contains('Maybach');
+      }
+      if (_selectedOccasion == 'Red Carpet Galas') {
+        return car.brand.contains('Bentley') || car.brand.contains('Rolls-Royce') || car.brand.contains('Aston');
+      }
+      if (_selectedOccasion == 'Armored VIP Convoys') {
+        return car.brand.contains('Maybach') || car.brand.contains('Mercedes') || car.brand.contains('Land');
+      }
+      if (_selectedOccasion == 'Supercar Track Days') {
+        return car.brand.contains('Ferrari') || car.brand.contains('Lamborghini') || car.brand.contains('Porsche');
+      }
+      return true;
+    }).toList();
+
     return Scaffold(
+      backgroundColor: LuxuryColors.pureBlack,
       appBar: const LuxuryAppBar(
         title: 'NP LUXE DRIVE',
         showBack: true,
       ),
       body: Column(
         children: [
+          // Occasions / Event Filter Chips (Weddings, Galas, Convoys, Track)
+          Container(
+            height: 44,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            margin: const EdgeInsets.only(top: 8),
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: _occasions.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 8),
+              itemBuilder: (context, index) {
+                final occ = _occasions[index];
+                final isSelected = _selectedOccasion == occ;
+                return ChoiceChip(
+                  label: Text(
+                    occ.toUpperCase(),
+                    style: LuxuryTypography.microCaps.copyWith(
+                      color: isSelected ? LuxuryColors.pureBlack : LuxuryColors.platinum,
+                      fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                    ),
+                  ),
+                  selected: isSelected,
+                  selectedColor: LuxuryColors.gold,
+                  backgroundColor: const Color(0xFF141414),
+                  side: BorderSide(
+                    color: isSelected ? LuxuryColors.gold : LuxuryColors.borderDark,
+                    width: 0.8,
+                  ),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
+                  onSelected: (_) => setState(() => _selectedOccasion = occ),
+                );
+              },
+            ),
+          ),
+
           // City filter chips
           Container(
-            height: 48,
+            height: 44,
             padding: const EdgeInsets.symmetric(horizontal: 16),
+            margin: const EdgeInsets.symmetric(vertical: 4),
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: _cities.length,
@@ -226,10 +287,21 @@ class _LuxeDriveScreenState extends ConsumerState<LuxeDriveScreen> {
                 final city = _cities[index];
                 final isSelected = state.selectedCity == city;
                 return ChoiceChip(
-                  label: Text(city, style: TextStyle(fontSize: 12, color: isSelected ? Colors.black : (isDark ? Colors.white : Colors.black))),
+                  label: Text(
+                    city,
+                    style: LuxuryTypography.bodySmall.copyWith(
+                      fontSize: 11,
+                      color: isSelected ? LuxuryColors.pureBlack : LuxuryColors.mutedGrey,
+                    ),
+                  ),
                   selected: isSelected,
-                  selectedColor: LuxuryColors.champagne,
-                  backgroundColor: isDark ? const Color(0xFF1C1C1E) : const Color(0xFFEEEEEE),
+                  selectedColor: LuxuryColors.goldLight,
+                  backgroundColor: const Color(0xFF101010),
+                  side: BorderSide(
+                    color: isSelected ? LuxuryColors.goldLight : LuxuryColors.borderDark,
+                    width: 0.6,
+                  ),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
                   onSelected: (_) => ref.read(rentalsProvider.notifier).setCityFilter(city),
                 );
               },
@@ -239,10 +311,10 @@ class _LuxeDriveScreenState extends ConsumerState<LuxeDriveScreen> {
           Expanded(
             child: ListView.separated(
               padding: const EdgeInsets.all(20),
-              itemCount: state.filteredFleet.length,
+              itemCount: filteredFleet.length,
               separatorBuilder: (_, __) => const SizedBox(height: 20),
               itemBuilder: (context, index) {
-                final car = state.filteredFleet[index];
+                final car = filteredFleet[index];
                 return Container(
                   decoration: BoxDecoration(
                     color: isDark ? const Color(0xFF141414) : Colors.white,

@@ -7,147 +7,35 @@ class LuxuryTheme {
   LuxuryTheme._();
 
   // ==========================================
-  // LIGHT LUXURY THEME
+  // LIGHT LUXURY THEME (Sovereign Obsidian Gold Edition)
   // ==========================================
-  static ThemeData get lightTheme {
-    return ThemeData(
-      useMaterial3: true,
-      brightness: Brightness.light,
-      primaryColor: LuxuryColors.deepForestGreen,
-      scaffoldBackgroundColor: LuxuryColors.softIvory,
-      canvasColor: LuxuryColors.softIvory,
-      cardColor: LuxuryColors.pureWhite,
-      dividerColor: LuxuryColors.borderLight,
-
-      colorScheme: const ColorScheme.light(
-        primary: LuxuryColors.deepForestGreen,
-        onPrimary: LuxuryColors.pureWhite,
-        secondary: LuxuryColors.veryDarkGreen,
-        onSecondary: LuxuryColors.pureWhite,
-        tertiary: LuxuryColors.champagne,
-        onTertiary: LuxuryColors.pureBlack,
-        surface: LuxuryColors.pureWhite,
-        onSurface: LuxuryColors.pureBlack,
-        surfaceContainerHighest: Color(0xFFF0ECE1),
-        outline: LuxuryColors.borderLight,
-        outlineVariant: Color(0xFFE5E2D9),
-        error: LuxuryColors.rejectionRed,
-      ),
-
-      appBarTheme: AppBarTheme(
-        backgroundColor: LuxuryColors.softIvory,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        centerTitle: true,
-        iconTheme: const IconThemeData(color: LuxuryColors.pureBlack),
-        actionsIconTheme: const IconThemeData(color: LuxuryColors.pureBlack),
-        titleTextStyle: LuxuryTypography.editorialHeading2.copyWith(
-          color: LuxuryColors.pureBlack,
-          letterSpacing: 1.5,
-        ),
-        systemOverlayStyle: const SystemUiOverlayStyle(
-          statusBarColor: Colors.transparent,
-          statusBarIconBrightness: Brightness.dark,
-          statusBarBrightness: Brightness.light,
-        ),
-      ),
-
-      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        backgroundColor: LuxuryColors.pureWhite,
-        selectedItemColor: LuxuryColors.deepForestGreen,
-        unselectedItemColor: LuxuryColors.mutedGrey,
-        type: BottomNavigationBarType.fixed,
-        elevation: 12,
-      ),
-
-      cardTheme: CardThemeData(
-        color: LuxuryColors.pureWhite,
-        elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(2),
-          side: const BorderSide(color: LuxuryColors.borderLight, width: 0.8),
-        ),
-        margin: EdgeInsets.zero,
-      ),
-
-      dividerTheme: const DividerThemeData(
-        color: LuxuryColors.borderLight,
-        thickness: 0.8,
-        space: 1,
-      ),
-
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: LuxuryColors.deepForestGreen,
-          foregroundColor: LuxuryColors.pureWhite,
-          elevation: 0,
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(2),
-          ),
-          textStyle: LuxuryTypography.buttonLabel,
-        ),
-      ),
-
-      outlinedButtonTheme: OutlinedButtonThemeData(
-        style: OutlinedButton.styleFrom(
-          foregroundColor: LuxuryColors.deepForestGreen,
-          side: const BorderSide(color: LuxuryColors.deepForestGreen, width: 1.0),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(2),
-          ),
-          textStyle: LuxuryTypography.buttonLabel,
-        ),
-      ),
-
-      inputDecorationTheme: InputDecorationTheme(
-        filled: true,
-        fillColor: LuxuryColors.pureWhite,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        hintStyle: LuxuryTypography.bodyMedium.copyWith(color: LuxuryColors.mutedGrey),
-        labelStyle: LuxuryTypography.bodyMedium.copyWith(color: LuxuryColors.charcoal),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(2),
-          borderSide: const BorderSide(color: LuxuryColors.borderLight, width: 0.8),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(2),
-          borderSide: const BorderSide(color: LuxuryColors.borderLight, width: 0.8),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(2),
-          borderSide: const BorderSide(color: LuxuryColors.deepForestGreen, width: 1.2),
-        ),
-      ),
-    );
-  }
+  static ThemeData get lightTheme => darkTheme; // Enforce Sovereign Obsidian & Gold aesthetic universally
 
   // ==========================================
-  // DARK LUXURY THEME
+  // DARK LUXURY THEME (Pure Obsidian & 24K Gold)
   // ==========================================
   static ThemeData get darkTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
-      primaryColor: LuxuryColors.champagne,
+      primaryColor: LuxuryColors.gold,
       scaffoldBackgroundColor: LuxuryColors.pureBlack,
       canvasColor: LuxuryColors.pureBlack,
       cardColor: LuxuryColors.darkCard,
       dividerColor: LuxuryColors.borderDark,
 
       colorScheme: const ColorScheme.dark(
-        primary: LuxuryColors.champagne,
+        primary: LuxuryColors.gold,
         onPrimary: LuxuryColors.pureBlack,
-        secondary: LuxuryColors.deepForestGreen,
-        onSecondary: LuxuryColors.pureWhite,
-        tertiary: LuxuryColors.champagneLight,
+        secondary: LuxuryColors.champagne,
+        onSecondary: LuxuryColors.pureBlack,
+        tertiary: LuxuryColors.goldLight,
         onTertiary: LuxuryColors.pureBlack,
         surface: LuxuryColors.darkCard,
         onSurface: LuxuryColors.pureWhite,
-        surfaceContainerHighest: Color(0xFF1F1F1F),
+        surfaceContainerHighest: Color(0xFF1C1C1E),
         outline: LuxuryColors.borderDark,
-        outlineVariant: Color(0xFF383838),
+        outlineVariant: Color(0xFF333333),
         error: LuxuryColors.rejectionRed,
       ),
 
@@ -156,11 +44,12 @@ class LuxuryTheme {
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: true,
-        iconTheme: const IconThemeData(color: LuxuryColors.pureWhite),
-        actionsIconTheme: const IconThemeData(color: LuxuryColors.pureWhite),
+        iconTheme: const IconThemeData(color: LuxuryColors.gold),
+        actionsIconTheme: const IconThemeData(color: LuxuryColors.gold),
         titleTextStyle: LuxuryTypography.editorialHeading2.copyWith(
           color: LuxuryColors.pureWhite,
-          letterSpacing: 1.5,
+          letterSpacing: 2.0,
+          fontWeight: FontWeight.w600,
         ),
         systemOverlayStyle: const SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
@@ -170,18 +59,18 @@ class LuxuryTheme {
       ),
 
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        backgroundColor: Color(0xFF111111),
-        selectedItemColor: LuxuryColors.champagne,
-        unselectedItemColor: LuxuryColors.mutedGrey,
+        backgroundColor: Color(0xFF0C0C0C),
+        selectedItemColor: LuxuryColors.gold,
+        unselectedItemColor: Color(0xFF707070),
         type: BottomNavigationBarType.fixed,
-        elevation: 12,
+        elevation: 16,
       ),
 
       cardTheme: CardThemeData(
         color: LuxuryColors.darkCard,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(2),
+          borderRadius: BorderRadius.circular(4),
           side: const BorderSide(color: LuxuryColors.borderDark, width: 0.8),
         ),
         margin: EdgeInsets.zero,
@@ -195,32 +84,39 @@ class LuxuryTheme {
 
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: LuxuryColors.champagne,
+          backgroundColor: LuxuryColors.gold,
           foregroundColor: LuxuryColors.pureBlack,
-          elevation: 0,
+          elevation: 2,
+          shadowColor: LuxuryColors.gold.withValues(alpha: 0.3),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(2),
           ),
-          textStyle: LuxuryTypography.buttonLabel.copyWith(color: LuxuryColors.pureBlack),
+          textStyle: LuxuryTypography.buttonLabel.copyWith(
+            color: LuxuryColors.pureBlack,
+            fontWeight: FontWeight.w700,
+          ),
         ),
       ),
 
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: LuxuryColors.champagne,
-          side: const BorderSide(color: LuxuryColors.champagne, width: 1.0),
+          foregroundColor: LuxuryColors.gold,
+          side: const BorderSide(color: LuxuryColors.gold, width: 1.0),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(2),
           ),
-          textStyle: LuxuryTypography.buttonLabel.copyWith(color: LuxuryColors.champagne),
+          textStyle: LuxuryTypography.buttonLabel.copyWith(
+            color: LuxuryColors.gold,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
 
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: LuxuryColors.darkCard,
+        fillColor: LuxuryColors.darkCardElevated,
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         hintStyle: LuxuryTypography.bodyMedium.copyWith(color: LuxuryColors.mutedGrey),
         labelStyle: LuxuryTypography.bodyMedium.copyWith(color: LuxuryColors.pureWhite),
@@ -234,7 +130,7 @@ class LuxuryTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(2),
-          borderSide: const BorderSide(color: LuxuryColors.champagne, width: 1.2),
+          borderSide: const BorderSide(color: LuxuryColors.gold, width: 1.2),
         ),
       ),
     );

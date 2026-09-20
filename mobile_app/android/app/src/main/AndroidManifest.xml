@@ -5,7 +5,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.CAMERA"/>
     <application
-        android:label="Maison Du Luxe"
+        android:label="NP GROUPS"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

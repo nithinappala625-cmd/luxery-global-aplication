@@ -8,11 +8,12 @@ import 'providers/theme_provider.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Enforce elegant status bar styling
+  // Enforce elegant status bar styling for obsidian background
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
+      statusBarIconBrightness: Brightness.light,
+      statusBarBrightness: Brightness.dark,
     ),
   );
 

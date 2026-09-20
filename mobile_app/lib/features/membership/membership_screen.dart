@@ -10,14 +10,26 @@ import '../../providers/membership_provider.dart';
 class MembershipScreen extends ConsumerWidget {
   const MembershipScreen({super.key});
 
+  String _formatFee(double fee) {
+    if (fee >= 10000000) {
+      final cr = fee / 10000000;
+      return '₹${cr.toStringAsFixed(cr.truncateToDouble() == cr ? 0 : 1)} Crore';
+    } else if (fee >= 100000) {
+      final lk = fee / 100000;
+      return '₹${lk.toStringAsFixed(lk.truncateToDouble() == lk ? 0 : 1)} Lakh';
+    } else {
+      return '₹${fee.toInt()}';
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final state = ref.watch(membershipProvider);
 
     return Scaffold(
+      backgroundColor: LuxuryColors.pureBlack,
       appBar: const LuxuryAppBar(
-        title: 'NP MEMBERSHIP',
+        title: 'PATRON MEMBERSHIP',
         showBack: true,
       ),
       body: SingleChildScrollView(
@@ -25,18 +37,18 @@ class MembershipScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Current Status Header
+            // Current Patron Status Header
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: isDark
-                      ? [const Color(0xFF1E2820), const Color(0xFF0F1410)]
-                      : [const Color(0xFFE2EFE5), const Color(0xFFD4E5D8)],
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF1E180A), Color(0xFF0C0A04)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
                 borderRadius: BorderRadius.circular(4),
-                border: Border.all(color: LuxuryColors.champagne),
+                border: Border.all(color: LuxuryColors.gold, width: 1.2),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -45,9 +57,9 @@ class MembershipScreen extends ConsumerWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'CURRENT PATRON TIER',
+                        'CURRENT SOVEREIGN TIER',
                         style: LuxuryTypography.microCaps.copyWith(
-                          color: LuxuryColors.champagne,
+                          color: LuxuryColors.gold,
                           letterSpacing: 2.2,
                           fontWeight: FontWeight.bold,
                         ),
@@ -55,14 +67,13 @@ class MembershipScreen extends ConsumerWidget {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
-                          color: LuxuryColors.champagne,
+                          color: LuxuryColors.gold,
                           borderRadius: BorderRadius.circular(2),
                         ),
                         child: Text(
                           state.currentTier.title.toUpperCase(),
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 10,
+                          style: LuxuryTypography.microCaps.copyWith(
+                            color: LuxuryColors.pureBlack,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -72,16 +83,19 @@ class MembershipScreen extends ConsumerWidget {
                   const SizedBox(height: 12),
                   Text(
                     state.hasUnlimitedCredits
-                        ? 'Unlimited Contact Unlocks & VIP Deal Desk'
-                        : '${state.remainingContactCredits} Contact Unlocks Available',
-                    style: LuxuryTypography.editorialHeading2.copyWith(fontSize: 18),
+                        ? 'Unlimited Sovereign Contact Unlocks & Deal Room'
+                        : '${state.remainingContactCredits} Sovereign Contact Unlocks Available',
+                    style: LuxuryTypography.editorialHeading2.copyWith(
+                      color: LuxuryColors.pureWhite,
+                      fontSize: 18,
+                    ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 6),
                   Text(
-                    state.currentTier.subtitle,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: isDark ? Colors.white70 : Colors.black87,
+                    state.currentTier.buyingPower,
+                    style: LuxuryTypography.bodySmall.copyWith(
+                      color: LuxuryColors.goldLight,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ],
@@ -91,40 +105,44 @@ class MembershipScreen extends ConsumerWidget {
             const SizedBox(height: 32),
 
             Text(
-              'SELECT YOUR PATRONAGE TIER',
+              'ACQUISITION AUTHORITY & PRIVILEGES',
               style: LuxuryTypography.microCaps.copyWith(
-                color: LuxuryColors.champagne,
+                color: LuxuryColors.gold,
                 letterSpacing: 2.2,
               ),
             ),
             const SizedBox(height: 6),
             Text(
-              'THE PRIVILEGES',
-              style: LuxuryTypography.editorialHeading2.copyWith(
-                color: isDark ? LuxuryColors.pureWhite : LuxuryColors.pureBlack,
+              'THE FOUR WEALTH TIERS',
+              style: LuxuryTypography.editorialHeading1.copyWith(
+                color: LuxuryColors.pureWhite,
               ),
             ),
+            const SizedBox(height: 8),
+            Text(
+              'Membership fee scales strictly according to verified portfolio acquisition capacity.',
+              style: LuxuryTypography.bodyMedium.copyWith(color: LuxuryColors.mutedGrey),
+            ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
 
-            // The 3 Plans
+            // The 4 Plans
             ...state.availablePlans.map((plan) {
               final isCurrent = state.currentTier == plan.tier;
+              final isDynasty = plan.tier == MembershipTier.dynasty;
               final isBlack = plan.tier == MembershipTier.black;
 
               return Container(
-                margin: const EdgeInsets.only(bottom: 20),
+                margin: const EdgeInsets.only(bottom: 24),
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: isBlack
-                      ? (isDark ? const Color(0xFF0F0F0F) : const Color(0xFF161616))
-                      : (isDark ? const Color(0xFF141414) : Colors.white),
+                  color: isDynasty
+                      ? const Color(0xFF141005)
+                      : (isBlack ? const Color(0xFF0F0F0F) : LuxuryColors.darkCard),
                   borderRadius: BorderRadius.circular(4),
                   border: Border.all(
-                    color: isBlack
-                        ? LuxuryColors.champagne
-                        : (isDark ? LuxuryColors.borderDark : LuxuryColors.borderLight),
-                    width: isBlack ? 1.5 : 0.8,
+                    color: (isDynasty || isBlack) ? LuxuryColors.gold : LuxuryColors.borderDark,
+                    width: isDynasty ? 1.8 : (isBlack ? 1.2 : 0.8),
                   ),
                 ),
                 child: Column(
@@ -133,49 +151,86 @@ class MembershipScreen extends ConsumerWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          plan.tier.title,
-                          style: LuxuryTypography.editorialHeading2.copyWith(
-                            fontSize: 20,
-                            color: isBlack ? LuxuryColors.champagne : (isDark ? Colors.white : Colors.black),
+                        Expanded(
+                          child: Text(
+                            plan.tier.title,
+                            style: LuxuryTypography.editorialHeading2.copyWith(
+                              fontSize: 20,
+                              color: (isDynasty || isBlack) ? LuxuryColors.gold : LuxuryColors.pureWhite,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                         if (isCurrent)
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
-                              color: LuxuryColors.champagne.withOpacity(0.2),
+                              color: LuxuryColors.gold.withOpacity(0.2),
                               borderRadius: BorderRadius.circular(2),
+                              border: Border.all(color: LuxuryColors.gold, width: 0.8),
                             ),
-                            child: const Text('ACTIVE', style: TextStyle(color: LuxuryColors.champagne, fontSize: 10, fontWeight: FontWeight.bold)),
+                            child: const Text('ACTIVE', style: TextStyle(color: LuxuryColors.gold, fontSize: 10, fontWeight: FontWeight.bold)),
                           ),
                       ],
                     ),
                     const SizedBox(height: 6),
-                    Text(
-                      '₹ ${(plan.monthlyPriceInr / 1000).toStringAsFixed(0)}K / Month  (₹ ${(plan.annualPriceInr / 100000).toStringAsFixed(1)}L Annual)',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: LuxuryColors.champagne,
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF1C1C1E),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                      child: Text(
+                        plan.buyingPowerLimit.toUpperCase(),
+                        style: LuxuryTypography.microCaps.copyWith(
+                          color: LuxuryColors.goldLight,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 10),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
+                      children: [
+                        Text(
+                          _formatFee(plan.monthlyPriceInr),
+                          style: LuxuryTypography.priceLarge.copyWith(
+                            color: LuxuryColors.pureWhite,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 22,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          '/ Month',
+                          style: LuxuryTypography.bodySmall.copyWith(color: LuxuryColors.mutedGrey),
+                        ),
+                        const Spacer(),
+                        Text(
+                          '${_formatFee(plan.annualPriceInr)} Annual',
+                          style: LuxuryTypography.microCaps.copyWith(color: LuxuryColors.gold),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    const Divider(color: LuxuryColors.borderDark, height: 1),
+                    const SizedBox(height: 14),
+
                     ...plan.perks.map((perk) {
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 4),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Icon(Icons.check, size: 16, color: LuxuryColors.champagne),
+                            const Icon(Icons.check, size: 16, color: LuxuryColors.gold),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
                                 perk,
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: isBlack ? Colors.white70 : (isDark ? Colors.white70 : Colors.black87),
-                                  height: 1.3,
+                                style: LuxuryTypography.bodySmall.copyWith(
+                                  color: LuxuryColors.platinum,
+                                  height: 1.35,
                                 ),
                               ),
                             ),
@@ -183,19 +238,20 @@ class MembershipScreen extends ConsumerWidget {
                         ),
                       );
                     }),
-                    const SizedBox(height: 18),
+                    const SizedBox(height: 20),
+
                     LuxuryButton(
-                      text: isCurrent ? 'CURRENT PATRON TIER' : 'UPGRADE TO ${plan.tier.title.toUpperCase()}',
-                      variant: isBlack ? LuxuryButtonVariant.gold : LuxuryButtonVariant.secondary,
-                      height: 42,
+                      text: isCurrent ? 'CURRENT PATRON TIER' : 'ACTIVATE ${plan.tier.title.toUpperCase()}',
+                      backgroundColor: isCurrent ? const Color(0xFF222222) : LuxuryColors.gold,
+                      textColor: isCurrent ? LuxuryColors.mutedGrey : LuxuryColors.pureBlack,
                       onPressed: isCurrent
                           ? null
                           : () async {
                               await ref.read(membershipProvider.notifier).upgradePlan(plan.tier);
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text('Upgraded to ${plan.tier.title}! All privileges unlocked instantly.'),
-                                  backgroundColor: LuxuryColors.deepForestGreen,
+                                  content: Text('Upgraded to ${plan.tier.title}! All wealth privileges active.'),
+                                  backgroundColor: const Color(0xFF161616),
                                 ),
                               );
                             },

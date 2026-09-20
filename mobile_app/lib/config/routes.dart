@@ -19,6 +19,9 @@ import '../features/membership/membership_screen.dart';
 import '../features/navigation/main_scaffold.dart';
 import '../features/profile/profile_screen.dart';
 import '../features/rentals/luxe_drive_screen.dart';
+import '../features/real_estate/real_estate_screen.dart';
+import '../features/lockers/lockers_screen.dart';
+import '../features/crew/crew_booking_screen.dart';
 import '../features/sell/sell_wizard_screen.dart';
 import '../features/sell/seller_dashboard_screen.dart';
 import '../features/sell/seller_registration_screen.dart';
@@ -194,6 +197,21 @@ final appRouter = GoRouter(
       parentNavigatorKey: _rootNavigatorKey,
       path: '/membership',
       builder: (context, state) => const MembershipScreen(),
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: '/real-estate',
+      builder: (context, state) => const RealEstateScreen(),
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: '/lockers',
+      builder: (context, state) => const LockersScreen(),
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: '/crew',
+      builder: (context, state) => const CrewBookingScreen(),
     ),
     GoRoute(
       parentNavigatorKey: _rootNavigatorKey,

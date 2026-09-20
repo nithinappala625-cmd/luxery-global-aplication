@@ -15,7 +15,8 @@ class MembershipState {
     this.isSubscribing = false,
   });
 
-  bool get hasUnlimitedCredits => currentTier == MembershipTier.black;
+  bool get hasUnlimitedCredits =>
+      currentTier == MembershipTier.black || currentTier == MembershipTier.dynasty;
 
   MembershipState copyWith({
     MembershipTier? currentTier,
@@ -43,9 +44,9 @@ class MembershipNotifier extends StateNotifier<MembershipState> {
     state = state.copyWith(isSubscribing: true);
     await Future.delayed(const Duration(milliseconds: 700));
 
-    final credits = newTier == MembershipTier.black
-        ? 999
-        : (newTier == MembershipTier.prive ? 12 : 3);
+    final credits = (newTier == MembershipTier.black || newTier == MembershipTier.dynasty)
+        ? 9999
+        : (newTier == MembershipTier.prive ? 25 : 5);
 
     state = state.copyWith(
       currentTier: newTier,

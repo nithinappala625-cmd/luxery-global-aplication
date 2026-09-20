@@ -18,6 +18,8 @@ class LuxuryButton extends StatelessWidget {
   final Widget? icon;
   final double? width;
   final double height;
+  final Color? backgroundColor;
+  final Color? textColor;
 
   const LuxuryButton({
     super.key,
@@ -28,6 +30,8 @@ class LuxuryButton extends StatelessWidget {
     this.icon,
     this.width,
     this.height = 52,
+    this.backgroundColor,
+    this.textColor,
   });
 
   @override
@@ -58,10 +62,13 @@ class LuxuryButton extends StatelessWidget {
         fg = isDark ? LuxuryColors.pureWhite : LuxuryColors.pureBlack;
         break;
       case LuxuryButtonVariant.gold:
-        bg = LuxuryColors.champagne;
+        bg = LuxuryColors.gold;
         fg = LuxuryColors.pureBlack;
         break;
     }
+
+    if (backgroundColor != null) bg = backgroundColor!;
+    if (textColor != null) fg = textColor!;
 
     Widget content = Row(
       mainAxisSize: MainAxisSize.min,

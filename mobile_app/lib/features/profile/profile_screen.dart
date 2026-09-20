@@ -113,11 +113,11 @@ class ProfileScreen extends ConsumerWidget {
                   ),
                 ),
                 subtitle: Text(
-                  isDark ? 'Pure Black & Brushed Champagne' : 'Soft Ivory & Deep Forest Green',
+                  isDark ? 'Obsidian Black & 24K Royal Gold' : 'Sovereign Obsidian Gold Edition',
                   style: LuxuryTypography.bodySmall.copyWith(color: LuxuryColors.mutedGrey),
                 ),
                 value: isDark,
-                activeColor: LuxuryColors.champagne,
+                activeColor: LuxuryColors.gold,
                 onChanged: (val) {
                   ref.read(themeModeProvider.notifier).toggleTheme();
                 },
@@ -189,8 +189,26 @@ class ProfileScreen extends ConsumerWidget {
             _buildProfileMenuItem(
               context,
               icon: Icons.workspace_premium_outlined,
-              title: 'NP Memberships (Access, Privé, Black)',
+              title: 'NP Sovereign Wealth Memberships (4 Tiers)',
               onTap: () => context.push('/membership'),
+            ),
+            _buildProfileMenuItem(
+              context,
+              icon: Icons.villa_outlined,
+              title: 'Real Estate & Private Islands',
+              onTap: () => context.push('/real-estate'),
+            ),
+            _buildProfileMenuItem(
+              context,
+              icon: Icons.lock_outline,
+              title: 'High-Security Luxury Lockers & Vaults',
+              onTap: () => context.push('/lockers'),
+            ),
+            _buildProfileMenuItem(
+              context,
+              icon: Icons.badge_outlined,
+              title: 'Elite Crew, Jet Pilots & Armed Escorts',
+              onTap: () => context.push('/crew'),
             ),
             _buildProfileMenuItem(
               context,
@@ -213,7 +231,7 @@ class ProfileScreen extends ConsumerWidget {
             _buildProfileMenuItem(
               context,
               icon: Icons.directions_car_filled_outlined,
-              title: 'NP LUXE DRIVE (Supercar Fleet Rentals)',
+              title: 'NP LUXE DRIVE (Weddings, Galas & Convoys)',
               onTap: () => context.push('/rentals'),
             ),
             _buildProfileMenuItem(
