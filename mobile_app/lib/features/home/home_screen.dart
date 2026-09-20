@@ -99,6 +99,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             if (_selectedMode == 'BUY') ...[
               _buildBuySubcategoryPills(isDark),
               const SizedBox(height: 20),
+              _buildWealthTierMembershipCard(isDark),
+              const SizedBox(height: 24),
               _buildBuySection(isDark, categories, realEstateState, lockersState, auctionsState, listings, aviationState),
             ] else if (_selectedMode == 'RENT') ...[
               _buildRentSection(isDark, rentalsState, aviationState, crewState),
@@ -106,8 +108,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               _buildSellConsignSection(isDark),
             ],
 
-            const SizedBox(height: 36),
-            _buildWealthTierMembershipCard(isDark),
             const SizedBox(height: 36),
             _buildPrivateRequestBanner(isDark),
             const SizedBox(height: 36),
@@ -305,13 +305,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ),
         const SizedBox(height: 12),
-        SizedBox(
-          height: 155,
-          child: ListView.separated(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            scrollDirection: Axis.horizontal,
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
             itemCount: categories.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 14),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 1.35,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+            ),
             itemBuilder: (context, index) {
               final cat = categories[index];
               return GestureDetector(
@@ -336,7 +341,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   }
                 },
                 child: Container(
-                  width: 140,
                   decoration: BoxDecoration(
                     color: cardBg,
                     borderRadius: BorderRadius.circular(4),
@@ -354,21 +358,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      ClipRRect(
-                        borderRadius: const BorderRadius.vertical(top: Radius.circular(3)),
-                        child: Image.network(
-                          cat.bannerUrl,
-                          height: 85,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => Container(
-                            height: 85,
-                            color: isDark ? const Color(0xFF1E1E1E) : const Color(0xFFEFEFEF),
+                      Expanded(
+                        child: ClipRRect(
+                          borderRadius: const BorderRadius.vertical(top: Radius.circular(3)),
+                          child: Image.network(
+                            cat.bannerUrl,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => Container(
+                              color: isDark ? const Color(0xFF1E1E1E) : const Color(0xFFEFEFEF),
+                            ),
                           ),
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -377,8 +381,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: LuxuryTypography.bodyMedium.copyWith(
-                                fontSize: 11.5,
-                                fontWeight: FontWeight.w600,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
                                 color: textPrimary,
                               ),
                             ),
@@ -388,7 +392,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: LuxuryTypography.bodySmall.copyWith(
-                                fontSize: 9.5,
+                                fontSize: 10,
                                 color: goldAccent,
                               ),
                             ),
@@ -429,19 +433,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ),
         const SizedBox(height: 12),
-        SizedBox(
-          height: 260,
-          child: ListView.separated(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            scrollDirection: Axis.horizontal,
-            itemCount: realEstateState.listings.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 14),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: realEstateState.listings.take(4).length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 0.68,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+            ),
             itemBuilder: (context, index) {
               final prop = realEstateState.listings[index];
               return GestureDetector(
                 onTap: () => context.push('/real-estate'),
                 child: Container(
-                  width: 260,
                   decoration: BoxDecoration(
                     color: cardBg,
                     borderRadius: BorderRadius.circular(4),
@@ -465,14 +473,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             borderRadius: const BorderRadius.vertical(top: Radius.circular(3)),
                             child: LuxuryImage(
                               imageUrl: prop.mediaUrls.first,
-                              height: 140,
+                              height: 120,
                               width: double.infinity,
                               fit: BoxFit.cover,
                             ),
                           ),
                           Positioned(
-                            top: 8,
-                            left: 8,
+                            top: 6,
+                            left: 6,
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                               decoration: BoxDecoration(
@@ -483,7 +491,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 prop.estateType.toUpperCase(),
                                 style: LuxuryTypography.microCaps.copyWith(
                                   color: LuxuryColors.goldLight,
-                                  fontSize: 8.5,
+                                  fontSize: 8,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -491,44 +499,44 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           ),
                           if (prop.hasHelipad)
                             Positioned(
-                              top: 8,
-                              right: 8,
+                              top: 6,
+                              right: 6,
                               child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
                                 decoration: BoxDecoration(
                                   color: LuxuryColors.gold.withValues(alpha: 0.9),
                                   borderRadius: BorderRadius.circular(2),
                                 ),
                                 child: const Text(
                                   '🚁 HELIPAD',
-                                  style: TextStyle(color: Colors.black, fontSize: 8, fontWeight: FontWeight.bold),
+                                  style: TextStyle(color: Colors.black, fontSize: 7.5, fontWeight: FontWeight.bold),
                                 ),
                               ),
                             ),
                         ],
                       ),
                       Padding(
-                        padding: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(8),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               prop.title,
-                              maxLines: 1,
+                              maxLines: 2,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(fontWeight: FontWeight.bold, color: textPrimary, fontSize: 13),
+                              style: TextStyle(fontWeight: FontWeight.bold, color: textPrimary, fontSize: 11.5, height: 1.2),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               prop.priceDisplay,
-                              style: TextStyle(color: goldAccent, fontWeight: FontWeight.bold, fontSize: 12.5),
+                              style: TextStyle(color: goldAccent, fontWeight: FontWeight.bold, fontSize: 11),
                             ),
                             const SizedBox(height: 2),
                             Text(
                               '${prop.location} • ${prop.builtUpAreaSqFt.toInt()} sq ft',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(color: textSecondary, fontSize: 10.5),
+                              style: TextStyle(color: textSecondary, fontSize: 9.5),
                             ),
                           ],
                         ),
@@ -567,19 +575,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ),
         const SizedBox(height: 12),
-        SizedBox(
-          height: 260,
-          child: ListView.separated(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            scrollDirection: Axis.horizontal,
-            itemCount: aviationState.jets.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 14),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: aviationState.jets.take(4).length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 0.68,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+            ),
             itemBuilder: (context, index) {
               final jet = aviationState.jets[index];
+              final isHeli = jet.model.toLowerCase().contains('helicopter') || jet.model.toLowerCase().contains('s-76') || jet.model.toLowerCase().contains('ach130');
               return GestureDetector(
                 onTap: () => context.push('/aviation'),
                 child: Container(
-                  width: 260,
                   decoration: BoxDecoration(
                     color: cardBg,
                     borderRadius: BorderRadius.circular(4),
@@ -603,14 +616,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             borderRadius: const BorderRadius.vertical(top: Radius.circular(3)),
                             child: LuxuryImage(
                               imageUrl: jet.imageUrl,
-                              height: 140,
+                              height: 120,
                               width: double.infinity,
                               fit: BoxFit.cover,
                             ),
                           ),
                           Positioned(
-                            top: 8,
-                            left: 8,
+                            top: 6,
+                            left: 6,
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                               decoration: BoxDecoration(
@@ -618,10 +631,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                 borderRadius: BorderRadius.circular(2),
                               ),
                               child: Text(
-                                jet.category.toUpperCase(),
+                                isHeli ? 'VIP HELICOPTER' : 'PRIVATE JET',
                                 style: LuxuryTypography.microCaps.copyWith(
                                   color: LuxuryColors.goldLight,
-                                  fontSize: 8.5,
+                                  fontSize: 8,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -630,25 +643,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         ],
                       ),
                       Padding(
-                        padding: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(8),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               jet.model,
-                              maxLines: 1,
+                              maxLines: 2,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(fontWeight: FontWeight.bold, color: textPrimary, fontSize: 13),
+                              style: TextStyle(fontWeight: FontWeight.bold, color: textPrimary, fontSize: 11.5, height: 1.2),
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              '₹${(jet.purchasePrice / 10000000).toStringAsFixed(1)} Cr Acquisition',
-                              style: TextStyle(color: goldAccent, fontWeight: FontWeight.bold, fontSize: 12.5),
+                              '₹${(jet.purchasePrice / 10000000).toStringAsFixed(1)} Cr',
+                              style: TextStyle(color: goldAccent, fontWeight: FontWeight.bold, fontSize: 11),
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              '${jet.rangeNm} nm Range • ${jet.passengerCapacity} VIP Seats',
-                              style: TextStyle(color: textSecondary, fontSize: 10.5),
+                              '${jet.rangeNm} nm • ${jet.passengerCapacity} VIP Seats',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(color: textSecondary, fontSize: 9.5),
                             ),
                           ],
                         ),
@@ -687,19 +702,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ),
         const SizedBox(height: 12),
-        SizedBox(
-          height: 260,
-          child: ListView.separated(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            scrollDirection: Axis.horizontal,
-            itemCount: lockersState.lockers.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 14),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: lockersState.lockers.take(4).length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 0.68,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+            ),
             itemBuilder: (context, index) {
               final locker = lockersState.lockers[index];
               return GestureDetector(
                 onTap: () => context.push('/lockers'),
                 child: Container(
-                  width: 250,
                   decoration: BoxDecoration(
                     color: cardBg,
                     borderRadius: BorderRadius.circular(4),
@@ -721,33 +740,33 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         borderRadius: const BorderRadius.vertical(top: Radius.circular(3)),
                         child: LuxuryImage(
                           imageUrl: locker.mediaUrls.first,
-                          height: 135,
+                          height: 120,
                           width: double.infinity,
                           fit: BoxFit.cover,
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(8),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               locker.title,
-                              maxLines: 1,
+                              maxLines: 2,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(fontWeight: FontWeight.bold, color: textPrimary, fontSize: 12.5),
+                              style: TextStyle(fontWeight: FontWeight.bold, color: textPrimary, fontSize: 11.5, height: 1.2),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               locker.priceDisplay,
-                              style: TextStyle(color: goldAccent, fontWeight: FontWeight.bold, fontSize: 12),
+                              style: TextStyle(color: goldAccent, fontWeight: FontWeight.bold, fontSize: 11),
                             ),
                             const SizedBox(height: 2),
                             Text(
                               '${locker.manufacturer} • ${locker.securityRating}',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(color: textSecondary, fontSize: 10.5),
+                              style: TextStyle(color: textSecondary, fontSize: 9.5),
                             ),
                           ],
                         ),
@@ -939,19 +958,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ),
         const SizedBox(height: 12),
-        SizedBox(
-          height: 255,
-          child: ListView.separated(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            scrollDirection: Axis.horizontal,
-            itemCount: rentalsState.vehicles.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 14),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: rentalsState.vehicles.take(4).length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 0.68,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+            ),
             itemBuilder: (context, index) {
               final car = rentalsState.vehicles[index];
               return GestureDetector(
                 onTap: () => context.push('/rentals'),
                 child: Container(
-                  width: 240,
                   decoration: BoxDecoration(
                     color: cardBg,
                     borderRadius: BorderRadius.circular(4),
@@ -973,31 +996,33 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         borderRadius: const BorderRadius.vertical(top: Radius.circular(3)),
                         child: LuxuryImage(
                           imageUrl: car.coverImageUrl,
-                          height: 135,
+                          height: 120,
                           width: double.infinity,
                           fit: BoxFit.cover,
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(8),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               car.title,
-                              maxLines: 1,
+                              maxLines: 2,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(fontWeight: FontWeight.bold, color: textPrimary, fontSize: 13),
+                              style: TextStyle(fontWeight: FontWeight.bold, color: textPrimary, fontSize: 11.5, height: 1.2),
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              '₹${(car.dailyRate / 1000).toInt()}K / Day Escort',
-                              style: TextStyle(color: goldAccent, fontWeight: FontWeight.w600, fontSize: 11.5),
+                              '₹${(car.dailyRate / 1000).toInt()}K / Day',
+                              style: TextStyle(color: goldAccent, fontWeight: FontWeight.w600, fontSize: 11),
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              'VIP Marriage & Chauffeur Protocol',
-                              style: TextStyle(color: textSecondary, fontSize: 10),
+                              'Chauffeur & Protocol Escort',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(color: textSecondary, fontSize: 9.5),
                             ),
                           ],
                         ),
@@ -1036,23 +1061,36 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ),
         const SizedBox(height: 12),
-        SizedBox(
-          height: 260,
-          child: ListView.separated(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            scrollDirection: Axis.horizontal,
-            itemCount: aviationState.jets.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 14),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: aviationState.jets.take(4).length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 0.68,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+            ),
             itemBuilder: (context, index) {
               final jet = aviationState.jets[index];
               return GestureDetector(
                 onTap: () => context.push('/aviation'),
                 child: Container(
-                  width: 250,
                   decoration: BoxDecoration(
                     color: cardBg,
                     borderRadius: BorderRadius.circular(4),
                     border: Border.all(color: borderColor, width: 0.8),
+                    boxShadow: isDark
+                        ? []
+                        : [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.04),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1061,31 +1099,33 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         borderRadius: const BorderRadius.vertical(top: Radius.circular(3)),
                         child: LuxuryImage(
                           imageUrl: jet.imageUrl,
-                          height: 135,
+                          height: 120,
                           width: double.infinity,
                           fit: BoxFit.cover,
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(8),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               jet.model,
-                              maxLines: 1,
+                              maxLines: 2,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(fontWeight: FontWeight.bold, color: textPrimary, fontSize: 13),
+                              style: TextStyle(fontWeight: FontWeight.bold, color: textPrimary, fontSize: 11.5, height: 1.2),
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              '₹${(jet.hourlyCharterRate / 1000).toInt()}K / Flight Hour',
-                              style: TextStyle(color: goldAccent, fontWeight: FontWeight.w600, fontSize: 11.5),
+                              '₹${(jet.hourlyCharterRate / 1000).toInt()}K / Flight Hr',
+                              style: TextStyle(color: goldAccent, fontWeight: FontWeight.w600, fontSize: 11),
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              'Worldwide VIP Dispatch Available',
-                              style: TextStyle(color: textSecondary, fontSize: 10),
+                              'VIP Dispatch Worldwide',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(color: textSecondary, fontSize: 9.5),
                             ),
                           ],
                         ),
