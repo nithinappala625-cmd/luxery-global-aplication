@@ -1,12 +1,12 @@
 {
-  "name": "maison-du-luxe-web-portal",
-  "version": "1.0.0",
-  "description": "Maison Du Luxe Web Showcase, OAuth Callback & Super Admin Portal",
+  "name": "np-groups-global-luxury-portal",
+  "version": "2.0.0",
+  "description": "NP GROUPS Global Luxury Legacy Platform — Web Portal & Super Admin",
   "scripts": {
     "dev": "npx serve .",
     "start": "npx serve ."
   },
-  "keywords": ["luxury", "marketplace", "vercel", "supabase"],
-  "author": "Maison Du Luxe",
+  "keywords": ["luxury", "syndicate", "marketplace", "vercel"],
+  "author": "NP GROUPS",
   "license": "UNLICENSED"
 }
