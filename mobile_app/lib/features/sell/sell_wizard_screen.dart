@@ -1,6 +1,9 @@
+import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../core/constants/colors.dart';
 import '../../core/constants/typography.dart';
 import '../../core/widgets/luxury_app_bar.dart';
@@ -49,11 +52,14 @@ class _SellWizardScreenState extends ConsumerState<SellWizardScreen> {
   final _cityController = TextEditingController(text: 'Cannes');
   final _countryController = TextEditingController(text: 'France');
 
-  // Step 6: Photos (Simulated Cloudflare R2 Presigned Direct Upload)
+  // Step 6: Photos & Video (Cloudflare R2 Direct Upload)
+  final ImagePicker _mediaPicker = ImagePicker();
   final List<String> _uploadedImageUrls = [
     'https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=1200&auto=format&fit=crop',
     'https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?q=80&w=1200&auto=format&fit=crop',
   ];
+  String? _uploadedVideoPath;
+  String? _uploadedVideoName;
   bool _isUploadingToR2 = false;
 
   // Step 7: Documents
@@ -175,6 +181,7 @@ class _SellWizardScreenState extends ConsumerState<SellWizardScreen> {
           sortOrder: e.key + 1,
         );
       }).toList(),
+      videoUrl: _uploadedVideoPath,
       specifications: dynamicSpecs,
       seller: currentSeller != null
           ? SellerSnippet(
@@ -596,7 +603,7 @@ class _SellWizardScreenState extends ConsumerState<SellWizardScreen> {
         const SizedBox(height: 8),
         Wrap(
           spacing: 8,
-          children: ['EUR', 'USD', 'GBP', 'CHF', 'AED'].map((curr) {
+          children: ['EUR', 'USD', 'GBP', 'CHF', 'AED', 'INR'].map((curr) {
             final isSelected = _selectedCurrency == curr;
             return GestureDetector(
               onTap: () => setState(() => _selectedCurrency = curr),
@@ -650,19 +657,19 @@ class _SellWizardScreenState extends ConsumerState<SellWizardScreen> {
         LuxuryTextField(
           controller: _cityController,
           label: 'CITY / HARBOR / VAULT LOCATION',
-          hintText: 'e.g. Cannes, Geneva, London, Dubai',
+          hintText: 'e.g. Cannes, Geneva, London, Dubai, Mumbai',
         ),
         const SizedBox(height: 16),
         LuxuryTextField(
           controller: _countryController,
           label: 'COUNTRY / JURISDICTION',
-          hintText: 'e.g. France, Switzerland, United Kingdom, UAE',
+          hintText: 'e.g. France, Switzerland, United Kingdom, UAE, India',
         ),
       ],
     );
   }
 
-  // Step 6: Photos (Cloudflare R2)
+  // Step 6: Photos & Video (Cloudflare R2)
   Widget _buildStep6Photos() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -674,24 +681,69 @@ class _SellWizardScreenState extends ConsumerState<SellWizardScreen> {
         Text('Media is securely presigned via NestJS and uploaded directly to Cloudflare R2.',
             style: LuxuryTypography.bodySmall.copyWith(color: LuxuryColors.mutedGrey)),
         const SizedBox(height: 20),
-        // Upload button
-        LuxuryButton(
-          text: 'ATTACH HIGH-RES PHOTOGRAPHY',
-          variant: LuxuryButtonVariant.outline,
-          icon: const Icon(Icons.cloud_upload_outlined, size: 18),
-          isLoading: _isUploadingToR2,
-          onPressed: () async {
-            setState(() => _isUploadingToR2 = true);
-            await Future.delayed(const Duration(milliseconds: 1000));
-            if (mounted) {
-              setState(() {
-                _isUploadingToR2 = false;
-                _uploadedImageUrls.add(
-                  'https://images.unsplash.com/photo-1506929562872-bb421503ef21?q=80&w=1200&auto=format&fit=crop',
-                );
-              });
-            }
-          },
+        // Action Buttons: Photos and Video
+        Row(
+          children: [
+            Expanded(
+              child: LuxuryButton(
+                text: 'GALLERY PHOTOS',
+                variant: LuxuryButtonVariant.outline,
+                icon: const Icon(Icons.photo_library_outlined, size: 16),
+                isLoading: _isUploadingToR2,
+                onPressed: () async {
+                  try {
+                    final List<XFile> picked = await _mediaPicker.pickMultiImage();
+                    if (picked.isNotEmpty && mounted) {
+                      setState(() {
+                        for (final img in picked) {
+                          _uploadedImageUrls.add(img.path);
+                        }
+                      });
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Attached ${picked.length} asset photography frame(s). Presigning with Cloudflare R2...'),
+                          backgroundColor: LuxuryColors.deepForestGreen,
+                        ),
+                      );
+                    }
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Media picker error: $e')),
+                    );
+                  }
+                },
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: LuxuryButton(
+                text: 'CINEMATIC VIDEO',
+                variant: LuxuryButtonVariant.outline,
+                icon: const Icon(Icons.videocam_outlined, size: 16),
+                onPressed: () async {
+                  try {
+                    final XFile? video = await _mediaPicker.pickVideo(source: ImageSource.gallery);
+                    if (video != null && mounted) {
+                      setState(() {
+                        _uploadedVideoPath = video.path;
+                        _uploadedVideoName = video.name;
+                      });
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Cinematic video attached: ${video.name}. Ready for Cloudflare R2 video streaming.'),
+                          backgroundColor: LuxuryColors.deepForestGreen,
+                        ),
+                      );
+                    }
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Video picker error: $e')),
+                    );
+                  }
+                },
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 20),
         Text(
@@ -709,6 +761,9 @@ class _SellWizardScreenState extends ConsumerState<SellWizardScreen> {
             itemCount: _uploadedImageUrls.length,
             separatorBuilder: (context, index) => const SizedBox(width: 10),
             itemBuilder: (context, index) {
+              final path = _uploadedImageUrls[index];
+              final isNetwork = path.startsWith('http://') || path.startsWith('https://');
+
               return Stack(
                 children: [
                   Container(
@@ -720,10 +775,23 @@ class _SellWizardScreenState extends ConsumerState<SellWizardScreen> {
                         width: index == 0 ? 1.5 : 0.8,
                       ),
                     ),
-                    child: Image.network(
-                      _uploadedImageUrls[index],
-                      fit: BoxFit.cover,
-                    ),
+                    child: isNetwork
+                        ? Image.network(
+                            path,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => Container(
+                              color: LuxuryColors.darkCard,
+                              child: const Icon(Icons.broken_image, color: LuxuryColors.mutedGrey),
+                            ),
+                          )
+                        : Image.file(
+                            File(path),
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => Container(
+                              color: LuxuryColors.darkCard,
+                              child: const Icon(Icons.image, color: LuxuryColors.mutedGrey),
+                            ),
+                          ),
                   ),
                   if (index == 0)
                     Positioned(
@@ -731,7 +799,7 @@ class _SellWizardScreenState extends ConsumerState<SellWizardScreen> {
                       left: 4,
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                        color: LuxuryColors.pureBlack.withOpacity(0.8),
+                        color: LuxuryColors.pureBlack.withOpacity(0.85),
                         child: Text(
                           'COVER',
                           style: LuxuryTypography.microCaps.copyWith(
@@ -741,11 +809,90 @@ class _SellWizardScreenState extends ConsumerState<SellWizardScreen> {
                         ),
                       ),
                     ),
+                  Positioned(
+                    top: 2,
+                    right: 2,
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _uploadedImageUrls.removeAt(index);
+                        });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(3),
+                        decoration: BoxDecoration(
+                          color: LuxuryColors.pureBlack.withOpacity(0.7),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.close, size: 12, color: LuxuryColors.pureWhite),
+                      ),
+                    ),
+                  ),
                 ],
               );
             },
           ),
         ),
+
+        // Attached Video Card
+        if (_uploadedVideoPath != null) ...[
+          const SizedBox(height: 16),
+          Text(
+            'CINEMATIC 4K VIDEO STREAM',
+            style: LuxuryTypography.microCaps.copyWith(
+              color: LuxuryColors.champagne,
+              letterSpacing: 1.5,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(
+              color: isDark ? LuxuryColors.darkCard : LuxuryColors.pureWhite,
+              borderRadius: BorderRadius.circular(4),
+              border: Border.all(color: LuxuryColors.champagne.withOpacity(0.6)),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.videocam, color: LuxuryColors.champagne, size: 24),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _uploadedVideoName ?? 'Cinematic_Walkthrough_4K.mp4',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: LuxuryTypography.bodySmall.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: isDark ? LuxuryColors.pureWhite : LuxuryColors.pureBlack,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'READY FOR CLOUDFLARE STREAM / R2 ACCELERATION',
+                        style: LuxuryTypography.microCaps.copyWith(
+                          color: LuxuryColors.verifiedGreen,
+                          fontSize: 7.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close, size: 18, color: LuxuryColors.mutedGrey),
+                  onPressed: () {
+                    setState(() {
+                      _uploadedVideoPath = null;
+                      _uploadedVideoName = null;
+                    });
+                  },
+                ),
+              ],
+            ),
+          ),
+        ],
       ],
     );
   }
@@ -762,7 +909,51 @@ class _SellWizardScreenState extends ConsumerState<SellWizardScreen> {
         Text('Private title deeds, GIA dossier, or service history stored in secure private R2 buckets.',
             style: LuxuryTypography.bodySmall.copyWith(color: LuxuryColors.mutedGrey)),
         const SizedBox(height: 20),
-        ..._uploadedDocs.map((doc) {
+        LuxuryButton(
+          text: 'ATTACH DOSSIER / CERTIFICATE (PDF/SCAN)',
+          variant: LuxuryButtonVariant.outline,
+          icon: const Icon(Icons.upload_file, size: 18),
+          onPressed: () async {
+            try {
+              final result = await FilePicker.platform.pickFiles(
+                allowMultiple: true,
+                type: FileType.custom,
+                allowedExtensions: ['pdf', 'png', 'jpg', 'jpeg'],
+              );
+              if (result != null && result.files.isNotEmpty && mounted) {
+                setState(() {
+                  for (final file in result.files) {
+                    if (!_uploadedDocs.contains(file.name)) {
+                      _uploadedDocs.add(file.name);
+                    }
+                  }
+                });
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Attached ${result.files.length} authentication dossier(s).'),
+                    backgroundColor: LuxuryColors.deepForestGreen,
+                  ),
+                );
+              }
+            } catch (e) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Document picker error: $e')),
+              );
+            }
+          },
+        ),
+        const SizedBox(height: 20),
+        Text(
+          'AUTHENTICATION DOSSIERS (${_uploadedDocs.length})',
+          style: LuxuryTypography.microCaps.copyWith(
+            color: LuxuryColors.champagne,
+            letterSpacing: 1.5,
+          ),
+        ),
+        const SizedBox(height: 10),
+        ..._uploadedDocs.asMap().entries.map((entry) {
+          final idx = entry.key;
+          final doc = entry.value;
           return Container(
             margin: const EdgeInsets.only(bottom: 10),
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -786,6 +977,15 @@ class _SellWizardScreenState extends ConsumerState<SellWizardScreen> {
                     color: LuxuryColors.verifiedGreen,
                     fontSize: 8.5,
                   ),
+                ),
+                const SizedBox(width: 8),
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _uploadedDocs.removeAt(idx);
+                    });
+                  },
+                  child: const Icon(Icons.close, size: 16, color: LuxuryColors.mutedGrey),
                 ),
               ],
             ),

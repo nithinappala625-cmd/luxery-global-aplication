@@ -12,7 +12,7 @@ class HomeHeroBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      height: 480,
+      height: 520,
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(color: LuxuryColors.borderDark, width: 0.8),
@@ -24,7 +24,7 @@ class HomeHeroBanner extends StatelessWidget {
           const Positioned.fill(
             child: LuxuryImage(
               imageUrl:
-                  'https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=1600&auto=format&fit=crop',
+                  'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?q=80&w=1600&auto=format&fit=crop',
               fit: BoxFit.cover,
             ),
           ),
@@ -36,11 +36,11 @@ class HomeHeroBanner extends StatelessWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Colors.black.withOpacity(0.4),
+                    Colors.black.withOpacity(0.35),
                     Colors.black.withOpacity(0.55),
-                    Colors.black.withOpacity(0.85),
+                    Colors.black.withOpacity(0.92),
                   ],
-                  stops: const [0.0, 0.4, 1.0],
+                  stops: const [0.0, 0.45, 1.0],
                 ),
               ),
             ),
@@ -49,56 +49,59 @@ class HomeHeroBanner extends StatelessWidget {
           Positioned(
             left: 20,
             right: 20,
-            bottom: 36,
+            bottom: 32,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Quiet luxury prestige label
+                // NP GROUPS Prestige crest
                 Row(
                   children: [
                     Container(
                       width: 24,
-                      height: 1,
+                      height: 1.5,
                       color: LuxuryColors.champagne,
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      'PRIVATE SALON COLLECTION',
+                      'NP GROUPS • A PRIVATE MARKETPLACE',
                       style: LuxuryTypography.microCaps.copyWith(
                         color: LuxuryColors.champagne,
-                        letterSpacing: 2.8,
-                        fontSize: 9.5,
+                        letterSpacing: 2.5,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 12),
-                // Heading: "EXCEPTIONAL POSSESSIONS."
+                // Heading: "THE WORLD'S EXCEPTIONAL ASSETS."
                 Text(
-                  'EXCEPTIONAL\nPOSSESSIONS.',
+                  "THE WORLD'S\nEXCEPTIONAL ASSETS.",
                   style: LuxuryTypography.editorialHero.copyWith(
                     color: LuxuryColors.pureWhite,
-                    letterSpacing: 1.5,
+                    letterSpacing: 1.2,
+                    height: 1.15,
+                    fontSize: 30,
                   ),
                 ),
                 const SizedBox(height: 12),
-                // Subheading: "Discover exceptional pre-owned luxury from around the world."
+                // Subheading: "Discover, acquire, rent and auction extraordinary assets through a trusted private marketplace."
                 Text(
-                  'Discover exceptional pre-owned luxury from around the world.',
+                  'Discover, acquire, rent and auction extraordinary assets through a trusted private marketplace.',
                   style: LuxuryTypography.bodyMedium.copyWith(
-                    color: LuxuryColors.softIvory.withOpacity(0.9),
-                    fontSize: 14,
-                    height: 1.4,
+                    color: LuxuryColors.softIvory.withOpacity(0.92),
+                    fontSize: 13.5,
+                    height: 1.45,
                   ),
                 ),
                 const SizedBox(height: 24),
-                // Buttons: EXPLORE LUXURY & LIST YOUR ASSET
+                // Buttons: EXPLORE COLLECTION & SELL YOUR ASSET
                 Row(
                   children: [
                     Expanded(
                       child: LuxuryButton(
-                        text: 'EXPLORE LUXURY',
+                        text: 'EXPLORE COLLECTION',
                         variant: LuxuryButtonVariant.gold,
                         height: 48,
                         onPressed: () => context.go('/discover'),
@@ -107,7 +110,7 @@ class HomeHeroBanner extends StatelessWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: LuxuryButton(
-                        text: 'LIST YOUR ASSET',
+                        text: 'SELL YOUR ASSET',
                         variant: LuxuryButtonVariant.secondary,
                         height: 48,
                         onPressed: () => context.go('/sell'),

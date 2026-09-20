@@ -14,12 +14,14 @@ class LuxuryListingCard extends ConsumerWidget {
   final LuxuryListing listing;
   final ListingCardLayout layout;
   final double? width;
+  final VoidCallback? onTap;
 
   const LuxuryListingCard({
     super.key,
     required this.listing,
     this.layout = ListingCardLayout.horizontal,
     this.width,
+    this.onTap,
   });
 
   @override
@@ -44,7 +46,7 @@ class LuxuryListingCard extends ConsumerWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(2),
-          onTap: () {
+          onTap: onTap ?? () {
             context.push('/listing/${listing.id}');
           },
           child: Column(

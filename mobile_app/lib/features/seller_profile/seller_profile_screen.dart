@@ -80,7 +80,7 @@ class SellerProfileScreen extends ConsumerWidget {
                     child: ClipOval(
                       child: LuxuryImage(
                         imageUrl: seller.profilePhoto ??
-                            'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=300&auto=format&fit=crop',
+                            'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?q=80&w=300&auto=format&fit=crop',
                         fit: BoxFit.cover,
                       ),
                     ),

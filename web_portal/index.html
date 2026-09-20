@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maison Du Luxe | Global Curated Luxury Sanctuary</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Montserrat:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --gold-primary: #D4AF37;
+      --gold-light: #F4E8C1;
+      --gold-dark: #997A15;
+      --forest-dark: #0A120D;
+      --forest-card: #111C15;
+      --pure-black: #060807;
+      --pure-white: #FFFFFF;
+      --text-muted: #8E968F;
+      --border-gold: rgba(212, 175, 55, 0.25);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--pure-black);
+      color: #ECEAE4;
+      font-family: 'Montserrat', sans-serif;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    /* TYPOGRAPHY */
+    h1, h2, h3, h4, .serif-font {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 400;
+      letter-spacing: 1px;
+    }
+
+    .micro-caps {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 2.2px;
+      font-weight: 600;
+    }
+
+    /* NAVIGATION */
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 100;
+      background: rgba(6, 8, 7, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-gold);
+      padding: 1.2rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--pure-white);
+    }
+
+    .nav-brand .crest {
+      font-size: 1.6rem;
+      color: var(--gold-primary);
+    }
+
+    .nav-brand .title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2.4rem;
+      list-style: none;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1.8px;
+      transition: color 0.3s ease;
+    }
+
+    .nav-links a:hover, .nav-links a.active {
+      color: var(--gold-primary);
+    }
+
+    .btn-gold {
+      background: linear-gradient(135deg, #D4AF37 0%, #AA820A 100%);
+      color: var(--pure-black);
+      padding: 0.65rem 1.6rem;
+      border: none;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.6px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-gold:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 20px rgba(212, 175, 55, 0.4);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--gold-primary);
+      color: var(--gold-primary);
+      padding: 0.65rem 1.6rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.6px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: all 0.3s;
+    }
+
+    .btn-outline:hover {
+      background: rgba(212, 175, 55, 0.1);
+      color: var(--gold-light);
+    }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 8rem 2rem 5rem;
+      position: relative;
+      background: radial-gradient(circle at 50% 35%, rgba(22, 37, 28, 0.8) 0%, var(--pure-black) 75%);
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border: 1px solid var(--border-gold);
+      background: rgba(212, 175, 55, 0.08);
+      margin-bottom: 2rem;
+      border-radius: 2px;
+    }
+
+    .hero-badge .dot {
+      width: 6px;
+      height: 6px;
+      background: #2E7D32;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #4CAF50;
+    }
+
+    .hero h1 {
+      font-size: 4.2rem;
+      line-height: 1.15;
+      max-width: 960px;
+      margin-bottom: 1.5rem;
+      font-weight: 300;
+    }
+
+    .hero h1 span {
+      color: var(--gold-primary);
+      font-style: italic;
+    }
+
+    .hero p {
+      max-width: 680px;
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      margin-bottom: 2.8rem;
+      font-weight: 300;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 1.2rem;
+      margin-bottom: 4rem;
+    }
+
+    /* STATS BANNER */
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      max-width: 1100px;
+      width: 100%;
+      background: rgba(17, 28, 21, 0.6);
+      border: 1px solid var(--border-subtle);
+      border-top: 1px solid var(--border-gold);
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .stat-item h3 {
+      font-size: 2.2rem;
+      color: var(--gold-primary);
+      margin-bottom: 0.3rem;
+    }
+
+    .stat-item p {
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    /* CURATED ASSETS SECTION */
+    .section {
+      padding: 7rem 3rem;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 4.5rem;
+    }
+
+    .section-header h2 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .section-header p {
+      color: var(--text-muted);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .grid-assets {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+    }
+
+    .asset-card {
+      background: var(--forest-card);
+      border: 1px solid var(--border-subtle);
+      overflow: hidden;
+      transition: transform 0.3s, border-color 0.3s;
+      position: relative;
+    }
+
+    .asset-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--gold-primary);
+    }
+
+    .asset-img {
+      width: 100%;
+      height: 240px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .asset-badge {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      background: rgba(6, 8, 7, 0.85);
+      border: 1px solid var(--border-gold);
+      color: var(--gold-primary);
+      padding: 4px 8px;
+      font-size: 0.65rem;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+    }
+
+    .asset-info {
+      padding: 1.5rem;
+    }
+
+    .asset-category {
+      color: var(--gold-primary);
+      font-size: 0.68rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 0.4rem;
+    }
+
+    .asset-title {
+      font-size: 1.35rem;
+      margin-bottom: 0.8rem;
+      line-height: 1.3;
+    }
+
+    .asset-location {
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      margin-bottom: 1rem;
+    }
+
+    .asset-price {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 1rem;
+    }
+
+    .asset-price .amount {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem;
+      color: var(--pure-white);
+    }
+
+    .asset-price .status {
+      color: #4CAF50;
+      font-size: 0.7rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    /* ARCHITECTURE & AUDIT PILLARS */
+    .pillars-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+
+    .pillar-card {
+      background: rgba(17, 28, 21, 0.4);
+      border: 1px solid var(--border-subtle);
+      padding: 2.5rem 2rem;
+      text-align: left;
+    }
+
+    .pillar-card .icon {
+      font-size: 2rem;
+      color: var(--gold-primary);
+      margin-bottom: 1.2rem;
+    }
+
+    .pillar-card h3 {
+      font-size: 1.5rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .pillar-card p {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      line-height: 1.6;
+    }
+
+    /* APP DOWNLOAD SECTION */
+    .download-section {
+      background: linear-gradient(180deg, var(--forest-dark) 0%, var(--pure-black) 100%);
+      border-top: 1px solid var(--border-gold);
+      border-bottom: 1px solid var(--border-gold);
+      text-align: center;
+      padding: 6rem 2rem;
+    }
+
+    .download-badges {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-top: 2.5rem;
+      flex-wrap: wrap;
+    }
+
+    .download-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0.8rem 1.8rem;
+      background: #111A14;
+      border: 1px solid var(--border-gold);
+      color: var(--pure-white);
+      text-decoration: none;
+      border-radius: 4px;
+      transition: all 0.3s;
+    }
+
+    .download-btn:hover {
+      background: rgba(212, 175, 55, 0.15);
+      transform: translateY(-2px);
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 4rem 3rem 2rem;
+      background: var(--pure-black);
+      border-top: 1px solid var(--border-subtle);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .footer-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2.5rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .footer-bottom {
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 2rem;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    @media (max-width: 900px) {
+      nav { padding: 1rem 1.5rem; }
+      .nav-links { display: none; }
+      .hero h1 { font-size: 2.8rem; }
+      .stats-bar { grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+      .pillars-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVIGATION -->
+  <nav>
+    <a href="/" class="nav-brand">
+      <span class="crest">⚜</span>
+      <span class="title">NP GROUPS</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#collection">Curated Assets</a></li>
+      <li><a href="#verticals">10 Global Verticals</a></li>
+      <li><a href="#auctions">Live Auctions</a></li>
+      <li><a href="#deal-room">Deal Room</a></li>
+      <li><a href="#download">Mobile App</a></li>
+      <li><a href="/admin" style="color: var(--gold-primary);">Control Room</a></li>
+    </ul>
+    <div>
+      <a href="/admin" class="btn-outline" style="margin-right: 8px;">Curator Desk</a>
+      <a href="#download" class="btn-gold">VIP Access</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-badge">
+      <span class="dot"></span>
+      <span class="micro-caps" style="color: var(--gold-primary);">A PRIVATE MARKETPLACE FOR EXTRAORDINARY ASSETS</span>
+    </div>
+    <h1>THE WORLD'S <span>EXCEPTIONAL ASSETS.</span></h1>
+    <p>Consigned exclusively by accredited European, Middle Eastern, and Indian royal heritage salons. Zero anonymous sellers. 10 marketplace verticals verified within 24 hours under board audit.</p>
+    <div class="hero-cta">
+      <a href="#download" class="btn-gold">Launch Mobile App (Android / iOS)</a>
+      <a href="/admin" class="btn-outline">Curatorial Super Admin</a>
+    </div>
+
+    <!-- METRICS -->
+    <div class="stats-bar">
+      <div class="stat-item">
+        <h3>₹2,450 Cr+</h3>
+        <p>Active Curated Asset Portfolio</p>
+      </div>
+      <div class="stat-item">
+        <h3>10 Verticals</h3>
+        <p>Cars, Jets, Yachts, Watches, Jewels</p>
+      </div>
+      <div class="stat-item">
+        <h3>24-Hour SLA</h3>
+        <p>Curatorial Audit & Lab Verification</p>
+      </div>
+      <div class="stat-item">
+        <h3>100% Direct</h3>
+        <p>Cloudflare R2 Encrypted Media Vault</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 CORE MARKETPLACE VERTICALS -->
+  <section id="verticals" class="section" style="padding: 4rem 2rem; border-bottom: 1px solid var(--border-subtle);">
+    <div class="section-header">
+      <span class="micro-caps" style="color: var(--gold-primary);">CORE ECOSYSTEM</span>
+      <h2>10 Launch-Ready Marketplace Verticals</h2>
+      <p>Bespoke transaction infrastructure engineered for the world's most valuable asset classes.</p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.2rem; max-width: 1200px; margin: 0 auto;">
+      <div class="pillar-card" style="padding: 1.5rem;">
+        <div style="font-size: 1.6rem; color: var(--gold-primary); margin-bottom: 0.5rem;">⌚</div>
+        <h4 style="font-size: 1.1rem; margin-bottom: 0.3rem;">Luxury Watches</h4>
+        <p style="font-size: 0.78rem; color: var(--text-muted);">Patek Philippe, Rolex, Audemars Piguet, Richard Mille.</p>
+      </div>
+      <div class="pillar-card" style="padding: 1.5rem;">
+        <div style="font-size: 1.6rem; color: var(--gold-primary); margin-bottom: 0.5rem;">💎</div>
+        <h4 style="font-size: 1.1rem; margin-bottom: 0.3rem;">Diamonds & Fine Jewellery</h4>
+        <p style="font-size: 0.78rem; color: var(--text-muted);">GIA certified gemstones, Royal Polki, Colombian emeralds.</p>
+      </div>
+      <div class="pillar-card" style="padding: 1.5rem;">
+        <div style="font-size: 1.6rem; color: var(--gold-primary); margin-bottom: 0.5rem;">🏎️</div>
+        <h4 style="font-size: 1.1rem; margin-bottom: 0.3rem;">Exotic & Collector Cars</h4>
+        <p style="font-size: 0.78rem; color: var(--text-muted);">Hypercars, coachbuilt classics, delivery mileage flagships.</p>
+      </div>
+      <div class="pillar-card" style="padding: 1.5rem;">
+        <div style="font-size: 1.6rem; color: var(--gold-primary); margin-bottom: 0.5rem;">🔑</div>
+        <h4 style="font-size: 1.1rem; margin-bottom: 0.3rem;">NP LUXE DRIVE</h4>
+        <p style="font-size: 0.78rem; color: var(--text-muted);">Supercar fleet rentals, bespoke chauffeur options, security escrow.</p>
+      </div>
+      <div class="pillar-card" style="padding: 1.5rem;">
+        <div style="font-size: 1.6rem; color: var(--gold-primary); margin-bottom: 0.5rem;">✈️</div>
+        <h4 style="font-size: 1.1rem; margin-bottom: 0.3rem;">Private Aviation</h4>
+        <p style="font-size: 0.78rem; color: var(--text-muted);">Executive jet sales, turnkey VIP charters, PPI compliance.</p>
+      </div>
+      <div class="pillar-card" style="padding: 1.5rem;">
+        <div style="font-size: 1.6rem; color: var(--gold-primary); margin-bottom: 0.5rem;">⚓</div>
+        <h4 style="font-size: 1.1rem; margin-bottom: 0.3rem;">Yachts & Superyachts</h4>
+        <p style="font-size: 0.78rem; color: var(--text-muted);">Maxi flybridges, custom catamarans, Mediterranean berths.</p>
+      </div>
+      <div class="pillar-card" style="padding: 1.5rem;">
+        <div style="font-size: 1.6rem; color: var(--gold-primary); margin-bottom: 0.5rem;">⚡</div>
+        <h4 style="font-size: 1.1rem; margin-bottom: 0.3rem;">Strategic Materials</h4>
+        <p style="font-size: 0.78rem; color: var(--text-muted);">Industrial rare earths, Neodymium, Lithium, ISO certified assays.</p>
+      </div>
+      <div class="pillar-card" style="padding: 1.5rem;">
+        <div style="font-size: 1.6rem; color: var(--gold-primary); margin-bottom: 0.5rem;">🎨</div>
+        <h4 style="font-size: 1.1rem; margin-bottom: 0.3rem;">Luxury Collectibles</h4>
+        <p style="font-size: 0.78rem; color: var(--text-muted);">Hermès Birkin Himalayan, Grand Cru vintages, blue-chip fine art.</p>
+      </div>
+      <div class="pillar-card" style="padding: 1.5rem;">
+        <div style="font-size: 1.6rem; color: var(--gold-primary); margin-bottom: 0.5rem;">🏛️</div>
+        <h4 style="font-size: 1.1rem; margin-bottom: 0.3rem;">NP AUCTIONS</h4>
+        <p style="font-size: 0.78rem; color: var(--text-muted);">Live bidding floor, timed online lots, verified reserve status.</p>
+      </div>
+      <div class="pillar-card" style="padding: 1.5rem;">
+        <div style="font-size: 1.6rem; color: var(--gold-primary); margin-bottom: 0.5rem;">🤝</div>
+        <h4 style="font-size: 1.1rem; margin-bottom: 0.3rem;">Private Deal Room</h4>
+        <p style="font-size: 0.78rem; color: var(--text-muted);">Bilateral negotiation, binding counter-offers, digital escrow.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CURATED COLLECTION -->
+  <section id="collection" class="section">
+    <div class="section-header">
+      <span class="micro-caps" style="color: var(--gold-primary);">FEATURED CURATED PORTFOLIO</span>
+      <h2>Exceptional Pre-Owned Acquisitions</h2>
+      <p>Museum-grade horology, princely diamonds, bespoke hypercars, and turnkey Mediterranean yachts.</p>
+    </div>
+
+    <div class="grid-assets">
+      <!-- 1. Jaipur Nizam Emerald & Polki Choker -->
+      <div class="asset-card">
+        <span class="asset-badge">Indian Royal Heritage</span>
+        <img class="asset-img" src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?q=80&w=800&auto=format&fit=crop" alt="Jaipur Nizam Emerald Choker">
+        <div class="asset-info">
+          <div class="asset-category">Fine Jewellery & Diamonds</div>
+          <h3 class="asset-title">Royal Jaipur Nizam Emerald & Polki Choker</h3>
+          <div class="asset-location">📍 Jaipur, India • GIA & SSEF Certified</div>
+          <div class="asset-price">
+            <span class="amount">₹14.5 Cr</span>
+            <span class="status">✓ AUDIT VERIFIED</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Rolls-Royce Phantom VIII Maharaja Extended -->
+      <div class="asset-card">
+        <span class="asset-badge">One-of-One Bespoke</span>
+        <img class="asset-img" src="https://images.unsplash.com/photo-1631295868223-63265b40d9e4?q=80&w=800&auto=format&fit=crop" alt="Rolls-Royce Phantom Maharaja">
+        <div class="asset-info">
+          <div class="asset-category">Luxury & Exotic Cars</div>
+          <h3 class="asset-title">Rolls-Royce Phantom VIII Extended 'Maharaja'</h3>
+          <div class="asset-location">📍 Mumbai, India • 420 km Delivery Spec</div>
+          <div class="asset-price">
+            <span class="amount">₹11.8 Cr</span>
+            <span class="status">✓ AUDIT VERIFIED</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Ferretti 920 Maxi Flybridge 'Maharani' -->
+      <div class="asset-card">
+        <span class="asset-badge">Maxi Superyacht</span>
+        <img class="asset-img" src="https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?q=80&w=800&auto=format&fit=crop" alt="Ferretti 920 Maxi Flybridge">
+        <div class="asset-info">
+          <div class="asset-category">Yachts & Marine</div>
+          <h3 class="asset-title">Ferretti Yachts 920 'Maharani' (28.5m)</h3>
+          <div class="asset-location">📍 Goa Marina, India • RINA Class 5-Cabin</div>
+          <div class="asset-price">
+            <span class="amount">₹65.0 Cr</span>
+            <span class="status">✓ AUDIT VERIFIED</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Gulfstream G700 Ultra Long Range Jet -->
+      <div class="asset-card">
+        <span class="asset-badge">Private Aviation Flagship</span>
+        <img class="asset-img" src="https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?q=80&w=800&auto=format&fit=crop" alt="Gulfstream G700">
+        <div class="asset-info">
+          <div class="asset-category">Private Aircraft Sales</div>
+          <h3 class="asset-title">Gulfstream G700 Ultra-Long Range Jet</h3>
+          <div class="asset-location">📍 London Stansted / Geneva • 85 Hours</div>
+          <div class="asset-price">
+            <span class="amount">₹620 Cr</span>
+            <span class="status">✓ AUDIT VERIFIED</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VERIFICATION & R2 PILLARS -->
+  <section id="verification" class="section" style="background: rgba(10, 18, 13, 0.5);">
+    <div class="section-header">
+      <span class="micro-caps" style="color: var(--gold-primary);">INFRASTRUCTURE INTEGRITY</span>
+      <h2>Engineered for Sovereign Privacy & Trust</h2>
+      <p>Institutional security, curatorial diligence, and digital escrow built into every transaction.</p>
+    </div>
+
+    <div class="pillars-grid">
+      <div class="pillar-card">
+        <div class="icon">⏳</div>
+        <h3>24-Hour Curatorial Audit</h3>
+        <p>No asset or consignor profile is ever published without a strict 24-hour review by the NP GROUPS Curatorial Board. Identity documents, title deeds, and gemological laboratory dossiers are verified prior to live publication.</p>
+      </div>
+
+      <div class="pillar-card" id="r2-media">
+        <div class="icon">☁️</div>
+        <h3>Cloudflare R2 Encrypted Media Vault</h3>
+        <p>High-resolution photography, 4K cinematic walkthroughs, and confidential GIA/title certificates are presigned via NestJS and uploaded directly to Cloudflare R2 object storage with zero public bucket compromise.</p>
+      </div>
+
+      <div class="pillar-card">
+        <div class="icon">💳</div>
+        <h3>Dual Payment Abstraction</h3>
+        <p>Integrated with Razorpay for domestic INR high-value escrow and unlock fees alongside international settlement layers for Monaco, Geneva, London, and Dubai cross-border transactions.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- DOWNLOAD APP -->
+  <section id="download" class="download-section">
+    <span class="micro-caps" style="color: var(--gold-primary);">MOBILE NATIVE LUXURY</span>
+    <h2 style="font-size: 3.2rem; margin: 0.8rem 0 1rem;">Experience NP GROUPS on Mobile</h2>
+    <p style="color: var(--text-muted); max-width: 580px; margin: 0 auto;">Download our Flutter-powered Android and iOS mobile client for quiet-luxury aesthetics, live auction bidding, private deal rooms, instant contact unlocks, and curatorial alerts.</p>
+
+    <div class="download-badges">
+      <a href="#" class="download-btn">
+        <span style="font-size: 1.8rem;">🤖</span>
+        <div style="text-align: left;">
+          <div style="font-size: 0.65rem; color: var(--text-muted);">DEPLOYED ON PHYSICAL MOTOROLA EDGE</div>
+          <div style="font-weight: 700; font-size: 0.95rem;">Android 16 Native APK</div>
+        </div>
+      </a>
+
+      <a href="#" class="download-btn">
+        <span style="font-size: 1.8rem;">🍎</span>
+        <div style="text-align: left;">
+          <div style="font-size: 0.65rem; color: var(--text-muted);">AVAILABLE ON TESTFLIGHT</div>
+          <div style="font-weight: 700; font-size: 0.95rem;">Apple iOS VIP Build</div>
+        </div>
+      </a>
+
+      <a href="/admin" class="download-btn" style="border-color: var(--gold-primary);">
+        <span style="font-size: 1.8rem;">🛡️</span>
+        <div style="text-align: left;">
+          <div style="font-size: 0.65rem; color: var(--gold-primary);">CURATOR BOARD CONTROL ROOM</div>
+          <div style="font-weight: 700; font-size: 0.95rem;">Super Admin Panel</div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-top">
+      <div class="nav-brand">
+        <span class="crest">⚜</span>
+        <span class="title">NP GROUPS</span>
+      </div>
+      <div>
+        <span class="micro-caps" style="color: var(--gold-primary);">GLOBAL HUBS:</span>
+        <span style="margin-left: 8px;">LONDON • MONACO • DUBAI • MUMBAI • GENEVA</span>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>© 2026 NP GROUPS. All rights reserved. A Private Marketplace for Extraordinary Assets.</div>
+      <div>
+        <a href="/auth/callback" style="color: var(--text-muted); text-decoration: none; margin-right: 16px;">OAuth Redirect</a>
+        <a href="/admin" style="color: var(--gold-primary); text-decoration: none;">Curator Super Admin</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

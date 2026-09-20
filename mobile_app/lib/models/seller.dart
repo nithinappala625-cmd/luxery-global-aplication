@@ -1,29 +1,36 @@
 enum SellerType {
-  individual('INDIVIDUAL_SELLER', 'Private Seller / Collector'),
-  dealer('DEALER', 'Boutique Dealer / Retailer'),
-  broker('BROKER', 'Luxury Broker / Agent'),
-  auctionHouse('AUCTION_HOUSE', 'Accredited Auction House'),
-  jewelleryDealer('JEWELLERY_DEALER', 'High Joaillerie Dealer'),
+  individual('INDIVIDUAL_SELLER', 'Individual Seller'),
+  verifiedSeller('VERIFIED_SELLER', 'Verified Private Collector'),
+  dealer('DEALER', 'Independent Luxury Dealer'),
+  luxuryDealer('LUXURY_DEALER', 'High Luxury Salon Dealer'),
+  jewelleryDealer('JEWELLERY_DEALER', 'High Joaillerie & Diamond Dealer'),
   watchDealer('WATCH_DEALER', 'Haute Horlogerie Dealer'),
-  carDealer('CAR_DEALER', 'Exotic Car Specialist'),
-  yachtBroker('YACHT_BROKER', 'Yacht & Marine Broker'),
-  other('OTHER', 'Other Luxury Specialist');
+  automotiveDealer('AUTOMOTIVE_DEALER', 'Exotic & Supercar Dealer'),
+  aircraftBroker('AIRCRAFT_BROKER', 'Accredited Aircraft Broker'),
+  yachtBroker('YACHT_BROKER', 'Yacht & Superyacht Broker'),
+  rentalOperator('RENTAL_OPERATOR', 'NP Luxe Drive Rental Fleet Operator'),
+  corporateSeller('CORPORATE_SELLER', 'Corporate / Strategic Asset Enterprise'),
+  auctionHouse('AUCTION_HOUSE', 'Accredited Auction House');
 
   final String code;
   final String label;
   const SellerType(this.code, this.label);
 
+  // Backward-compatibility aliases
+  static const SellerType carDealer = SellerType.automotiveDealer;
+  static const SellerType broker = SellerType.aircraftBroker;
+
   static SellerType fromCode(String code) {
     return SellerType.values.firstWhere(
       (e) => e.code == code || e.name.toLowerCase() == code.toLowerCase(),
-      orElse: () => SellerType.other,
+      orElse: () => SellerType.individual,
     );
   }
 }
 
 enum VerificationStatus {
   unverified('UNVERIFIED', 'Unverified'),
-  pending('PENDING', 'Under Review'),
+  pending('PENDING', 'Under 24-Hour Review'),
   verified('VERIFIED', 'Verified Seller'),
   rejected('REJECTED', 'Changes Required'),
   suspended('SUSPENDED', 'Suspended');
@@ -41,10 +48,18 @@ enum VerificationStatus {
 }
 
 enum VerificationLevel {
-  level0('LEVEL_0', 'Tier 0 - Registered'),
-  level1('LEVEL_1', 'Tier 1 - Contact Verified'),
-  level2('LEVEL_2', 'Tier 2 - Identity & Business Verified'),
-  level3('LEVEL_3', 'Tier 3 - Curated Heritage Partner');
+  unverified('UNVERIFIED', 'Tier 0 - Unverified'),
+  identityVerified('IDENTITY_VERIFIED', 'Tier 1 - Identity Verified'),
+  businessVerified('BUSINESS_VERIFIED', 'Tier 2 - Business Verified'),
+  dealerVerified('DEALER_VERIFIED', 'Tier 3 - Accredited Dealer'),
+  premiumSeller('PREMIUM_SELLER', 'Tier 4 - Premium Partner'),
+  foundingSeller('FOUNDING_SELLER', 'Tier 5 - Founding Seller');
+
+  // Backward-compatibility aliases
+  static const VerificationLevel level0 = VerificationLevel.unverified;
+  static const VerificationLevel level1 = VerificationLevel.identityVerified;
+  static const VerificationLevel level2 = VerificationLevel.businessVerified;
+  static const VerificationLevel level3 = VerificationLevel.dealerVerified;
 
   final String code;
   final String label;
@@ -53,7 +68,7 @@ enum VerificationLevel {
   static VerificationLevel fromCode(String code) {
     return VerificationLevel.values.firstWhere(
       (e) => e.code == code || e.name.toLowerCase() == code.toLowerCase(),
-      orElse: () => VerificationLevel.level0,
+      orElse: () => VerificationLevel.unverified,
     );
   }
 }
@@ -85,6 +100,8 @@ class SellerProfile {
   final bool isActive;
   final double reputationScore;
   final int activeListingsCount;
+  final int activeAuctionsCount;
+  final int rentalFleetCount;
   final BusinessProfile? businessProfile;
   final BrokerProfile? brokerProfile;
   final AuctionHouseProfile? auctionHouseProfile;
@@ -113,10 +130,12 @@ class SellerProfile {
     this.languages = const ['English'],
     this.categoriesSold = const [],
     this.verificationStatus = VerificationStatus.pending,
-    this.verificationLevel = VerificationLevel.level0,
+    this.verificationLevel = VerificationLevel.unverified,
     this.isActive = true,
     this.reputationScore = 5.00,
     this.activeListingsCount = 0,
+    this.activeAuctionsCount = 0,
+    this.rentalFleetCount = 0,
     this.businessProfile,
     this.brokerProfile,
     this.auctionHouseProfile,
@@ -124,7 +143,7 @@ class SellerProfile {
   });
 
   bool get isVerified => verificationStatus == VerificationStatus.verified;
-
+  bool get isFoundingSeller => verificationLevel == VerificationLevel.foundingSeller;
   String get locationString => '$city, $country';
 
   SellerProfile copyWith({
@@ -143,6 +162,8 @@ class SellerProfile {
     VerificationStatus? verificationStatus,
     VerificationLevel? verificationLevel,
     int? activeListingsCount,
+    int? activeAuctionsCount,
+    int? rentalFleetCount,
   }) {
     return SellerProfile(
       id: id,
@@ -171,6 +192,8 @@ class SellerProfile {
       isActive: isActive,
       reputationScore: reputationScore,
       activeListingsCount: activeListingsCount ?? this.activeListingsCount,
+      activeAuctionsCount: activeAuctionsCount ?? this.activeAuctionsCount,
+      rentalFleetCount: rentalFleetCount ?? this.rentalFleetCount,
       businessProfile: businessProfile,
       brokerProfile: brokerProfile,
       auctionHouseProfile: auctionHouseProfile,

@@ -1,4 +1,4 @@
-﻿import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import '../models/attribute.dart';
 
@@ -310,6 +310,16 @@ class AttributesNotifier extends StateNotifier<List<AttributeDefinition>> {
       searchable: true,
       displayOrder: 10,
     ),
+    const AttributeDefinition(
+      id: 'def-j-11',
+      categoryId: 'c1000000-0000-0000-0000-000000000002',
+      name: 'GIA / IGI Certification File',
+      slug: 'cert_document',
+      label: 'Attach GIA / IGI Certificate Dossier (PDF / Scan)',
+      dataType: AttributeDataType.file,
+      required: false,
+      displayOrder: 11,
+    ),
 
     // ----------------------------------------------------
     // 3. LUXURY & EXOTIC CARS (c1000000-0000-0000-0000-000000000003)
@@ -394,6 +404,16 @@ class AttributesNotifier extends StateNotifier<List<AttributeDefinition>> {
       dataType: AttributeDataType.text,
       required: false,
       displayOrder: 7,
+    ),
+    const AttributeDefinition(
+      id: 'def-c-8',
+      categoryId: 'c1000000-0000-0000-0000-000000000003',
+      name: 'Title & Service Dossier',
+      slug: 'car_title_dossier',
+      label: 'Attach Title & Service Dossier (PDF / Scan)',
+      dataType: AttributeDataType.file,
+      required: false,
+      displayOrder: 8,
     ),
 
     // ----------------------------------------------------
@@ -499,6 +519,16 @@ class AttributesNotifier extends StateNotifier<List<AttributeDefinition>> {
       required: true,
       displayOrder: 9,
       options: ['VAT Paid', 'VAT Not Paid', 'Commercial Exemption', 'Export Scheme Eligible'],
+    ),
+    const AttributeDefinition(
+      id: 'def-y-10',
+      categoryId: 'c1000000-0000-0000-0000-000000000004',
+      name: 'Survey & Registry Dossier',
+      slug: 'yacht_registry_dossier',
+      label: 'Attach Lloyd\'s / RINA / Registry Dossier (PDF / Scan)',
+      dataType: AttributeDataType.file,
+      required: false,
+      displayOrder: 10,
     ),
   ];
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import '../../../core/constants/colors.dart';
 import '../../../core/constants/typography.dart';
 import '../../../core/widgets/luxury_button.dart';
@@ -8,23 +7,24 @@ import '../../../models/auction.dart';
 
 class LuxuryAuctionCard extends StatelessWidget {
   final LuxuryAuction auction;
-  final VoidCallback onSelect;
+  final VoidCallback onPlaceBid;
+  final VoidCallback onViewHistory;
 
   const LuxuryAuctionCard({
     super.key,
     required this.auction,
-    required this.onSelect,
+    required this.onPlaceBid,
+    required this.onViewHistory,
   });
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final dateFormat = DateFormat('MMM dd, yyyy • HH:mm');
 
     return Container(
       decoration: BoxDecoration(
         color: isDark ? LuxuryColors.darkCard : LuxuryColors.pureWhite,
-        borderRadius: BorderRadius.circular(2),
+        borderRadius: BorderRadius.circular(4),
         border: Border.all(
           color: isDark ? LuxuryColors.borderDark : LuxuryColors.borderLight,
           width: 0.8,
@@ -39,7 +39,7 @@ class LuxuryAuctionCard extends StatelessWidget {
               LuxuryImage(
                 imageUrl: auction.coverImageUrl,
                 width: double.infinity,
-                height: 180,
+                height: 190,
                 fit: BoxFit.cover,
               ),
               Positioned.fill(
@@ -49,9 +49,9 @@ class LuxuryAuctionCard extends StatelessWidget {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Colors.black.withOpacity(0.5),
+                        Colors.black.withOpacity(0.4),
                         Colors.transparent,
-                        Colors.black.withOpacity(0.7),
+                        Colors.black.withOpacity(0.75),
                       ],
                     ),
                   ),
@@ -61,33 +61,27 @@ class LuxuryAuctionCard extends StatelessWidget {
                 top: 12,
                 left: 12,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
                     color: auction.isLive
-                        ? LuxuryColors.auctionLiveRed
-                        : LuxuryColors.pureBlack.withOpacity(0.8),
+                        ? Colors.redAccent.withOpacity(0.9)
+                        : Colors.black.withOpacity(0.7),
                     borderRadius: BorderRadius.circular(2),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       if (auction.isLive) ...[
-                        Container(
-                          width: 6,
-                          height: 6,
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
+                        const Icon(Icons.circle, size: 8, color: Colors.white),
                         const SizedBox(width: 5),
                       ],
                       Text(
-                        (auction.isLive ? 'LIVE NOW' : 'UPCOMING SALE').toUpperCase(),
-                        style: LuxuryTypography.microCaps.copyWith(
-                          color: LuxuryColors.pureWhite,
-                          fontSize: 8.5,
-                          letterSpacing: 1.2,
+                        auction.isLive ? 'LIVE LOT' : auction.status.label.toUpperCase(),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.0,
                         ),
                       ),
                     ],
@@ -95,89 +89,142 @@ class LuxuryAuctionCard extends StatelessWidget {
                 ),
               ),
               Positioned(
-                bottom: 10,
+                top: 12,
                 right: 12,
-                child: Text(
-                  '${auction.totalLots} LOTS',
-                  style: LuxuryTypography.microCaps.copyWith(
-                    color: LuxuryColors.champagne,
-                    fontSize: 9,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.8),
+                    borderRadius: BorderRadius.circular(2),
+                    border: Border.all(color: LuxuryColors.champagne, width: 0.8),
                   ),
+                  child: Text(
+                    auction.auctionHouseName,
+                    style: const TextStyle(
+                      color: LuxuryColors.champagne,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: 12,
+                left: 14,
+                child: Row(
+                  children: [
+                    const Icon(Icons.timer_outlined, size: 14, color: Colors.white70),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${auction.timeRemaining.inHours}h ${auction.timeRemaining.inMinutes % 60}m Remaining',
+                      style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w500),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
 
-          // Metadata Details
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      auction.auctionHouseName?.toUpperCase() ?? 'SOTHEBY\'S',
-                      style: LuxuryTypography.microCaps.copyWith(
-                        color: LuxuryColors.champagne,
-                        letterSpacing: 2.0,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        const Icon(Icons.location_on_outlined, size: 12, color: LuxuryColors.mutedGrey),
-                        const SizedBox(width: 3),
-                        Text(
-                          auction.location,
-                          style: LuxuryTypography.bodySmall.copyWith(
-                            color: LuxuryColors.mutedGrey,
-                            fontSize: 11,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
                 Text(
-                  auction.title,
-                  style: LuxuryTypography.editorialHeading3.copyWith(
-                    fontSize: 17,
+                  auction.categoryName.toUpperCase(),
+                  style: LuxuryTypography.microCaps.copyWith(
+                    color: LuxuryColors.champagne,
+                    letterSpacing: 1.8,
                   ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  auction.assetTitle,
+                  style: LuxuryTypography.editorialHeading2.copyWith(fontSize: 17),
                 ),
                 const SizedBox(height: 6),
                 Text(
                   auction.description,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: LuxuryTypography.bodySmall.copyWith(
-                    color: LuxuryColors.mutedGrey,
-                    height: 1.4,
+                  style: TextStyle(
+                    fontSize: 12,
+                    height: 1.35,
+                    color: isDark ? Colors.white70 : Colors.black87,
                   ),
                 ),
-                const SizedBox(height: 12),
+                const Divider(height: 24),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Icon(Icons.access_time, size: 13, color: LuxuryColors.champagne),
-                    const SizedBox(width: 6),
-                    Text(
-                      dateFormat.format(auction.startDate),
-                      style: LuxuryTypography.bodySmall.copyWith(
-                        color: isDark ? LuxuryColors.pureWhite : LuxuryColors.charcoal,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 12,
-                      ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'CURRENT BID (${auction.totalBidsCount} BIDS)',
+                          style: LuxuryTypography.microCaps.copyWith(
+                            fontSize: 9.5,
+                            color: isDark ? Colors.white54 : Colors.black54,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          '₹ ${(auction.currentBid / 10000000).toStringAsFixed(2)} Cr',
+                          style: TextStyle(
+                            color: LuxuryColors.champagne,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          'MIN INCREMENT',
+                          style: LuxuryTypography.microCaps.copyWith(
+                            fontSize: 9.5,
+                            color: isDark ? Colors.white54 : Colors.black54,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          '+₹ ${(auction.minBidIncrement / 100000).toStringAsFixed(0)} Lakh',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: isDark ? Colors.white70 : Colors.black87,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
                 const SizedBox(height: 16),
-                LuxuryButton(
-                  text: auction.isLive ? 'VIEW LIVE BIDDING ROOM' : 'VIEW AUCTION CATALOG',
-                  variant: auction.isLive ? LuxuryButtonVariant.gold : LuxuryButtonVariant.primary,
-                  height: 44,
-                  onPressed: onSelect,
+                Row(
+                  children: [
+                    Expanded(
+                      child: LuxuryButton(
+                        text: 'PLACE BINDING BID',
+                        variant: LuxuryButtonVariant.gold,
+                        height: 42,
+                        onPressed: onPlaceBid,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    OutlinedButton(
+                      onPressed: onViewHistory,
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(
+                          color: isDark ? LuxuryColors.borderDark : LuxuryColors.borderLight,
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
+                      ),
+                      child: const Text('HISTORY', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                    ),
+                  ],
                 ),
               ],
             ),

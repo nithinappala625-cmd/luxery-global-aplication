@@ -1,4 +1,4 @@
-﻿-- ==============================================================================
+-- ==============================================================================
 -- GLOBAL LUXURY MARKETPLACE - SUPABASE POSTGRESQL SCHEMA
 -- ==============================================================================
 
@@ -946,3 +946,222 @@ VALUES
 ('c1000000-0000-0000-0000-000000000004', 'Heads / Bathrooms', 'heads_count', 'Heads / En-suite Bathrooms', 'Total bathrooms on board', 'NUMBER', 'heads', false, false, false, 13, '[]'::jsonb),
 ('c1000000-0000-0000-0000-000000000004', 'VAT Status', 'vat_status', 'VAT / Tax Status', 'European or global maritime VAT compliance', 'SELECT', NULL, true, true, false, 14, '[\"VAT Paid\", \"VAT Not Paid\", \"Commercial Exemption\", \"Export Scheme Eligible\"]'::jsonb)
 ON CONFLICT (category_id, slug) DO NOTHING;
+
+-- ==========================================
+-- 5. CERTIFICATE & DOSSIER ATTRIBUTE DEFINITIONS
+-- ==========================================
+INSERT INTO attribute_definitions (category_id, name, slug, label, description, data_type, unit, required, filterable, searchable, display_order, options)
+VALUES
+('c1000000-0000-0000-0000-000000000002', 'GIA / IGI Certification File', 'cert_document', 'Attach GIA / IGI Certificate Dossier (PDF / Scan)', 'Authenticated laboratory report stored in encrypted R2 vault', 'FILE', NULL, false, false, false, 15, '[]'::jsonb),
+('c1000000-0000-0000-0000-000000000003', 'Title & Service Dossier', 'car_title_dossier', 'Attach Title & Service Dossier (PDF / Scan)', 'Chassis registration and factory maintenance logs', 'FILE', NULL, false, false, false, 15, '[]'::jsonb),
+('c1000000-0000-0000-0000-000000000004', 'Survey & Registry Dossier', 'yacht_registry_dossier', 'Attach Lloyd''s / RINA / Registry Dossier (PDF / Scan)', 'Marine survey and sovereign flag state registry documents', 'FILE', NULL, false, false, false, 15, '[]'::jsonb)
+ON CONFLICT (category_id, slug) DO NOTHING;
+
+-- ==========================================
+-- 6. INDIAN ROYAL HERITAGE LISTINGS & EXPANSION
+-- ==========================================
+-- Jaipur Royal Jewel Salons Seller Profile
+INSERT INTO profiles (id, email, full_name, role, avatar_url, country, preferred_currency, is_verified)
+VALUES
+('00000000-0000-0000-0000-000000000005', 'curator@jaipurjewelsalons.in', 'Jaipur Royal Jewel Salons', 'dealer', 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?q=80&w=300&auto=format&fit=crop', 'India', 'INR', true)
+ON CONFLICT (id) DO UPDATE SET is_verified = true;
+
+-- Indian Heritage Listings
+INSERT INTO listings (id, seller_id, category_id, title, slug, description, price, currency, year, condition, status, is_featured, view_count, contact_unlock_fee)
+VALUES
+-- 11. Royal Jaipur Nizam Emerald & Polki Choker
+('l1000000-0000-0000-0000-000000000011', '00000000-0000-0000-0000-000000000005', 'c1000000-0000-0000-0000-000000000002',
+ 'Royal Jaipur Nizam Emerald & Polki Diamond Choker', 'royal-jaipur-nizam-emerald-polki-choker',
+ 'An extraordinarily rare royal choker from the princely estates of Jaipur. Centerpiece features a 68-carat unheated Colombian emerald cabochon flanked by 115 carats of natural uncut syndicate Polki diamonds set in 24k Kundan gold with intricate Meenakari enamel on the reverse. Accompanied by full GIA & SSEF gemological dossiers.',
+ 145000000.00, 'INR', 1912, 'Pristine Antique / Museum Provenance', 'verified', true, 4120, 25000.00),
+
+-- 12. Rolls-Royce Phantom VIII Maharaja Extended
+('l1000000-0000-0000-0000-000000000012', '00000000-0000-0000-0000-000000000001', 'c1000000-0000-0000-0000-000000000003',
+ 'Rolls-Royce Phantom VIII Extended Wheelbase \'Maharaja Edition\'', 'rolls-royce-phantom-viii-extended-maharaja',
+ 'One-of-one bespoke Extended Wheelbase Phantom commissioned for royal state processions. Finished in two-tone Peacock Blue over Andalusian White with 24-carat gold leaf coachline. Starlight headliner with 1,344 hand-woven fiber-optic stars depicting the constellations over Rajasthan.',
+ 118000000.00, 'INR', 2024, 'Collector Delivery Mileage (420 km)', 'verified', true, 6380, 20000.00),
+
+-- 13. Patek Philippe Celestial 6102R Sky Moon
+('l1000000-0000-0000-0000-000000000013', '00000000-0000-0000-0000-000000000001', 'c1000000-0000-0000-0000-000000000001',
+ 'Patek Philippe Grand Complications Celestial 6102R Sky Moon', 'patek-philippe-celestial-6102r-sky-moon',
+ 'Masterpiece of astronomical horology in 18k rose gold. Rotating sapphire crystal dial displays the exact celestial canopy of the northern hemisphere, Sirius passage, and lunar phases. Complete double-sealed collector vault box and Geneva Certificate of Origin.',
+ 29500000.00, 'INR', 2023, 'Unworn / Vault Preserved', 'verified', true, 3490, 15000.00),
+
+-- 14. Ferretti 920 Maxi Flybridge 'Maharani'
+('l1000000-0000-0000-0000-000000000014', '00000000-0000-0000-0000-000000000001', 'c1000000-0000-0000-0000-000000000004',
+ 'Ferretti Yachts 920 Maxi Flybridge \'Maharani\' (28.5m)', 'ferretti-yachts-920-maxi-flybridge-maharani',
+ 'Tri-deck maxi flybridge motor yacht berthed in private marina, Goa. Designed by Zuccon International with bespoke teak aft beach club, twin MTU 2,435 hp engines, zero-speed gyro stabilizers, and capacity for 10 guests across 5 opulent suites.',
+ 650000000.00, 'INR', 2022, 'Exceptional / Captain Maintained (380 hrs)', 'verified', true, 7920, 50000.00)
+ON CONFLICT (id) DO UPDATE SET
+ price = EXCLUDED.price,
+ currency = EXCLUDED.currency,
+ title = EXCLUDED.title,
+ description = EXCLUDED.description;
+
+-- ==============================================================================
+-- 7. NP LUXE DRIVE (EXOTIC & SUPERCARS RENTAL FLEET)
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS rental_vehicles (
+    id TEXT PRIMARY KEY,
+    title TEXT NOT NULL,
+    model_name TEXT NOT NULL,
+    category TEXT NOT NULL,
+    daily_rate NUMERIC(12, 2) NOT NULL,
+    currency TEXT NOT NULL DEFAULT 'INR',
+    security_deposit NUMERIC(12, 2) NOT NULL,
+    chauffeur_daily_rate NUMERIC(12, 2) DEFAULT 0,
+    horsepower INT,
+    acceleration_0_100 NUMERIC(3, 1),
+    top_speed_kmh INT,
+    transmission TEXT,
+    cover_image_url TEXT NOT NULL,
+    gallery_images JSONB DEFAULT '[]'::jsonb,
+    location_city TEXT NOT NULL,
+    location_country TEXT NOT NULL,
+    operator_name TEXT,
+    is_available BOOLEAN NOT NULL DEFAULT true,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS rental_bookings (
+    id TEXT PRIMARY KEY,
+    vehicle_id TEXT REFERENCES rental_vehicles(id),
+    renter_id TEXT NOT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    total_days INT NOT NULL,
+    daily_rate NUMERIC(12, 2) NOT NULL,
+    chauffeur_fee NUMERIC(12, 2) DEFAULT 0,
+    security_deposit NUMERIC(12, 2) NOT NULL,
+    total_amount NUMERIC(12, 2) NOT NULL,
+    status TEXT NOT NULL DEFAULT 'PENDING_ESCROW',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- ==============================================================================
+-- 8. PRIVATE AVIATION (AIRCRAFT SALES & VIP CHARTERS)
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS aircraft_listings (
+    id TEXT PRIMARY KEY,
+    title TEXT NOT NULL,
+    aviation_type TEXT NOT NULL, -- 'SALE', 'CHARTER'
+    aircraft_model TEXT NOT NULL,
+    manufacturer TEXT NOT NULL,
+    year INT NOT NULL,
+    total_time_airframe_hours NUMERIC(8, 1),
+    passenger_capacity INT NOT NULL,
+    max_range_nm INT,
+    max_speed_knots INT,
+    asking_price NUMERIC(16, 2),
+    charter_hourly_rate NUMERIC(12, 2),
+    currency TEXT NOT NULL DEFAULT 'INR',
+    location_base TEXT NOT NULL,
+    inspection_status TEXT,
+    ppi_compliance TEXT,
+    seller_name TEXT,
+    cover_image_url TEXT NOT NULL,
+    gallery_images JSONB DEFAULT '[]'::jsonb,
+    status TEXT NOT NULL DEFAULT 'AVAILABLE',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- ==============================================================================
+-- 9. PRIVATE DEAL ROOM (BILATERAL CONFIDENTIAL NEGOTIATION)
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS deal_rooms (
+    id TEXT PRIMARY KEY,
+    listing_id TEXT NOT NULL,
+    listing_title TEXT NOT NULL,
+    asking_price NUMERIC(16, 2) NOT NULL,
+    current_offer NUMERIC(16, 2) NOT NULL,
+    currency TEXT NOT NULL DEFAULT 'INR',
+    status TEXT NOT NULL DEFAULT 'NEGOTIATING', -- 'NEGOTIATING', 'COUNTERED', 'AGREED', 'ESCROW_FUNDED', 'COMPLETED'
+    buyer_id TEXT NOT NULL,
+    buyer_name TEXT NOT NULL,
+    seller_id TEXT NOT NULL,
+    seller_name TEXT NOT NULL,
+    escrow_required_amount NUMERIC(16, 2),
+    is_escrow_funded BOOLEAN NOT NULL DEFAULT false,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS deal_offers (
+    id TEXT PRIMARY KEY,
+    deal_id TEXT REFERENCES deal_rooms(id) ON DELETE CASCADE,
+    sender_id TEXT NOT NULL,
+    amount NUMERIC(16, 2) NOT NULL,
+    currency TEXT NOT NULL DEFAULT 'INR',
+    terms TEXT,
+    status TEXT NOT NULL DEFAULT 'PENDING',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS deal_documents (
+    id TEXT PRIMARY KEY,
+    deal_id TEXT REFERENCES deal_rooms(id) ON DELETE CASCADE,
+    title TEXT NOT NULL,
+    file_url TEXT NOT NULL,
+    document_type TEXT,
+    is_verified BOOLEAN NOT NULL DEFAULT false,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- ==============================================================================
+-- 10. BUYER REQUESTS ("I AM LOOKING FOR...")
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS buyer_requests (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    user_name TEXT,
+    category TEXT NOT NULL,
+    title TEXT NOT NULL,
+    description TEXT NOT NULL,
+    budget_min NUMERIC(16, 2),
+    budget_max NUMERIC(16, 2),
+    currency TEXT NOT NULL DEFAULT 'INR',
+    target_timeline TEXT,
+    status TEXT NOT NULL DEFAULT 'ACTIVE',
+    proposals_count INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- ==============================================================================
+-- 11. MEMBERSHIP TIERS (NP ACCESS, NP PRIVÉ, NP BLACK)
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS membership_plans (
+    id TEXT PRIMARY KEY,
+    slug TEXT UNIQUE NOT NULL, -- 'access', 'prive', 'black'
+    name TEXT NOT NULL,
+    badge TEXT NOT NULL,
+    price_monthly NUMERIC(12, 2) NOT NULL,
+    price_annual NUMERIC(12, 2) NOT NULL,
+    currency TEXT NOT NULL DEFAULT 'INR',
+    contact_credits INT NOT NULL DEFAULT 0,
+    perks JSONB NOT NULL DEFAULT '[]'::jsonb,
+    is_most_popular BOOLEAN NOT NULL DEFAULT false,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- ==============================================================================
+-- 12. FIRST 50 FOUNDING SELLERS PROGRAM
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS founding_sellers (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    business_name TEXT NOT NULL,
+    seller_type TEXT NOT NULL,
+    country TEXT NOT NULL,
+    city TEXT NOT NULL,
+    contact_email TEXT NOT NULL,
+    contact_phone TEXT,
+    portfolio_value_estimate TEXT,
+    inventory_summary TEXT,
+    slot_number INT,
+    status TEXT NOT NULL DEFAULT 'PENDING_REVIEW',
+    badge_issued BOOLEAN NOT NULL DEFAULT false,
+    submitted_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    approved_at TIMESTAMPTZ
+);
+
+

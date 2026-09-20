@@ -31,7 +31,7 @@ class GlobalLuxuryMarketplaceApp extends ConsumerWidget {
     final themeMode = ref.watch(themeModeProvider);
 
     return MaterialApp.router(
-      title: 'Maison Du Luxe',
+      title: 'NP GROUPS',
       debugShowCheckedModeBanner: false,
       theme: LuxuryTheme.lightTheme,
       darkTheme: LuxuryTheme.darkTheme,

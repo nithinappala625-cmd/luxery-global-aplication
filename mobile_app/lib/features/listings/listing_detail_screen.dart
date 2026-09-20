@@ -14,6 +14,7 @@ import '../../providers/wishlist_provider.dart';
 import 'widgets/contact_unlock_dialog.dart';
 import 'widgets/enquiry_dialog.dart';
 import 'widgets/fullscreen_gallery.dart';
+import 'widgets/make_offer_dialog.dart';
 
 class ListingDetailScreen extends ConsumerStatefulWidget {
   final String listingId;
@@ -340,6 +341,75 @@ class _ListingDetailScreenState extends ConsumerState<ListingDetailScreen> {
             Divider(color: isDark ? LuxuryColors.borderDark : LuxuryColors.borderLight),
             const SizedBox(height: 24),
 
+            // 5. Private Deal Room & Formal Acquisition
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF141414) : const Color(0xFFFAF8F5),
+                  borderRadius: BorderRadius.circular(2),
+                  border: Border.all(
+                    color: LuxuryColors.champagne.withOpacity(0.4),
+                    width: 0.8,
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.handshake_outlined, color: LuxuryColors.champagne, size: 20),
+                        const SizedBox(width: 8),
+                        Text(
+                          'PRIVATE ACQUISITIONS & ESCROW',
+                          style: LuxuryTypography.microCaps.copyWith(
+                            color: LuxuryColors.champagne,
+                            letterSpacing: 2.0,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      'Direct bilateral negotiation protected by NP Private Escrow. Submit a formal binding offer or enter the confidential Deal Room with verified asset documents and title deeds.',
+                      style: LuxuryTypography.bodySmall.copyWith(
+                        color: isDark ? LuxuryColors.mutedGrey : LuxuryColors.charcoal,
+                        height: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: LuxuryButton(
+                            text: 'MAKE FORMAL OFFER',
+                            variant: LuxuryButtonVariant.secondary,
+                            icon: const Icon(Icons.gavel_outlined, size: 14),
+                            onPressed: () => MakeOfferDialog.show(context, listing),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: LuxuryButton(
+                            text: 'ENTER DEAL ROOM',
+                            variant: LuxuryButtonVariant.gold,
+                            icon: const Icon(Icons.meeting_room_outlined, size: 14),
+                            onPressed: () => context.push('/deals/deal-101'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 28),
+            Divider(color: isDark ? LuxuryColors.borderDark : LuxuryColors.borderLight),
+            const SizedBox(height: 24),
+
             // 6. Seller / Custodian Information
             if (listing.seller != null)
               Padding(
@@ -444,23 +514,50 @@ class _ListingDetailScreenState extends ConsumerState<ListingDetailScreen> {
           ],
         ),
         child: SafeArea(
-          child: Row(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Expanded(
-                child: LuxuryButton(
-                  text: 'ENQUIRE',
-                  variant: LuxuryButtonVariant.secondary,
-                  onPressed: () => EnquiryDialog.show(context, listing),
-                ),
+              Row(
+                children: [
+                  Expanded(
+                    child: LuxuryButton(
+                      text: 'MAKE OFFER',
+                      variant: LuxuryButtonVariant.secondary,
+                      icon: const Icon(Icons.gavel, size: 14),
+                      onPressed: () => MakeOfferDialog.show(context, listing),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: LuxuryButton(
+                      text: 'DEAL ROOM',
+                      variant: LuxuryButtonVariant.secondary,
+                      icon: const Icon(Icons.meeting_room_outlined, size: 14),
+                      onPressed: () => context.push('/deals/deal-101'),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                flex: 2,
-                child: LuxuryButton(
-                  text: 'REQUEST SELLER CONTACT',
-                  variant: LuxuryButtonVariant.gold,
-                  onPressed: () => ContactUnlockDialog.show(context, listing),
-                ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: LuxuryButton(
+                      text: 'ENQUIRE',
+                      variant: LuxuryButtonVariant.secondary,
+                      onPressed: () => EnquiryDialog.show(context, listing),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    flex: 2,
+                    child: LuxuryButton(
+                      text: 'REQUEST SELLER CONTACT',
+                      variant: LuxuryButtonVariant.gold,
+                      onPressed: () => ContactUnlockDialog.show(context, listing),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

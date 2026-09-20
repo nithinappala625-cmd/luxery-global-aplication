@@ -1,98 +1,155 @@
+enum AuctionStatus {
+  draft('DRAFT', 'Draft'),
+  pendingApproval('PENDING_APPROVAL', 'Pending Approval'),
+  scheduled('SCHEDULED', 'Scheduled'),
+  live('LIVE', 'Live Auction'),
+  ended('ENDED', 'Auction Ended'),
+  settled('SETTLED', 'Settled'),
+  cancelled('CANCELLED', 'Cancelled');
+
+  final String code;
+  final String label;
+  const AuctionStatus(this.code, this.label);
+}
+
+enum AuctionFormat {
+  timed('TIMED', 'Timed Online'),
+  live('LIVE', 'Live Curated Floor'),
+  reserve('RESERVE', 'Reserve Auction'),
+  noReserve('NO_RESERVE', 'No-Reserve'),
+  private('PRIVATE', 'Private Invitation Only');
+
+  final String code;
+  final String label;
+  const AuctionFormat(this.code, this.label);
+}
+
+class AuctionBid {
+  final String id;
+  final String auctionId;
+  final String bidderId;
+  final String bidderMaskedName; // e.g. "Bidder #4910"
+  final double amount;
+  final DateTime timestamp;
+  final bool isWinningBid;
+
+  const AuctionBid({
+    required this.id,
+    required this.auctionId,
+    required this.bidderId,
+    required this.bidderMaskedName,
+    required this.amount,
+    required this.timestamp,
+    this.isWinningBid = false,
+  });
+}
+
 class AuctionHouse {
   final String id;
   final String name;
-  final String slug;
-  final String? logoUrl;
   final String city;
   final String country;
   final String? description;
-  final String websiteUrl;
-  final bool isVerified;
+  final String? websiteUrl;
 
   const AuctionHouse({
     required this.id,
     required this.name,
-    required this.slug,
-    this.logoUrl,
     required this.city,
     required this.country,
     this.description,
-    required this.websiteUrl,
-    this.isVerified = true,
+    this.websiteUrl,
   });
-
-  factory AuctionHouse.fromJson(Map<String, dynamic> json) {
-    return AuctionHouse(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      slug: json['slug'] as String,
-      logoUrl: json['logo_url'] ?? json['logoUrl'],
-      city: json['city'] as String? ?? 'London',
-      country: json['country'] as String? ?? 'UK',
-      description: json['description'] as String?,
-      websiteUrl: json['website_url'] ?? json['websiteUrl'] ?? 'https://sothebys.com',
-      isVerified: json['is_verified'] ?? json['isVerified'] ?? true,
-    );
-  }
 }
 
 class LuxuryAuction {
   final String id;
-  final String auctionHouseId;
-  final String? auctionHouseName;
-  final String? auctionHouseLogo;
-  final String title;
-  final String slug;
+  final String assetTitle;
+  final String categoryName;
   final String description;
   final String coverImageUrl;
-  final String? bannerImageUrl;
-  final String location;
+  final List<String> galleryImages;
+  final double startingBid;
+  final double? reservePrice;
+  final bool isReserveMet;
+  final double currentBid;
+  final double minBidIncrement;
+  final String currency;
   final DateTime startDate;
   final DateTime endDate;
-  final String status; // 'upcoming', 'live', 'ended'
-  final int totalLots;
-  final String currency;
-  final String externalBiddingUrl;
+  final AuctionStatus status;
+  final AuctionFormat format;
+  final String auctionHouseName;
+  final String location;
+  final int totalBidsCount;
+  final List<AuctionBid> bidHistory;
+  final String terms;
+  final double buyerPremiumPercentage;
 
   const LuxuryAuction({
     required this.id,
-    required this.auctionHouseId,
-    this.auctionHouseName,
-    this.auctionHouseLogo,
-    required this.title,
-    required this.slug,
+    required this.assetTitle,
+    required this.categoryName,
     required this.description,
     required this.coverImageUrl,
-    this.bannerImageUrl,
-    required this.location,
+    this.galleryImages = const [],
+    required this.startingBid,
+    this.reservePrice,
+    this.isReserveMet = true,
+    required this.currentBid,
+    this.minBidIncrement = 50000.0,
+    this.currency = 'INR',
     required this.startDate,
     required this.endDate,
-    required this.status,
-    required this.totalLots,
-    required this.currency,
-    required this.externalBiddingUrl,
+    this.status = AuctionStatus.live,
+    this.format = AuctionFormat.timed,
+    required this.auctionHouseName,
+    this.location = 'Monaco / Geneva',
+    this.totalBidsCount = 0,
+    this.bidHistory = const [],
+    this.terms = 'Standard NP GROUPS Curated Auction Terms. 10% Escrow deposit required to place binding bids.',
+    this.buyerPremiumPercentage = 12.5,
   });
 
-  bool get isLive => status == 'live';
+  bool get isLive => status == AuctionStatus.live;
+  double get nextMinimumBid => currentBid + minBidIncrement;
 
-  factory LuxuryAuction.fromJson(Map<String, dynamic> json) {
+  Duration get timeRemaining {
+    final now = DateTime.now();
+    if (now.isAfter(endDate)) return Duration.zero;
+    return endDate.difference(now);
+  }
+
+  LuxuryAuction copyWith({
+    double? currentBid,
+    int? totalBidsCount,
+    List<AuctionBid>? bidHistory,
+    bool? isReserveMet,
+    AuctionStatus? status,
+  }) {
     return LuxuryAuction(
-      id: json['id'] as String,
-      auctionHouseId: json['auction_house_id'] ?? json['auctionHouseId'] ?? '',
-      auctionHouseName: json['auction_house_name'] ?? json['auctionHouseName'] ?? 'Sotheby\'s',
-      auctionHouseLogo: json['auction_house_logo'] ?? json['auctionHouseLogo'],
-      title: json['title'] as String,
-      slug: json['slug'] as String? ?? '',
-      description: json['description'] as String? ?? '',
-      coverImageUrl: json['cover_image_url'] ?? json['coverImageUrl'] ?? '',
-      bannerImageUrl: json['banner_image_url'] ?? json['bannerImageUrl'],
-      location: json['location'] as String? ?? 'Geneva',
-      startDate: json['start_date'] != null ? DateTime.parse(json['start_date']) : DateTime.now(),
-      endDate: json['end_date'] != null ? DateTime.parse(json['end_date']) : DateTime.now().add(const Duration(days: 2)),
-      status: json['status'] as String? ?? 'upcoming',
-      totalLots: json['total_lots'] ?? json['totalLots'] ?? 0,
-      currency: json['currency'] as String? ?? 'USD',
-      externalBiddingUrl: json['external_bidding_url'] ?? json['externalBiddingUrl'] ?? 'https://sothebys.com',
+      id: id,
+      assetTitle: assetTitle,
+      categoryName: categoryName,
+      description: description,
+      coverImageUrl: coverImageUrl,
+      galleryImages: galleryImages,
+      startingBid: startingBid,
+      reservePrice: reservePrice,
+      isReserveMet: isReserveMet ?? this.isReserveMet,
+      currentBid: currentBid ?? this.currentBid,
+      minBidIncrement: minBidIncrement,
+      currency: currency,
+      startDate: startDate,
+      endDate: endDate,
+      status: status ?? this.status,
+      format: format,
+      auctionHouseName: auctionHouseName,
+      location: location,
+      totalBidsCount: totalBidsCount ?? this.totalBidsCount,
+      bidHistory: bidHistory ?? this.bidHistory,
+      terms: terms,
+      buyerPremiumPercentage: buyerPremiumPercentage,
     );
   }
 }

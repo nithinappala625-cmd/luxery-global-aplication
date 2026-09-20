@@ -59,7 +59,7 @@ class ListingLocation {
     required this.city,
     this.stateProvince,
     required this.country,
-    this.countryCode = 'US',
+    this.countryCode = 'IN',
     this.latitude,
     this.longitude,
   });
@@ -76,7 +76,7 @@ class ListingLocation {
       city: json['city'] ?? '',
       stateProvince: json['state_province'] ?? json['stateProvince'],
       country: json['country'] ?? '',
-      countryCode: json['country_code'] ?? json['countryCode'] ?? 'US',
+      countryCode: json['country_code'] ?? json['countryCode'] ?? 'IN',
       latitude: (json['latitude'] as num?)?.toDouble(),
       longitude: (json['longitude'] as num?)?.toDouble(),
     );
@@ -86,12 +86,13 @@ class ListingLocation {
 class SellerSnippet {
   final String id;
   final String name;
-  final String sellerType; // 'private_collector', 'boutique_dealer', 'authorized_dealer'
+  final String sellerType;
   final String? avatarUrl;
   final String? city;
   final String? country;
   final double reputationScore;
   final bool isVerified;
+  final bool isFoundingSeller;
 
   const SellerSnippet({
     required this.id,
@@ -102,20 +103,33 @@ class SellerSnippet {
     this.country,
     this.reputationScore = 5.0,
     this.isVerified = true,
+    this.isFoundingSeller = false,
   });
 
   factory SellerSnippet.fromJson(Map<String, dynamic> json) {
     return SellerSnippet(
       id: json['id'] as String,
       name: json['business_name'] ?? json['full_name'] ?? json['name'] ?? 'Private Collector',
-      sellerType: json['seller_type'] ?? json['sellerType'] ?? 'private_collector',
+      sellerType: json['seller_type'] ?? json['sellerType'] ?? 'INDIVIDUAL_SELLER',
       avatarUrl: json['avatar_url'] ?? json['avatarUrl'],
       city: json['location_city'] ?? json['city'],
       country: json['location_country'] ?? json['country'],
       reputationScore: (json['reputation_score'] as num?)?.toDouble() ?? 5.0,
       isVerified: json['is_verified'] ?? json['isVerified'] ?? true,
+      isFoundingSeller: json['is_founding_seller'] ?? json['isFoundingSeller'] ?? false,
     );
   }
+}
+
+enum ListingSaleType {
+  fixedPrice('FIXED', 'Fixed Price'),
+  makeOffer('OFFER', 'Make an Offer'),
+  auction('AUCTION', 'NP Auction Lot'),
+  rental('RENTAL', 'NP Luxe Drive Rental');
+
+  final String code;
+  final String label;
+  const ListingSaleType(this.code, this.label);
 }
 
 class LuxuryListing {
@@ -141,6 +155,9 @@ class LuxuryListing {
   final List<ListingImage> images;
   final List<ListingSpecification> specifications;
   final SellerSnippet? seller;
+  final String? videoUrl;
+  final List<String> certificateUrls;
+  final ListingSaleType saleType;
   final bool isSaved;
   final DateTime createdAt;
 
@@ -167,6 +184,9 @@ class LuxuryListing {
     required this.images,
     this.specifications = const [],
     this.seller,
+    this.videoUrl,
+    this.certificateUrls = const [],
+    this.saleType = ListingSaleType.fixedPrice,
     this.isSaved = false,
     required this.createdAt,
   });
@@ -180,11 +200,23 @@ class LuxuryListing {
   }
 
   bool get isCuratorVerified => status == 'verified';
+  bool get hasVideo => videoUrl != null && videoUrl!.isNotEmpty;
+  bool get hasCertificates => certificateUrls.isNotEmpty;
+  bool get allowsOffer => saleType == ListingSaleType.makeOffer || saleType == ListingSaleType.fixedPrice;
 
   LuxuryListing copyWith({
+    String? title,
+    String? description,
+    double? price,
+    String? currency,
+    String? condition,
     bool? isSaved,
     String? status,
     int? viewCount,
+    String? videoUrl,
+    List<ListingImage>? images,
+    List<String>? certificateUrls,
+    ListingSaleType? saleType,
   }) {
     return LuxuryListing(
       id: id,
@@ -194,21 +226,24 @@ class LuxuryListing {
       subcategoryId: subcategoryId,
       brandId: brandId,
       brandName: brandName,
-      title: title,
+      title: title ?? this.title,
       slug: slug,
-      description: description,
-      price: price,
-      currency: currency,
+      description: description ?? this.description,
+      price: price ?? this.price,
+      currency: currency ?? this.currency,
       year: year,
-      condition: condition,
+      condition: condition ?? this.condition,
       status: status ?? this.status,
       isFeatured: isFeatured,
       viewCount: viewCount ?? this.viewCount,
       contactUnlockFee: contactUnlockFee,
       location: location,
-      images: images,
+      images: images ?? this.images,
       specifications: specifications,
       seller: seller,
+      videoUrl: videoUrl ?? this.videoUrl,
+      certificateUrls: certificateUrls ?? this.certificateUrls,
+      saleType: saleType ?? this.saleType,
       isSaved: isSaved ?? this.isSaved,
       createdAt: createdAt,
     );
@@ -228,8 +263,8 @@ class LuxuryListing {
       loc = ListingLocation.fromJson((json['listing_locations'] as List).first as Map<String, dynamic>);
     } else {
       loc = ListingLocation(
-        city: json['city'] ?? json['location_city'] ?? 'Geneva',
-        country: json['country'] ?? json['location_country'] ?? 'Switzerland',
+        city: json['city'] ?? json['location_city'] ?? 'Mumbai',
+        country: json['country'] ?? json['location_country'] ?? 'India',
       );
     }
 
@@ -250,7 +285,7 @@ class LuxuryListing {
       slug: json['slug'] as String? ?? '',
       description: json['description'] as String? ?? '',
       price: (json['price'] as num?)?.toDouble() ?? 0.0,
-      currency: json['currency'] as String? ?? 'USD',
+      currency: json['currency'] as String? ?? 'INR',
       year: json['year'] as int?,
       condition: json['condition'] as String? ?? 'Pristine',
       status: json['status'] as String? ?? 'draft',
@@ -261,6 +296,8 @@ class LuxuryListing {
       images: imagesList,
       specifications: specsList,
       seller: sellerInfo,
+      videoUrl: json['video_url'] ?? json['videoUrl'],
+      certificateUrls: (json['certificate_urls'] as List?)?.map((e) => e.toString()).toList() ?? [],
       isSaved: json['is_saved'] ?? json['isSaved'] ?? false,
       createdAt: json['created_at'] != null ? DateTime.parse(json['created_at']) : DateTime.now(),
     );

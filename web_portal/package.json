@@ -1,0 +1,12 @@
+{
+  "name": "maison-du-luxe-web-portal",
+  "version": "1.0.0",
+  "description": "Maison Du Luxe Web Showcase, OAuth Callback & Super Admin Portal",
+  "scripts": {
+    "dev": "npx serve .",
+    "start": "npx serve ."
+  },
+  "keywords": ["luxury", "marketplace", "vercel", "supabase"],
+  "author": "Maison Du Luxe",
+  "license": "UNLICENSED"
+}

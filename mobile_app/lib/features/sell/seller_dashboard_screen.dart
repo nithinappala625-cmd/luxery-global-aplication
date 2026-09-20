@@ -93,7 +93,7 @@ class _SellerDashboardScreenState extends ConsumerState<SellerDashboardScreen>
                 children: [
                   CircleAvatar(
                     radius: 14,
-                    backgroundImage: NetworkImage(currentSeller.profilePhoto ?? 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=100&auto=format&fit=crop'),
+                    backgroundImage: NetworkImage(currentSeller.profilePhoto ?? 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?q=80&w=300&auto=format&fit=crop'),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
@@ -149,21 +149,74 @@ class _SellerDashboardScreenState extends ConsumerState<SellerDashboardScreen>
             )
           else
             Container(
-              padding: const EdgeInsets.all(12),
-              color: LuxuryColors.rejectionRed.withOpacity(0.1),
-              child: Row(
+              padding: const EdgeInsets.all(16),
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: isDark ? LuxuryColors.pureBlack : const Color(0xFFFAF7F2),
+                borderRadius: BorderRadius.circular(4),
+                border: Border.all(color: LuxuryColors.champagne.withOpacity(0.5)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.info_outline, size: 18, color: LuxuryColors.champagne),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'Accreditation required to consign luxury assets.',
-                      style: LuxuryTypography.bodySmall.copyWith(fontSize: 11),
+                  Row(
+                    children: [
+                      const Icon(Icons.hourglass_top_rounded, color: LuxuryColors.champagne, size: 20),
+                      const SizedBox(width: 8),
+                      Text(
+                        'UNDER 24-HOUR CURATORIAL AUDIT',
+                        style: LuxuryTypography.microCaps.copyWith(
+                          color: LuxuryColors.champagne,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 1.2,
+                          fontSize: 10.5,
+                        ),
+                      ),
+                      const Spacer(),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: LuxuryColors.champagne.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                        child: Text(
+                          'IN REVIEW',
+                          style: LuxuryTypography.microCaps.copyWith(
+                            color: LuxuryColors.champagne,
+                            fontSize: 7.5,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Your entity documents and asset dossiers are currently undergoing curatorial vetting by the Maison Du Luxe Board. Genuine verification completes within 24 hours. Your portfolio will then be published globally.',
+                    style: LuxuryTypography.bodySmall.copyWith(
+                      color: isDark ? LuxuryColors.mutedGrey : LuxuryColors.charcoal,
+                      fontSize: 11,
+                      height: 1.4,
                     ),
                   ),
-                  TextButton(
-                    onPressed: () => context.push('/seller/register'),
-                    child: const Text('ACCREDIT', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 10),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: () => context.push('/seller/register'),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                        backgroundColor: LuxuryColors.champagne.withOpacity(0.12),
+                      ),
+                      child: Text(
+                        'UPDATE AUDIT DOSSIERS',
+                        style: LuxuryTypography.microCaps.copyWith(
+                          color: LuxuryColors.champagne,
+                          fontSize: 8.5,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -346,16 +399,21 @@ class _SellerDashboardScreenState extends ConsumerState<SellerDashboardScreen>
                 color: isDark ? LuxuryColors.borderDark : LuxuryColors.borderLight,
                 height: 1,
               ),
-              // Seller Actions Bar: Preview, Pause, Mark Sold, Delete
+              // Seller Actions Bar: Preview, Edit, Pause, Sold, Delete
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     _buildActionButton(
                       icon: Icons.visibility_outlined,
                       label: 'PREVIEW',
                       onTap: () => context.push('/listing/${item.id}'),
+                    ),
+                    _buildActionButton(
+                      icon: Icons.edit_outlined,
+                      label: 'EDIT',
+                      onTap: () => _showEditListingModal(context, item),
                     ),
                     _buildActionButton(
                       icon: Icons.pause_circle_outline,
@@ -380,13 +438,8 @@ class _SellerDashboardScreenState extends ConsumerState<SellerDashboardScreen>
                     ),
                     _buildActionButton(
                       icon: Icons.delete_outline,
-                      label: 'ARCHIVE',
-                      onTap: () {
-                        ref.read(allListingsProvider.notifier).removeListing(item.id);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Asset archived from salon.')),
-                        );
-                      },
+                      label: 'DELETE',
+                      onTap: () => _confirmDeleteListing(context, item),
                     ),
                   ],
                 ),
@@ -395,6 +448,258 @@ class _SellerDashboardScreenState extends ConsumerState<SellerDashboardScreen>
           ),
         );
       },
+    );
+  }
+
+  void _showEditListingModal(BuildContext context, LuxuryListing item) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final priceCtrl = TextEditingController(text: item.price.toStringAsFixed(0));
+    final titleCtrl = TextEditingController(text: item.title);
+    final descCtrl = TextEditingController(text: item.description);
+    String selectedCurrency = item.currency;
+    String selectedStatus = item.status;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: isDark ? LuxuryColors.pureBlack : LuxuryColors.pureWhite,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                left: 20,
+                right: 20,
+                top: 20,
+                bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'EDIT ASSET VALUATION & DETAILS',
+                          style: LuxuryTypography.microCaps.copyWith(
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 1.2,
+                            fontSize: 11,
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close, size: 20),
+                          onPressed: () => Navigator.pop(ctx),
+                        ),
+                      ],
+                    ),
+                    const Divider(height: 1),
+                    const SizedBox(height: 16),
+                    Text(
+                      'TITLE / ASSET NAME',
+                      style: LuxuryTypography.microCaps.copyWith(color: LuxuryColors.champagne),
+                    ),
+                    const SizedBox(height: 6),
+                    TextField(
+                      controller: titleCtrl,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(2)),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      ),
+                      style: LuxuryTypography.bodyMedium,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'ASKING PRICE / VALUATION',
+                      style: LuxuryTypography.microCaps.copyWith(color: LuxuryColors.champagne),
+                    ),
+                    const SizedBox(height: 6),
+                    TextField(
+                      controller: priceCtrl,
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(2)),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      ),
+                      style: LuxuryTypography.bodyMedium,
+                    ),
+                    const SizedBox(height: 14),
+                    Text(
+                      'CURRENCY JURISDICTION',
+                      style: LuxuryTypography.microCaps.copyWith(color: LuxuryColors.champagne),
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      children: ['INR', 'USD', 'EUR', 'GBP', 'CHF', 'AED'].map((curr) {
+                        final isSel = selectedCurrency == curr;
+                        return ChoiceChip(
+                          label: Text(curr),
+                          selected: isSel,
+                          selectedColor: isDark ? LuxuryColors.champagne : LuxuryColors.deepForestGreen,
+                          labelStyle: TextStyle(
+                            color: isSel ? Colors.black : (isDark ? Colors.white : Colors.black),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 11,
+                          ),
+                          onSelected: (sel) {
+                            if (sel) setModalState(() => selectedCurrency = curr);
+                          },
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 14),
+                    Text(
+                      'PORTFOLIO STATUS',
+                      style: LuxuryTypography.microCaps.copyWith(color: LuxuryColors.champagne),
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      children: ['verified', 'pending_review', 'draft', 'sold'].map((st) {
+                        final isSel = selectedStatus == st;
+                        return ChoiceChip(
+                          label: Text(st.replaceAll('_', ' ').toUpperCase()),
+                          selected: isSel,
+                          selectedColor: isDark ? LuxuryColors.champagne : LuxuryColors.deepForestGreen,
+                          labelStyle: TextStyle(
+                            color: isSel ? Colors.black : (isDark ? Colors.white : Colors.black),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 10,
+                          ),
+                          onSelected: (sel) {
+                            if (sel) setModalState(() => selectedStatus = st);
+                          },
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'CURATORIAL DESCRIPTION',
+                      style: LuxuryTypography.microCaps.copyWith(color: LuxuryColors.champagne),
+                    ),
+                    const SizedBox(height: 6),
+                    TextField(
+                      controller: descCtrl,
+                      maxLines: 3,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(2)),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      ),
+                      style: LuxuryTypography.bodyMedium,
+                    ),
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: isDark ? LuxuryColors.champagne : LuxuryColors.deepForestGreen,
+                          foregroundColor: isDark ? LuxuryColors.pureBlack : LuxuryColors.pureWhite,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
+                        ),
+                        onPressed: () {
+                          final newPrice = double.tryParse(priceCtrl.text) ?? item.price;
+                          final updated = item.copyWith(
+                            title: titleCtrl.text.isNotEmpty ? titleCtrl.text : item.title,
+                            price: newPrice,
+                            currency: selectedCurrency,
+                            description: descCtrl.text.isNotEmpty ? descCtrl.text : item.description,
+                            status: selectedStatus,
+                          );
+                          ref.read(allListingsProvider.notifier).updateListing(updated);
+                          Navigator.pop(ctx);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Valuation and asset specifications updated.'),
+                              backgroundColor: LuxuryColors.deepForestGreen,
+                            ),
+                          );
+                        },
+                        child: Text(
+                          'SAVE CURATED VALUATION',
+                          style: LuxuryTypography.microCaps.copyWith(
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 1.2,
+                            color: isDark ? LuxuryColors.pureBlack : LuxuryColors.pureWhite,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _confirmDeleteListing(BuildContext context, LuxuryListing item) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: isDark ? LuxuryColors.darkCard : LuxuryColors.pureWhite,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(4),
+          side: BorderSide(color: LuxuryColors.rejectionRed.withOpacity(0.5)),
+        ),
+        title: Text(
+          'REMOVE FROM PRIVATE SALON?',
+          style: LuxuryTypography.microCaps.copyWith(
+            fontWeight: FontWeight.w700,
+            letterSpacing: 1.2,
+            fontSize: 12,
+            color: LuxuryColors.rejectionRed,
+          ),
+        ),
+        content: Text(
+          'Are you sure you wish to permanently delete "${item.title}" from your salon portfolio? This action cannot be undone.',
+          style: LuxuryTypography.bodySmall,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(
+              'KEEP ASSET',
+              style: LuxuryTypography.microCaps.copyWith(
+                color: LuxuryColors.mutedGrey,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: LuxuryColors.rejectionRed,
+              foregroundColor: LuxuryColors.pureWhite,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
+            ),
+            onPressed: () {
+              ref.read(allListingsProvider.notifier).removeListing(item.id);
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Asset permanently deleted from salon.')),
+              );
+            },
+            child: Text(
+              'DELETE ASSET',
+              style: LuxuryTypography.microCaps.copyWith(
+                fontWeight: FontWeight.w700,
+                letterSpacing: 1.0,
+                color: LuxuryColors.pureWhite,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

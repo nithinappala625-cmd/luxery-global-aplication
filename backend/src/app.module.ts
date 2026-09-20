@@ -11,6 +11,12 @@ import { ContactUnlocksModule } from './modules/contact-unlocks/contact-unlocks.
 import { AdminModule } from './modules/admin/admin.module';
 import { SellersModule } from './modules/sellers/sellers.module';
 import { AttributesModule } from './modules/attributes/attributes.module';
+import { RentalsModule } from './modules/rentals/rentals.module';
+import { AviationModule } from './modules/aviation/aviation.module';
+import { DealsModule } from './modules/deals/deals.module';
+import { BuyerRequestsModule } from './modules/buyer-requests/buyer-requests.module';
+import { MembershipsModule } from './modules/memberships/memberships.module';
+import { FoundingSellersModule } from './modules/founding-sellers/founding-sellers.module';
 
 @Module({
   imports: [
@@ -28,6 +34,12 @@ import { AttributesModule } from './modules/attributes/attributes.module';
     AdminModule,
     SellersModule,
     AttributesModule,
+    RentalsModule,
+    AviationModule,
+    DealsModule,
+    BuyerRequestsModule,
+    MembershipsModule,
+    FoundingSellersModule,
   ],
 })
 export class AppModule {}

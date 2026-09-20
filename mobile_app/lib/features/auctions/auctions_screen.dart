@@ -7,7 +7,6 @@ import '../../core/widgets/luxury_button.dart';
 import '../../models/auction.dart';
 import '../../providers/auctions_provider.dart';
 import 'widgets/auction_card.dart';
-import 'widgets/auction_house_sheet.dart';
 
 class AuctionsScreen extends ConsumerStatefulWidget {
   const AuctionsScreen({super.key});
@@ -32,208 +31,309 @@ class _AuctionsScreenState extends ConsumerState<AuctionsScreen>
     super.dispose();
   }
 
+  void _openPlaceBidSheet(LuxuryAuction lot) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    double proposedBid = lot.nextMinimumBid;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: isDark ? const Color(0xFF141414) : Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setSheetState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                left: 20,
+                right: 20,
+                top: 20,
+                bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'PLACE BINDING AUCTION BID',
+                        style: LuxuryTypography.microCaps.copyWith(
+                          color: LuxuryColors.champagne,
+                          letterSpacing: 2.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close, size: 20),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    lot.assetTitle,
+                    style: LuxuryTypography.editorialHeading2.copyWith(fontSize: 16),
+                  ),
+                  Text(
+                    'Curated by: ${lot.auctionHouseName}',
+                    style: const TextStyle(color: Colors.grey, fontSize: 12),
+                  ),
+                  const Divider(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Current High Bid:', style: TextStyle(fontSize: 13)),
+                      Text('₹ ${(lot.currentBid / 10000000).toStringAsFixed(2)} Cr',
+                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Next Minimum Bid:', style: TextStyle(fontSize: 13)),
+                      Text('₹ ${(lot.nextMinimumBid / 10000000).toStringAsFixed(2)} Cr',
+                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: LuxuryColors.champagne)),
+                    ],
+                  ),
+                  const SizedBox(height: 18),
+
+                  // Bid increment selector
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.remove_circle_outline),
+                        onPressed: proposedBid <= lot.nextMinimumBid
+                            ? null
+                            : () {
+                                setSheetState(() {
+                                  proposedBid -= lot.minBidIncrement;
+                                });
+                              },
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: isDark ? const Color(0xFF0C0C0C) : const Color(0xFFEEEEEE),
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(color: LuxuryColors.champagne),
+                        ),
+                        child: Text(
+                          '₹ ${(proposedBid / 10000000).toStringAsFixed(2)} Cr',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: LuxuryColors.champagne,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.add_circle_outline),
+                        onPressed: () {
+                          setSheetState(() {
+                            proposedBid += lot.minBidIncrement;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF0D140F) : const Color(0xFFEBF3ED),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      'Terms: Bids are legally binding under NP AUCTIONS regulations. A 10% refundable escrow deposit is pre-authorized. Buyer Premium: ${lot.buyerPremiumPercentage}%.',
+                      style: const TextStyle(fontSize: 10.5, height: 1.35),
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  LuxuryButton(
+                    text: 'CONFIRM & TRANSMIT BINDING BID',
+                    variant: LuxuryButtonVariant.gold,
+                    onPressed: () async {
+                      final success = await ref.read(auctionsProvider.notifier).placeBid(
+                            auctionId: lot.id,
+                            bidAmount: proposedBid,
+                            bidderMaskedName: 'You (VIP Bidder #884)',
+                          );
+                      if (context.mounted) {
+                        Navigator.pop(context);
+                        if (success) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Bid Accepted! You are currently the highest bidder on this lot.'),
+                              backgroundColor: LuxuryColors.deepForestGreen,
+                            ),
+                          );
+                        }
+                      }
+                    },
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _openBidHistorySheet(LuxuryAuction lot) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: isDark ? const Color(0xFF141414) : Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) {
+        return Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'BID AUDIT TRAIL',
+                    style: LuxuryTypography.microCaps.copyWith(
+                      color: LuxuryColors.champagne,
+                      letterSpacing: 2.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close, size: 20),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Text(
+                lot.assetTitle,
+                style: LuxuryTypography.editorialHeading2.copyWith(fontSize: 16),
+              ),
+              const Divider(height: 20),
+              if (lot.bidHistory.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Text('No bids recorded yet. Be the first to place the starting bid.'),
+                )
+              else
+                ...lot.bidHistory.map((b) {
+                  return Container(
+                    margin: const EdgeInsets.symmetric(vertical: 6),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: b.isWinningBid
+                          ? (isDark ? const Color(0xFF142418) : const Color(0xFFE2F0E5))
+                          : (isDark ? const Color(0xFF1C1C1E) : const Color(0xFFEEEEEE)),
+                      borderRadius: BorderRadius.circular(4),
+                      border: b.isWinningBid ? Border.all(color: LuxuryColors.champagne) : null,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            if (b.isWinningBid)
+                              const Icon(Icons.check_circle, size: 16, color: LuxuryColors.champagne),
+                            if (b.isWinningBid) const SizedBox(width: 8),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(b.bidderMaskedName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                                Text('${b.timestamp.hour}:${b.timestamp.minute.toString().padLeft(2, '0')}',
+                                    style: const TextStyle(fontSize: 10, color: Colors.grey)),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Text(
+                          '₹ ${(b.amount / 10000000).toStringAsFixed(2)} Cr',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            color: b.isWinningBid ? LuxuryColors.champagne : null,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }),
+              const SizedBox(height: 16),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final auctions = ref.watch(auctionsProvider);
-    final houses = ref.watch(auctionHousesProvider);
-
-    final liveAuctions = auctions.where((a) => a.status == 'live').toList();
-    final upcomingAuctions = auctions.where((a) => a.status == 'upcoming').toList();
-    final endingSoonAuctions = auctions.where((a) => a.status == 'live').toList();
+    final state = ref.watch(auctionsProvider);
 
     return Scaffold(
       appBar: LuxuryAppBar(
-        title: 'CURATED AUCTIONS',
-        showBack: false,
-        showWishlist: true,
+        title: 'NP AUCTIONS',
+        showBack: true,
         bottom: TabBar(
           controller: _tabController,
-          indicatorColor: isDark ? LuxuryColors.champagne : LuxuryColors.deepForestGreen,
-          labelColor: isDark ? LuxuryColors.champagne : LuxuryColors.deepForestGreen,
-          unselectedLabelColor: LuxuryColors.mutedGrey,
+          indicatorColor: LuxuryColors.champagne,
+          labelColor: LuxuryColors.champagne,
+          unselectedLabelColor: isDark ? Colors.white54 : Colors.black54,
           labelStyle: LuxuryTypography.microCaps.copyWith(fontWeight: FontWeight.w700),
           tabs: const [
-            Tab(text: 'LIVE'),
-            Tab(text: 'UPCOMING'),
+            Tab(text: 'LIVE (10)'),
+            Tab(text: 'TIMED'),
             Tab(text: 'ENDING SOON'),
-            Tab(text: 'HOUSES'),
+            Tab(text: 'ALL LOTS'),
           ],
         ),
       ),
       body: TabBarView(
         controller: _tabController,
         children: [
-          _buildAuctionsList(liveAuctions, 'No live sales currently taking bids.'),
-          _buildAuctionsList(upcomingAuctions, 'No upcoming sales registered.'),
-          _buildAuctionsList(endingSoonAuctions, 'No sales closing in the next 24 hours.'),
-          _buildHousesList(houses),
+          // Live Lots
+          _buildAuctionList(state.auctions, isDark),
+          // Timed Lots
+          _buildAuctionList(state.auctions.where((a) => a.format == AuctionFormat.timed).toList(), isDark),
+          // Ending Soon
+          _buildAuctionList(state.auctions.take(4).toList(), isDark),
+          // All Lots
+          _buildAuctionList(state.auctions, isDark),
         ],
       ),
     );
   }
 
-  Widget _buildAuctionsList(List<LuxuryAuction> list, String emptyMsg) {
-    if (list.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.gavel_outlined, size: 36, color: LuxuryColors.mutedGrey.withOpacity(0.5)),
-              const SizedBox(height: 12),
-              Text(emptyMsg, style: LuxuryTypography.bodyMedium.copyWith(color: LuxuryColors.mutedGrey)),
-            ],
-          ),
-        ),
-      );
-    }
-
+  Widget _buildAuctionList(List<LuxuryAuction> lots, bool isDark) {
     return ListView.separated(
       padding: const EdgeInsets.all(20),
-      itemCount: list.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 20),
+      itemCount: lots.length,
+      separatorBuilder: (_, __) => const SizedBox(height: 20),
       itemBuilder: (context, index) {
-        final item = list[index];
+        final lot = lots[index];
         return LuxuryAuctionCard(
-          auction: item,
-          onSelect: () => _openAuctionRedirect(item),
-        );
-      },
-    );
-  }
-
-  void _openAuctionRedirect(LuxuryAuction auction) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: Theme.of(context).brightness == Brightness.dark
-            ? LuxuryColors.darkCard
-            : LuxuryColors.pureWhite,
-        title: Text(
-          'EXTERNAL BIDDING ROOM',
-          style: LuxuryTypography.editorialHeading3.copyWith(letterSpacing: 1.8),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'You are transitioning to the official live saleroom of ${auction.auctionHouseName}:',
-              style: LuxuryTypography.bodySmall.copyWith(color: LuxuryColors.mutedGrey),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              auction.title,
-              style: LuxuryTypography.bodyMedium.copyWith(fontWeight: FontWeight.w700),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              '${auction.totalLots} Lots • Starting Bids & Estimates Curated by ${auction.auctionHouseName}',
-              style: LuxuryTypography.bodySmall.copyWith(fontSize: 11, color: LuxuryColors.champagne),
-            ),
-          ],
-        ),
-        actions: [
-          LuxuryButton(
-            text: 'CANCEL',
-            variant: LuxuryButtonVariant.secondary,
-            onPressed: () => Navigator.of(ctx).pop(),
-          ),
-          const SizedBox(height: 8),
-          LuxuryButton(
-            text: 'CONTINUE TO LIVE BIDDING',
-            variant: LuxuryButtonVariant.gold,
-            onPressed: () {
-              Navigator.of(ctx).pop();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Redirecting to: ${auction.externalBiddingUrl}')),
-              );
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHousesList(List<AuctionHouse> houses) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return ListView.separated(
-      padding: const EdgeInsets.all(20),
-      itemCount: houses.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 16),
-      itemBuilder: (context, index) {
-        final house = houses[index];
-        return Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: isDark ? LuxuryColors.darkCard : LuxuryColors.pureWhite,
-            borderRadius: BorderRadius.circular(2),
-            border: Border.all(
-              color: isDark ? LuxuryColors.borderDark : LuxuryColors.borderLight,
-              width: 0.8,
-            ),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF222222) : const Color(0xFFEFECE5),
-                  borderRadius: BorderRadius.circular(2),
-                ),
-                child: Center(
-                  child: Text(
-                    house.name.substring(0, 1),
-                    style: LuxuryTypography.editorialHeading2.copyWith(color: LuxuryColors.champagne),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          house.name,
-                          style: LuxuryTypography.editorialHeading3.copyWith(fontSize: 16),
-                        ),
-                        const SizedBox(width: 6),
-                        const Icon(Icons.verified, size: 14, color: LuxuryColors.champagne),
-                      ],
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      '${house.city}, ${house.country}'.toUpperCase(),
-                      style: LuxuryTypography.microCaps.copyWith(color: LuxuryColors.mutedGrey),
-                    ),
-                  ],
-                ),
-              ),
-              OutlinedButton(
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  side: BorderSide(
-                    color: isDark ? LuxuryColors.champagne : LuxuryColors.deepForestGreen,
-                    width: 0.8,
-                  ),
-                ),
-                onPressed: () => AuctionHouseSheet.show(context, house),
-                child: Text(
-                  'SALONS',
-                  style: LuxuryTypography.microCaps.copyWith(
-                    color: isDark ? LuxuryColors.champagne : LuxuryColors.deepForestGreen,
-                    fontSize: 8.5,
-                  ),
-                ),
-              ),
-            ],
-          ),
+          auction: lot,
+          onPlaceBid: () => _openPlaceBidSheet(lot),
+          onViewHistory: () => _openBidHistorySheet(lot),
         );
       },
     );

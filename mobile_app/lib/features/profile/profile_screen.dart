@@ -46,7 +46,7 @@ class ProfileScreen extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(2),
                     child: LuxuryImage(
                       imageUrl: user?.avatarUrl ??
-                          'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=300&auto=format&fit=crop',
+                          'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?q=80&w=300&auto=format&fit=crop',
                       width: 64,
                       height: 64,
                     ),
@@ -179,7 +179,7 @@ class ProfileScreen extends ConsumerWidget {
 
             // Portfolio & Private Operations
             Text(
-              'PRIVATE CLIENT PRIVILEGES',
+              'PRIVATE CLIENT PRIVILEGES & SERVICES',
               style: LuxuryTypography.microCaps.copyWith(
                 color: LuxuryColors.champagne,
                 letterSpacing: 2.0,
@@ -188,25 +188,57 @@ class ProfileScreen extends ConsumerWidget {
             const SizedBox(height: 10),
             _buildProfileMenuItem(
               context,
+              icon: Icons.workspace_premium_outlined,
+              title: 'NP Memberships (Access, Privé, Black)',
+              onTap: () => context.push('/membership'),
+            ),
+            _buildProfileMenuItem(
+              context,
+              icon: Icons.handshake_outlined,
+              title: 'Private Deal Room (Active Negotiations)',
+              onTap: () => context.push('/deals/deal-101'),
+            ),
+            _buildProfileMenuItem(
+              context,
+              icon: Icons.find_in_page_outlined,
+              title: 'Buyer Requests ("I am looking for...")',
+              onTap: () => context.push('/buyer-requests'),
+            ),
+            _buildProfileMenuItem(
+              context,
+              icon: Icons.star_border_purple500_outlined,
+              title: 'First 50 Founding Sellers Program',
+              onTap: () => context.push('/founding-sellers'),
+            ),
+            _buildProfileMenuItem(
+              context,
+              icon: Icons.directions_car_filled_outlined,
+              title: 'NP LUXE DRIVE (Supercar Fleet Rentals)',
+              onTap: () => context.push('/rentals'),
+            ),
+            _buildProfileMenuItem(
+              context,
+              icon: Icons.flight_takeoff_outlined,
+              title: 'Aviation Salons (Sales & Jet Charters)',
+              onTap: () => context.push('/aviation'),
+            ),
+            _buildProfileMenuItem(
+              context,
+              icon: Icons.diamond_outlined,
+              title: 'Strategic Materials & Rare Earths',
+              onTap: () => context.push('/materials'),
+            ),
+            _buildProfileMenuItem(
+              context,
               icon: Icons.bookmark_outline,
               title: 'Saved Possessions (Vault)',
               onTap: () => context.push('/wishlist'),
             ),
             _buildProfileMenuItem(
               context,
-              icon: Icons.lock_open_outlined,
-              title: 'Unlocked Custodian Contacts',
-              onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Displaying 1 unlocked seller record in Geneva.')),
-                );
-              },
-            ),
-            _buildProfileMenuItem(
-              context,
-              icon: Icons.gavel_outlined,
-              title: 'External Auction Registrations',
-              onTap: () => context.go('/auctions'),
+              icon: Icons.policy_outlined,
+              title: 'Legal, PPI Compliance & Curatorial Terms',
+              onTap: () => context.push('/legal'),
             ),
             _buildProfileMenuItem(
               context,
@@ -216,9 +248,9 @@ class ProfileScreen extends ConsumerWidget {
                 showDialog(
                   context: context,
                   builder: (ctx) => AlertDialog(
-                    title: const Text('GLOBAL CONCIERGE SALON'),
+                    title: const Text('NP GROUPS CONCIERGE'),
                     content: const Text(
-                      'Dedicated 24/7 private acquisition concierge:\n\nTelephone: +377 98 06 20 00 (Monaco)\nEmail: concierge@luxurymarketplace.global',
+                      'Dedicated 24/7 private acquisition concierge:\n\nTelephone: +377 98 06 20 00 (Monaco)\nTelephone: +91 80 4000 5000 (India Desk)\nEmail: concierge@npgroups.global',
                     ),
                     actions: [
                       TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('CLOSE')),
@@ -228,6 +260,19 @@ class ProfileScreen extends ConsumerWidget {
               },
             ),
 
+            _buildProfileMenuItem(
+              context,
+              icon: Icons.vpn_key_outlined,
+              title: 'VIP Sign In / Google Login',
+              onTap: () => context.push('/login'),
+            ),
+            _buildProfileMenuItem(
+              context,
+              icon: Icons.auto_awesome_outlined,
+              title: 'Experience Splash Brandmark',
+              onTap: () => context.push('/splash'),
+            ),
+
             const SizedBox(height: 32),
 
             // Sign Out
@@ -235,9 +280,11 @@ class ProfileScreen extends ConsumerWidget {
               text: 'SIGN OUT FROM PRIVATE SESSION',
               variant: LuxuryButtonVariant.secondary,
               onPressed: () {
+                ref.read(authProvider.notifier).signOut();
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Private session ended.')),
                 );
+                context.go('/login');
               },
             ),
           ],

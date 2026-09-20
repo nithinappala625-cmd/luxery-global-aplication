@@ -16,6 +16,8 @@ class LuxuryColors {
   static const Color mutedGrey = Color(0xFF777770);
   static const Color borderLight = Color(0xFFDAD8D0);
   static const Color borderDark = Color(0xFF2E2E2E);
+  static const Color cardLight = Color(0xFFF7F5EF);
+  static const Color darkText = Color(0xFF242424);
 
   // Subtle Metallic Accents (Restrained & Muted, never loud or flashy)
   static const Color champagne = Color(0xFFC5A880);

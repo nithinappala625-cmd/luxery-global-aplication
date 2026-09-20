@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import '../../../core/constants/colors.dart';
 import '../../../core/constants/typography.dart';
@@ -385,6 +386,105 @@ class DynamicAttributeFormState extends State<DynamicAttributeForm> {
                   },
                 );
               }).toList(),
+            ),
+          ],
+        );
+
+      case AttributeDataType.file:
+        final attachedFile = _values[def.slug]?.toString();
+        final hasFile = attachedFile != null && attachedFile.isNotEmpty;
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (hasFile)
+              Container(
+                margin: const EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                decoration: BoxDecoration(
+                  color: isDark ? LuxuryColors.darkCard : LuxuryColors.pureWhite,
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(
+                    color: LuxuryColors.champagne.withOpacity(0.6),
+                    width: 1.0,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.picture_as_pdf, color: LuxuryColors.champagne, size: 22),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            attachedFile,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: LuxuryTypography.bodySmall.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: isDark ? LuxuryColors.pureWhite : LuxuryColors.pureBlack,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'ENCRYPTED & PRE-SIGNED • CLOUDFLARE R2',
+                            style: LuxuryTypography.microCaps.copyWith(
+                              color: LuxuryColors.verifiedGreen,
+                              fontSize: 7.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close, size: 18, color: LuxuryColors.mutedGrey),
+                      onPressed: () => _updateValue(def.slug, null),
+                    ),
+                  ],
+                ),
+              ),
+            InkWell(
+              onTap: () async {
+                final result = await FilePicker.platform.pickFiles(
+                  type: FileType.custom,
+                  allowedExtensions: ['pdf', 'png', 'jpg', 'jpeg'],
+                );
+                if (result != null && result.files.isNotEmpty) {
+                  final name = result.files.first.name;
+                  _updateValue(def.slug, name);
+                }
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                decoration: BoxDecoration(
+                  color: isDark ? LuxuryColors.darkCard : LuxuryColors.pureWhite,
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(
+                    color: isDark ? LuxuryColors.borderDark : LuxuryColors.borderLight,
+                    style: BorderStyle.solid,
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.cloud_upload_outlined,
+                      size: 18,
+                      color: isDark ? LuxuryColors.champagne : LuxuryColors.deepForestGreen,
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      hasFile ? 'REPLACE ATTACHED DOSSIER' : 'ATTACH OFFICIAL CERTIFICATE / REPORT (PDF/JPG)',
+                      style: LuxuryTypography.microCaps.copyWith(
+                        color: isDark ? LuxuryColors.champagne : LuxuryColors.deepForestGreen,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 9.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         );

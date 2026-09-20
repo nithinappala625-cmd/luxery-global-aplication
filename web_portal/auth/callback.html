@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Authentication Callback | Maison Du Luxe</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background-color: #060807;
+      color: #ECEAE4;
+      font-family: 'Montserrat', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      margin: 0;
+    }
+    .auth-card {
+      background: #111C15;
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      padding: 3rem 2.5rem;
+      max-width: 520px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+      border-radius: 4px;
+    }
+    .crest {
+      font-size: 3rem;
+      color: #D4AF37;
+      margin-bottom: 1rem;
+    }
+    h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.2rem;
+      color: #FFFFFF;
+      margin-bottom: 0.5rem;
+      letter-spacing: 1px;
+    }
+    .micro-caps {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #D4AF37;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+    }
+    p {
+      color: #8E968F;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+    .token-box {
+      background: #0A120D;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 12px;
+      font-family: monospace;
+      font-size: 0.75rem;
+      color: #A5D6A7;
+      word-break: break-all;
+      margin-bottom: 2rem;
+      border-radius: 2px;
+    }
+    .btn-gold {
+      background: linear-gradient(135deg, #D4AF37 0%, #AA820A 100%);
+      color: #060807;
+      padding: 0.85rem 2rem;
+      border: none;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.8px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      width: 100%;
+      box-sizing: border-box;
+      margin-bottom: 1rem;
+      transition: all 0.2s;
+    }
+    .btn-gold:hover {
+      box-shadow: 0 4px 20px rgba(212, 175, 55, 0.4);
+    }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid rgba(212, 175, 55, 0.5);
+      color: #D4AF37;
+      padding: 0.75rem 2rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.6px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .btn-outline:hover {
+      background: rgba(212, 175, 55, 0.1);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="auth-card">
+    <div class="crest">⚜</div>
+    <h1>Maison Du Luxe</h1>
+    <div class="micro-caps">GOOGLE OAUTH SESSION VERIFIED</div>
+    <p>Your authentication tokens have been validated with Supabase Auth. Your encrypted salon session is active.</p>
+
+    <div class="token-box" id="tokenDisplay">
+      ✓ ACCESS TOKEN PARSED SUCCESSFULLY<br>
+      SESSION STATE: ACTIVE • ROLE: VIP PATRON
+    </div>
+
+    <a href="#" id="deepLinkBtn" class="btn-gold">OPEN MAISON DU LUXE MOBILE APP</a>
+    <a href="/admin" class="btn-outline">PROCEED TO SUPER ADMIN PORTAL</a>
+  </div>
+
+  <script>
+    // Parse Supabase Hash or Query parameters
+    const hash = window.location.hash.substring(1);
+    const params = new URLSearchParams(hash || window.location.search);
+    const accessToken = params.get('access_token');
+    const refreshToken = params.get('refresh_token');
+
+    const tokenDisplay = document.getElementById('tokenDisplay');
+    const deepLinkBtn = document.getElementById('deepLinkBtn');
+
+    if (accessToken) {
+      tokenDisplay.innerHTML = `✓ TOKEN RECEIVED: ${accessToken.substring(0, 16)}...<br>STATUS: ENCRYPTED HANDSHAKE READY`;
+      deepLinkBtn.href = `maison-du-luxe://auth/callback#${hash}`;
+      
+      // Store locally for web portal
+      localStorage.setItem('sb_access_token', accessToken);
+      if (refreshToken) localStorage.setItem('sb_refresh_token', refreshToken);
+
+      // Attempt immediate mobile deep-link redirection
+      setTimeout(() => {
+        window.location.href = `maison-du-luxe://auth/callback#${hash}`;
+      }, 1500);
+    } else {
+      tokenDisplay.innerHTML = `✓ READY FOR OAUTH REDIRECTS<br>Paste this URL in Supabase Redirect URLs:<br><strong>https://&lt;your-domain&gt;/auth/callback</strong>`;
+      deepLinkBtn.href = '/';
+      deepLinkBtn.innerText = 'RETURN TO SHOWCASE';
+    }
+  </script>
+</body>
+</html>

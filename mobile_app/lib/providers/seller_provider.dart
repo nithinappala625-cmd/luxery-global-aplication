@@ -1,4 +1,4 @@
-﻿import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import '../models/seller.dart';
 
@@ -68,7 +68,7 @@ class SellerNotifier extends StateNotifier<SellerState> {
       sellerType: sellerType,
       displayName: displayName,
       legalName: legalName,
-      profilePhoto: profilePhoto ?? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=300&auto=format&fit=crop',
+      profilePhoto: profilePhoto ?? 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?q=80&w=300&auto=format&fit=crop',
       bio: bio,
       country: country,
       stateProvince: stateProvince,
@@ -124,8 +124,8 @@ class SellerNotifier extends StateNotifier<SellerState> {
     sellerType: SellerType.dealer,
     displayName: 'Monaco Private Heritage Salons',
     legalName: 'Monaco Heritage Salons S.A.M.',
-    profilePhoto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=300&auto=format&fit=crop',
-    coverPhoto: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?q=80&w=1200&auto=format&fit=crop',
+    profilePhoto: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?q=80&w=300&auto=format&fit=crop',
+    coverPhoto: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?q=80&w=1200&auto=format&fit=crop',
     bio: 'Established in Monte-Carlo in 1984. Curating museum-grade horology and historic automotive machinery for international connoisseurs.',
     country: 'Monaco',
     city: 'Monte-Carlo',
@@ -140,7 +140,7 @@ class SellerNotifier extends StateNotifier<SellerState> {
     verificationStatus: VerificationStatus.verified,
     verificationLevel: VerificationLevel.level3,
     reputationScore: 4.98,
-    activeListingsCount: 5,
+    activeListingsCount: 4,
     businessProfile: const BusinessProfile(
       id: 'biz-001',
       sellerId: 'seller-001',
@@ -148,30 +148,23 @@ class SellerNotifier extends StateNotifier<SellerState> {
       tradingName: 'Monaco Private Heritage Salons',
       businessType: 'Boutique Dealer',
       registrationCountry: 'Monaco',
-      registrationNumber: 'RCI-84S02194',
-      taxNumber: 'FR-MC-198402',
-      website: 'https://monacoheritage.mc',
-      businessEmail: 'concierge@monacoheritage.mc',
-      businessPhone: '+377 98 06 20 00',
-      businessAddress: 'Place du Casino, 98000 Monaco',
-      yearEstablished: 1984,
-      numberOfEmployees: '10-25',
-      description: 'Exclusive gallery located on Place du Casino.',
-      brandsRepresented: ['Patek Philippe', 'Rolex', 'Ferrari'],
+      registrationNumber: 'MC-1984-9921',
+      taxNumber: 'FR-99882211',
+      businessAddress: '15 Boulevard des Moulins, 98000 Monaco',
     ),
-    createdAt: DateTime(2022, 1, 1),
+    createdAt: DateTime(2022, 1, 15),
   );
 
   static final List<SellerProfile> _initialSellers = [
     _mockCurrentSeller,
     SellerProfile(
       id: '00000000-0000-0000-0000-000000000001',
-      userId: 'user-00000000-0000-0000-0000-000000000001',
+      userId: 'user-yacht-01',
       sellerType: SellerType.yachtBroker,
       displayName: 'Oceanic Yachts & Marine',
       legalName: 'Oceanic International Yachting SARL',
-      profilePhoto: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=300&auto=format&fit=crop',
-      coverPhoto: 'https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?q=80&w=1200&auto=format&fit=crop',
+      profilePhoto: 'https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?q=80&w=300&auto=format&fit=crop',
+      coverPhoto: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=1200&auto=format&fit=crop',
       bio: 'Leading Mediterranean yacht brokerage specializing in sailing catamarans, superyachts, and turnkey marina berths from Cannes to Saint-Tropez.',
       country: 'France',
       city: 'Cannes',
@@ -205,7 +198,7 @@ class SellerNotifier extends StateNotifier<SellerState> {
       sellerType: SellerType.carDealer,
       displayName: 'Luxury Motors Dubai',
       legalName: 'Emirates Hypercar Vault LLC',
-      profilePhoto: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=300&auto=format&fit=crop',
+      profilePhoto: 'https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?q=80&w=300&auto=format&fit=crop',
       coverPhoto: 'https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?q=80&w=1200&auto=format&fit=crop',
       bio: 'Premier Middle Eastern gallery for limited-edition hypercars, homologation specials, and bespoke automotive commissions.',
       country: 'United Arab Emirates',

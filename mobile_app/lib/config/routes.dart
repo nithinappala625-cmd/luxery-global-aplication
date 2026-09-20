@@ -3,11 +3,22 @@ import 'package:go_router/go_router.dart';
 import '../features/admin/admin_dashboard_screen.dart';
 import '../features/admin/admin_field_builder_screen.dart';
 import '../features/auctions/auctions_screen.dart';
+import '../features/auth/login_screen.dart';
+import '../features/auth/register_screen.dart';
+import '../features/auth/splash_screen.dart';
+import '../features/aviation/aviation_screen.dart';
+import '../features/buyer_requests/buyer_requests_screen.dart';
+import '../features/deal_room/deal_room_screen.dart';
 import '../features/discover/discover_screen.dart';
+import '../features/founding_sellers/founding_sellers_screen.dart';
 import '../features/home/home_screen.dart';
+import '../features/legal/legal_screen.dart';
 import '../features/listings/listing_detail_screen.dart';
+import '../features/materials/materials_screen.dart';
+import '../features/membership/membership_screen.dart';
 import '../features/navigation/main_scaffold.dart';
 import '../features/profile/profile_screen.dart';
+import '../features/rentals/luxe_drive_screen.dart';
 import '../features/sell/sell_wizard_screen.dart';
 import '../features/sell/seller_dashboard_screen.dart';
 import '../features/sell/seller_registration_screen.dart';
@@ -18,7 +29,7 @@ final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(de
 
 final appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
-  initialLocation: '/',
+  initialLocation: '/splash',
   routes: [
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
@@ -84,6 +95,14 @@ final appRouter = GoRouter(
     ),
     GoRoute(
       parentNavigatorKey: _rootNavigatorKey,
+      path: '/listings/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id'] ?? '';
+        return ListingDetailScreen(listingId: id);
+      },
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
       path: '/sell/new',
       builder: (context, state) => const SellWizardScreen(),
     ),
@@ -112,8 +131,79 @@ final appRouter = GoRouter(
     ),
     GoRoute(
       parentNavigatorKey: _rootNavigatorKey,
+      path: '/splash',
+      builder: (context, state) => const SplashScreen(),
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: '/login',
+      builder: (context, state) => const LoginScreen(),
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: '/register',
+      builder: (context, state) => const RegisterScreen(),
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
       path: '/admin/fields',
       builder: (context, state) => const AdminFieldBuilderScreen(),
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: '/rentals',
+      builder: (context, state) => const LuxeDriveScreen(),
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: '/aviation',
+      builder: (context, state) => const AviationScreen(),
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: '/materials',
+      builder: (context, state) => const MaterialsScreen(),
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: '/deals/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id'] ?? '';
+        return DealRoomScreen(dealId: id);
+      },
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: '/deal-room/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id'] ?? '';
+        return DealRoomScreen(dealId: id);
+      },
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: '/buyer-requests',
+      builder: (context, state) => const BuyerRequestsScreen(),
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: '/requests',
+      builder: (context, state) => const BuyerRequestsScreen(),
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: '/membership',
+      builder: (context, state) => const MembershipScreen(),
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: '/founding-sellers',
+      builder: (context, state) => const FoundingSellersScreen(),
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: '/legal',
+      builder: (context, state) => const LegalScreen(),
     ),
   ],
 );

@@ -46,8 +46,17 @@ class LuxuryPrice extends StatelessWidget {
         symbol = 'S\$';
         break;
       case 'INR':
-        symbol = '₹';
-        break;
+        if (val >= 10000000) {
+          final cr = val / 10000000;
+          final crFormatted = cr.toStringAsFixed(cr.truncateToDouble() == cr ? 0 : 2);
+          return '₹$crFormatted Cr';
+        } else if (val >= 100000) {
+          final lakh = val / 100000;
+          final lFormatted = lakh.toStringAsFixed(lakh.truncateToDouble() == lakh ? 0 : 2);
+          return '₹$lFormatted L';
+        }
+        final inFormatter = NumberFormat('#,##,##0', 'en_IN');
+        return '₹${inFormatter.format(val)}';
       default:
         symbol = '$curr ';
     }

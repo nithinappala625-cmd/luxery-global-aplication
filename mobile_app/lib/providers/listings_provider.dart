@@ -61,6 +61,13 @@ class ListingsNotifier extends StateNotifier<List<LuxuryListing>> {
     state = [listing, ...state];
   }
 
+  void updateListing(LuxuryListing updated) {
+    state = [
+      for (final item in state)
+        if (item.id == updated.id) updated else item
+    ];
+  }
+
   void updateListingStatus(String listingId, String status) {
     state = [
       for (final item in state)
@@ -87,6 +94,8 @@ final allListingsProvider =
     StateNotifierProvider<ListingsNotifier, List<LuxuryListing>>((ref) {
   return ListingsNotifier();
 });
+
+final listingsProvider = allListingsProvider;
 
 final listingFilterProvider =
     StateNotifierProvider<ListingFilterNotifier, ListingFilterState>((ref) {

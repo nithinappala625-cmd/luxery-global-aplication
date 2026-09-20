@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../core/constants/colors.dart';
 import '../../core/constants/typography.dart';
 import '../../core/widgets/luxury_app_bar.dart';
@@ -39,7 +40,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
 
     return Scaffold(
       appBar: const LuxuryAppBar(
-        title: 'SALON DISCOVERY',
+        title: 'NP GROUPS DISCOVERY',
         showBack: false,
         showWishlist: true,
       ),
@@ -73,7 +74,21 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                 ...categories.map((c) => _buildQuickCategoryChip(
                       label: c.name.toUpperCase(),
                       isSelected: filter.categoryId == c.id,
-                      onTap: () => ref.read(listingFilterProvider.notifier).setCategory(c.id),
+                      onTap: () {
+                        if (c.slug == 'rentals') {
+                          context.push('/rentals');
+                        } else if (c.slug == 'aviation') {
+                          context.push('/aviation');
+                        } else if (c.slug == 'materials') {
+                          context.push('/materials');
+                        } else if (c.slug == 'auctions') {
+                          context.push('/auctions');
+                        } else if (c.slug == 'deal_rooms') {
+                          context.push('/deals/deal-101');
+                        } else {
+                          ref.read(listingFilterProvider.notifier).setCategory(c.id);
+                        }
+                      },
                     )),
               ],
             ),
@@ -88,7 +103,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '${listings.length} EXCEPTIONAL PIECES',
+                  '${listings.length} VERIFIED POSSESSIONS',
                   style: LuxuryTypography.microCaps.copyWith(
                     color: LuxuryColors.mutedGrey,
                     letterSpacing: 1.5,
@@ -139,18 +154,14 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            'NO MATCHING POSSESSIONS',
-                            style: LuxuryTypography.editorialHeading3.copyWith(
-                              letterSpacing: 1.5,
-                            ),
+                            'NO MATCHING CURATED ASSETS',
+                            style: LuxuryTypography.editorialHeading2.copyWith(fontSize: 16),
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Try adjusting your search terms or expanding your filter criteria.',
+                            'Try adjusting your search criteria, price range, or category filter.',
                             textAlign: TextAlign.center,
-                            style: LuxuryTypography.bodySmall.copyWith(
-                              color: LuxuryColors.mutedGrey,
-                            ),
+                            style: LuxuryTypography.bodySmall,
                           ),
                         ],
                       ),
@@ -159,12 +170,12 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                 : ListView.separated(
                     padding: const EdgeInsets.all(20),
                     itemCount: listings.length,
-                    separatorBuilder: (context, index) => const SizedBox(height: 20),
+                    separatorBuilder: (_, __) => const SizedBox(height: 20),
                     itemBuilder: (context, index) {
                       final item = listings[index];
                       return LuxuryListingCard(
                         listing: item,
-                        layout: ListingCardLayout.grid,
+                        onTap: () => context.push('/listings/${item.id}'),
                       );
                     },
                   ),
@@ -185,12 +196,13 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
       padding: const EdgeInsets.only(right: 8),
       child: GestureDetector(
         onTap: onTap,
-        child: Container(
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           decoration: BoxDecoration(
             color: isSelected
                 ? (isDark ? LuxuryColors.champagne : LuxuryColors.deepForestGreen)
-                : Colors.transparent,
+                : (isDark ? LuxuryColors.darkCard : LuxuryColors.cardLight),
             borderRadius: BorderRadius.circular(2),
             border: Border.all(
               color: isSelected
@@ -199,15 +211,17 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
               width: 0.8,
             ),
           ),
-          child: Text(
-            label,
-            style: LuxuryTypography.microCaps.copyWith(
-              color: isSelected
-                  ? (isDark ? LuxuryColors.pureBlack : LuxuryColors.pureWhite)
-                  : (isDark ? LuxuryColors.pureWhite : LuxuryColors.pureBlack),
-              fontSize: 9,
-              letterSpacing: 1.2,
-              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+          child: Center(
+            child: Text(
+              label,
+              style: LuxuryTypography.microCaps.copyWith(
+                color: isSelected
+                    ? (isDark ? LuxuryColors.pureBlack : LuxuryColors.pureWhite)
+                    : (isDark ? LuxuryColors.softIvory : LuxuryColors.darkText),
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                fontSize: 10,
+                letterSpacing: 1.2,
+              ),
             ),
           ),
         ),
@@ -217,14 +231,14 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
 
   String _sortLabel(ListingSortOption option) {
     switch (option) {
-      case ListingSortOption.featured:
-        return 'FEATURED';
       case ListingSortOption.newest:
         return 'NEWEST';
       case ListingSortOption.priceLowToHigh:
-        return 'PRICE: LOW-HIGH';
+        return 'PRICE: LOW TO HIGH';
       case ListingSortOption.priceHighToLow:
-        return 'PRICE: HIGH-LOW';
+        return 'PRICE: HIGH TO LOW';
+      case ListingSortOption.featured:
+        return 'CURATED';
     }
   }
 }

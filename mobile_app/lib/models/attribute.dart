@@ -1,4 +1,4 @@
-﻿enum AttributeDataType {
+enum AttributeDataType {
   text('TEXT', 'Text String'),
   longText('LONG_TEXT', 'Paragraph / Narrative'),
   number('NUMBER', 'Integer Number'),
@@ -8,6 +8,7 @@
   select('SELECT', 'Single Selection List'),
   multiSelect('MULTI_SELECT', 'Multiple Selection Tags'),
   currency('CURRENCY', 'Monetary Valuation'),
+  file('FILE', 'Dossier / Certificate Document'),
   url('URL', 'Web Link / Report URL');
 
   final String code;

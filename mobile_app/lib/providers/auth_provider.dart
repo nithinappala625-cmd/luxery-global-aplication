@@ -49,7 +49,7 @@ class AuthNotifier extends StateNotifier<UserProfile?> {
           email: 'collector@privateclient.com',
           fullName: 'Lord Alexander Vance',
           role: UserRole.admin, // Default to admin for full review and seller access
-          avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=300&auto=format&fit=crop',
+          avatarUrl: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?q=80&w=300&auto=format&fit=crop',
           preferredCurrency: 'EUR',
           isVerified: true,
         ));
@@ -61,7 +61,32 @@ class AuthNotifier extends StateNotifier<UserProfile?> {
       fullName: 'Alexander Vance',
       role: UserRole.buyer,
       preferredCurrency: 'USD',
+      avatarUrl: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?q=80&w=300&auto=format&fit=crop',
       isVerified: true,
+    );
+  }
+
+  void signInWithEmail(String email, String password) {
+    state = UserProfile(
+      id: 'usr-${DateTime.now().millisecondsSinceEpoch}',
+      email: email,
+      fullName: email.split('@').first.toUpperCase(),
+      role: UserRole.seller,
+      preferredCurrency: 'EUR',
+      isVerified: true,
+      avatarUrl: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?q=80&w=300&auto=format&fit=crop',
+    );
+  }
+
+  void register({required String email, required String fullName, required String password}) {
+    state = UserProfile(
+      id: 'usr-${DateTime.now().millisecondsSinceEpoch}',
+      email: email,
+      fullName: fullName,
+      role: UserRole.buyer,
+      preferredCurrency: 'USD',
+      isVerified: false, // Under 24h audit
+      avatarUrl: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?q=80&w=300&auto=format&fit=crop',
     );
   }
 
