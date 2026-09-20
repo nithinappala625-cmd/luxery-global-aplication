@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../constants/colors.dart';
 import '../constants/typography.dart';
+import '../../providers/theme_provider.dart';
 
-class LuxuryAppBar extends StatelessWidget implements PreferredSizeWidget {
+class LuxuryAppBar extends ConsumerWidget implements PreferredSizeWidget {
   final String? title;
   final bool showBack;
   final bool showWishlist;
   final bool showSearch;
+  final bool showThemeToggle;
   final List<Widget>? actions;
   final PreferredSizeWidget? bottom;
   final VoidCallback? onBack;
@@ -18,6 +21,7 @@ class LuxuryAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.showBack = false,
     this.showWishlist = true,
     this.showSearch = false,
+    this.showThemeToggle = true,
     this.actions,
     this.bottom,
     this.onBack,
@@ -27,14 +31,16 @@ class LuxuryAppBar extends StatelessWidget implements PreferredSizeWidget {
   Size get preferredSize => Size.fromHeight(kToolbarHeight + (bottom?.preferredSize.height ?? 0.0));
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final fgColor = isDark ? LuxuryColors.pureWhite : LuxuryColors.pureBlack;
+    final fgColor = isDark ? LuxuryColors.pureWhite : LuxuryColors.darkOnyx;
+    final goldColor = isDark ? LuxuryColors.gold : LuxuryColors.goldDark;
+    final bgColor = isDark ? LuxuryColors.pureBlack : LuxuryColors.lightScaffold;
 
     return AppBar(
       elevation: 0,
       scrolledUnderElevation: 0,
-      backgroundColor: isDark ? LuxuryColors.pureBlack : LuxuryColors.softIvory,
+      backgroundColor: bgColor,
       bottom: bottom,
       centerTitle: true,
       leading: showBack
@@ -61,24 +67,37 @@ class LuxuryAppBar extends StatelessWidget implements PreferredSizeWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'MAISON DU LUXE',
+                  'NP GROUPS',
                   style: LuxuryTypography.editorialHeading3.copyWith(
                     color: fgColor,
                     letterSpacing: 4.0,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
                 Text(
-                  'INTERNATIONAL MARKETPLACE',
+                  'GLOBAL LUXURY SYNDICATE',
                   style: LuxuryTypography.microCaps.copyWith(
-                    color: LuxuryColors.champagne,
+                    color: goldColor,
                     fontSize: 8,
                     letterSpacing: 2.5,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],
             ),
       actions: [
+        if (showThemeToggle)
+          IconButton(
+            tooltip: isDark ? 'Switch to Carrara White Theme' : 'Switch to Obsidian Black Theme',
+            icon: Icon(
+              isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
+              size: 20,
+              color: goldColor,
+            ),
+            onPressed: () {
+              ref.read(themeModeProvider.notifier).toggleTheme();
+            },
+          ),
         if (showSearch)
           IconButton(
             icon: Icon(Icons.search, size: 22, color: fgColor),

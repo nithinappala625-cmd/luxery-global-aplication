@@ -46,4 +46,6 @@ class LuxuryRealEstate {
     required this.sellerName,
     this.verifiedListing = true,
   });
+
+  String get location => '$city, $country';
 }

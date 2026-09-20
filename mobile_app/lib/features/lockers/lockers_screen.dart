@@ -16,14 +16,20 @@ class LockersScreen extends ConsumerStatefulWidget {
 }
 
 class _LockersScreenState extends ConsumerState<LockersScreen> {
-  void _openConsultationSheet(LuxuryLocker locker) {
+  void _openConsultationSheet(LuxuryLocker locker, bool isDark) {
+    final textPrimary = LuxuryColors.textPrimary(isDark);
+    final textSecondary = LuxuryColors.textSecondary(isDark);
+    final goldColor = isDark ? LuxuryColors.gold : LuxuryColors.goldDark;
+    final cardBg = isDark ? const Color(0xFF141414) : LuxuryColors.lightCardElevated;
+    final sheetBg = isDark ? const Color(0xFF0D0D0D) : Colors.white;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color(0xFF0D0D0D),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-        side: BorderSide(color: LuxuryColors.goldBorder, width: 1.0),
+      backgroundColor: sheetBg,
+      shape: RoundedRectangleBorder(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+        side: BorderSide(color: isDark ? LuxuryColors.goldBorder : LuxuryColors.borderLight, width: 1.0),
       ),
       builder: (ctx) {
         return Padding(
@@ -43,13 +49,13 @@ class _LockersScreenState extends ConsumerState<LockersScreen> {
                   Text(
                     'SECURITY VAULT COMMISSION',
                     style: LuxuryTypography.microCaps.copyWith(
-                      color: LuxuryColors.gold,
+                      color: goldColor,
                       letterSpacing: 2.0,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.close, color: LuxuryColors.mutedGrey, size: 20),
+                    icon: Icon(Icons.close, color: textSecondary, size: 20),
                     onPressed: () => Navigator.pop(ctx),
                   ),
                 ],
@@ -57,53 +63,52 @@ class _LockersScreenState extends ConsumerState<LockersScreen> {
               const SizedBox(height: 8),
               Text(
                 locker.title,
-                style: LuxuryTypography.editorialHeading2.copyWith(color: LuxuryColors.pureWhite),
+                style: LuxuryTypography.editorialHeading2.copyWith(color: textPrimary),
               ),
               const SizedBox(height: 6),
               Text(
                 'Turnkey Commission: ${locker.priceDisplay} • ${locker.manufacturer}',
-                style: LuxuryTypography.bodyMedium.copyWith(color: LuxuryColors.gold, fontWeight: FontWeight.w600),
+                style: LuxuryTypography.bodyMedium.copyWith(color: goldColor, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 16),
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF141414),
-                  border: Border.all(color: LuxuryColors.goldBorder, width: 0.8),
+                  color: cardBg,
+                  border: Border.all(color: isDark ? LuxuryColors.goldBorder : LuxuryColors.borderLight, width: 0.8),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Column(
                   children: [
-                    _buildRow('Security Standard', locker.securityRating),
+                    _buildRow('Security Standard', locker.securityRating, textSecondary, textPrimary),
                     const SizedBox(height: 6),
-                    _buildRow('Locking System', locker.lockingMechanism),
+                    _buildRow('Locking System', locker.lockingMechanism, textSecondary, textPrimary),
                     const SizedBox(height: 6),
-                    _buildRow('Watch Winders', '${locker.watchWindersCount} Programmable Rotors'),
+                    _buildRow('Watch Winders', '${locker.watchWindersCount} Programmable Rotors', textSecondary, textPrimary),
                     const SizedBox(height: 6),
-                    _buildRow('Armored Weight', '${locker.weightKg.toInt()} kg Solid Steel / Composite'),
+                    _buildRow('Armored Weight', '${locker.weightKg.toInt()} kg Solid Steel / Composite', textSecondary, textPrimary),
                     const SizedBox(height: 6),
-                    _buildRow('Fire Rating', '${locker.fireRatingHours} Hours Continuous Thermal Barrier'),
+                    _buildRow('Fire Rating', '${locker.fireRatingHours} Hours Continuous Thermal Barrier', textSecondary, textPrimary),
                   ],
                 ),
               ),
               const SizedBox(height: 20),
               LuxuryButton(
                 text: 'COMMISSION ARCHITECTURAL SURVEY',
-                backgroundColor: LuxuryColors.gold,
-                textColor: LuxuryColors.pureBlack,
+                variant: LuxuryButtonVariant.gold,
                 onPressed: () {
                   Navigator.pop(ctx);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      backgroundColor: const Color(0xFF161616),
+                      backgroundColor: isDark ? const Color(0xFF161616) : Colors.white,
                       content: Row(
                         children: [
-                          const Icon(Icons.shield_outlined, color: LuxuryColors.gold, size: 18),
+                          Icon(Icons.shield_outlined, color: goldColor, size: 18),
                           const SizedBox(width: 10),
                           Expanded(
                             child: Text(
                               'White-glove vault engineering team assigned. Confidential site survey scheduled.',
-                              style: LuxuryTypography.bodySmall.copyWith(color: LuxuryColors.pureWhite),
+                              style: LuxuryTypography.bodySmall.copyWith(color: textPrimary),
                             ),
                           ),
                         ],
@@ -120,17 +125,17 @@ class _LockersScreenState extends ConsumerState<LockersScreen> {
     );
   }
 
-  Widget _buildRow(String label, String value) {
+  Widget _buildRow(String label, String value, Color labelColor, Color valColor) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: LuxuryTypography.bodySmall.copyWith(color: LuxuryColors.mutedGrey)),
+        Text(label, style: LuxuryTypography.bodySmall.copyWith(color: labelColor)),
         const SizedBox(width: 12),
         Expanded(
           child: Text(
             value,
             textAlign: TextAlign.end,
-            style: LuxuryTypography.bodySmall.copyWith(color: LuxuryColors.pureWhite, fontWeight: FontWeight.w500),
+            style: LuxuryTypography.bodySmall.copyWith(color: valColor, fontWeight: FontWeight.w500),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -141,14 +146,23 @@ class _LockersScreenState extends ConsumerState<LockersScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final state = ref.watch(lockersProvider);
 
+    final bgColor = LuxuryColors.scaffoldBg(isDark);
+    final textPrimary = LuxuryColors.textPrimary(isDark);
+    final textSecondary = LuxuryColors.textSecondary(isDark);
+    final goldColor = isDark ? LuxuryColors.gold : LuxuryColors.goldDark;
+    final cardBg = LuxuryColors.cardBg(isDark);
+    final borderColor = isDark ? LuxuryColors.borderDark : LuxuryColors.borderLight;
+
     return Scaffold(
-      backgroundColor: LuxuryColors.pureBlack,
+      backgroundColor: bgColor,
       appBar: const LuxuryAppBar(
         title: 'HIGH-SECURITY VAULTS',
         showBack: true,
         showSearch: true,
+        showThemeToggle: true,
       ),
       body: CustomScrollView(
         slivers: [
@@ -156,8 +170,8 @@ class _LockersScreenState extends ConsumerState<LockersScreen> {
           SliverToBoxAdapter(
             child: Container(
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
-              decoration: const BoxDecoration(
-                border: Border(bottom: BorderSide(color: LuxuryColors.borderDark, width: 0.8)),
+              decoration: BoxDecoration(
+                border: Border(bottom: BorderSide(color: borderColor, width: 0.8)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -165,7 +179,7 @@ class _LockersScreenState extends ConsumerState<LockersScreen> {
                   Text(
                     'NP GROUPS SOVEREIGN SANCTUARIES',
                     style: LuxuryTypography.microCaps.copyWith(
-                      color: LuxuryColors.gold,
+                      color: goldColor,
                       letterSpacing: 2.2,
                     ),
                   ),
@@ -173,14 +187,14 @@ class _LockersScreenState extends ConsumerState<LockersScreen> {
                   Text(
                     'Bespoke Armored Safes & Walk-In Panic Vaults',
                     style: LuxuryTypography.editorialHeading1.copyWith(
-                      color: LuxuryColors.pureWhite,
+                      color: textPrimary,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'German & Austrian ballistic engineering: Döttling, Stockinger, Buben & Zörweg. Certified VdS ratings, watch winders, and biometric encryption.',
                     style: LuxuryTypography.bodyMedium.copyWith(
-                      color: LuxuryColors.mutedGrey,
+                      color: textSecondary,
                     ),
                   ),
                 ],
@@ -198,9 +212,21 @@ class _LockersScreenState extends ConsumerState<LockersScreen> {
                   return Container(
                     margin: const EdgeInsets.only(bottom: 24),
                     decoration: BoxDecoration(
-                      color: LuxuryColors.darkCard,
+                      color: cardBg,
                       borderRadius: BorderRadius.circular(4),
-                      border: Border.all(color: LuxuryColors.goldBorder, width: 0.8),
+                      border: Border.all(
+                        color: isDark ? LuxuryColors.goldBorder : LuxuryColors.borderLight,
+                        width: 0.8,
+                      ),
+                      boxShadow: isDark
+                          ? []
+                          : [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.04),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -225,14 +251,14 @@ class _LockersScreenState extends ConsumerState<LockersScreen> {
                               child: Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                                 decoration: BoxDecoration(
-                                  color: LuxuryColors.pureBlack.withOpacity(0.85),
+                                  color: Colors.black.withValues(alpha: 0.85),
                                   borderRadius: BorderRadius.circular(2),
                                   border: Border.all(color: LuxuryColors.goldBorder, width: 0.8),
                                 ),
                                 child: Text(
                                   locker.manufacturer.toUpperCase(),
                                   style: LuxuryTypography.microCaps.copyWith(
-                                    color: LuxuryColors.gold,
+                                    color: LuxuryColors.goldLight,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -244,9 +270,9 @@ class _LockersScreenState extends ConsumerState<LockersScreen> {
                               child: Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                 decoration: BoxDecoration(
-                                  color: LuxuryColors.pureBlack.withOpacity(0.9),
+                                  color: Colors.black.withValues(alpha: 0.9),
                                   borderRadius: BorderRadius.circular(2),
-                                  border: Border.all(color: LuxuryColors.gold, width: 0.8),
+                                  border: Border.all(color: goldColor, width: 0.8),
                                 ),
                                 child: Text(
                                   locker.priceDisplay,
@@ -269,7 +295,7 @@ class _LockersScreenState extends ConsumerState<LockersScreen> {
                               Text(
                                 locker.vaultType.toUpperCase(),
                                 style: LuxuryTypography.microCaps.copyWith(
-                                  color: LuxuryColors.champagne,
+                                  color: goldColor,
                                   letterSpacing: 1.8,
                                 ),
                               ),
@@ -277,14 +303,14 @@ class _LockersScreenState extends ConsumerState<LockersScreen> {
                               Text(
                                 locker.title,
                                 style: LuxuryTypography.editorialHeading2.copyWith(
-                                  color: LuxuryColors.pureWhite,
+                                  color: textPrimary,
                                 ),
                               ),
                               const SizedBox(height: 8),
                               Text(
                                 locker.description,
                                 style: LuxuryTypography.bodyMedium.copyWith(
-                                  color: LuxuryColors.mutedGrey,
+                                  color: textSecondary,
                                   height: 1.45,
                                 ),
                               ),
@@ -295,20 +321,20 @@ class _LockersScreenState extends ConsumerState<LockersScreen> {
                                 spacing: 8,
                                 runSpacing: 8,
                                 children: [
-                                  _specBadge(Icons.verified, locker.securityRating, isGold: true),
-                                  _specBadge(Icons.fingerprint, locker.lockingMechanism),
-                                  _specBadge(Icons.watch, '${locker.watchWindersCount} Winders'),
-                                  _specBadge(Icons.fitness_center, '${locker.weightKg.toInt()} kg'),
-                                  _specBadge(Icons.local_fire_department, '${locker.fireRatingHours}h Fire Shield'),
+                                  _specBadge(Icons.verified, locker.securityRating, isDark, isGold: true),
+                                  _specBadge(Icons.fingerprint, locker.lockingMechanism, isDark),
+                                  _specBadge(Icons.watch, '${locker.watchWindersCount} Winders', isDark),
+                                  _specBadge(Icons.fitness_center, '${locker.weightKg.toInt()} kg', isDark),
+                                  _specBadge(Icons.local_fire_department, '${locker.fireRatingHours}h Fire Shield', isDark),
                                 ],
                               ),
                               const SizedBox(height: 18),
 
                               LuxuryButton(
                                 text: 'COMMISSION BESPOKE SAFE',
-                                backgroundColor: LuxuryColors.gold,
-                                textColor: LuxuryColors.pureBlack,
-                                onPressed: () => _openConsultationSheet(locker),
+                                variant: LuxuryButtonVariant.gold,
+                                height: 44,
+                                onPressed: () => _openConsultationSheet(locker, isDark),
                               ),
                             ],
                           ),
@@ -326,27 +352,33 @@ class _LockersScreenState extends ConsumerState<LockersScreen> {
     );
   }
 
-  Widget _specBadge(IconData icon, String text, {bool isGold = false}) {
+  Widget _specBadge(IconData icon, String text, bool isDark, {bool isGold = false}) {
+    final goldColor = isDark ? LuxuryColors.gold : LuxuryColors.goldDark;
     return Container(
+      constraints: const BoxConstraints(maxWidth: 280),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: const Color(0xFF181818),
+        color: isDark ? const Color(0xFF181818) : LuxuryColors.lightCardElevated,
         borderRadius: BorderRadius.circular(2),
         border: Border.all(
-          color: isGold ? LuxuryColors.gold : LuxuryColors.borderDark,
+          color: isGold ? goldColor : (isDark ? LuxuryColors.borderDark : LuxuryColors.borderLight),
           width: 0.8,
         ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 13, color: isGold ? LuxuryColors.gold : LuxuryColors.mutedGrey),
+          Icon(icon, size: 13, color: isGold ? goldColor : LuxuryColors.textSecondary(isDark)),
           const SizedBox(width: 5),
-          Text(
-            text,
-            style: LuxuryTypography.microCaps.copyWith(
-              color: isGold ? LuxuryColors.goldLight : LuxuryColors.platinum,
-              fontWeight: isGold ? FontWeight.bold : FontWeight.w500,
+          Flexible(
+            child: Text(
+              text,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: LuxuryTypography.microCaps.copyWith(
+                color: isGold ? goldColor : LuxuryColors.textPrimary(isDark),
+                fontWeight: isGold ? FontWeight.bold : FontWeight.w500,
+              ),
             ),
           ),
         ],

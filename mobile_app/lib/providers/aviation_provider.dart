@@ -19,6 +19,8 @@ class AviationState {
   List<AircraftListing> get charterRoutes =>
       aircraft.where((a) => a.aviationType == AviationType.charter).toList();
 
+  List<AircraftListing> get jets => aircraft;
+
   AviationState copyWith({
     List<AircraftListing>? aircraft,
     AviationType? selectedTab,

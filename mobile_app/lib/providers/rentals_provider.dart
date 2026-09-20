@@ -29,6 +29,8 @@ class RentalsState {
     }).toList();
   }
 
+  List<RentalVehicle> get vehicles => fleet;
+
   RentalsState copyWith({
     List<RentalVehicle>? fleet,
     List<RentalBooking>? userBookings,

@@ -36,9 +36,9 @@ class LuxurySearchBar extends StatelessWidget {
             child: TextField(
               controller: controller,
               onChanged: onChanged,
-              cursorColor: isDark ? LuxuryColors.champagne : LuxuryColors.deepForestGreen,
+              cursorColor: isDark ? LuxuryColors.gold : LuxuryColors.goldDark,
               style: LuxuryTypography.bodyMedium.copyWith(
-                color: isDark ? LuxuryColors.pureWhite : LuxuryColors.pureBlack,
+                color: isDark ? LuxuryColors.pureWhite : LuxuryColors.darkOnyx,
               ),
               decoration: InputDecoration(
                 hintText: 'Search watches, jewels, hypercars, yachts...',
@@ -49,7 +49,7 @@ class LuxurySearchBar extends StatelessWidget {
                 prefixIcon: Icon(
                   Icons.search,
                   size: 20,
-                  color: isDark ? LuxuryColors.champagneLight : LuxuryColors.charcoal,
+                  color: isDark ? LuxuryColors.gold : LuxuryColors.goldDark,
                 ),
                 suffixIcon: controller.text.isNotEmpty
                     ? IconButton(
@@ -77,7 +77,7 @@ class LuxurySearchBar extends StatelessWidget {
             height: 48,
             decoration: BoxDecoration(
               color: hasActiveFilters
-                  ? (isDark ? LuxuryColors.champagne : LuxuryColors.deepForestGreen)
+                  ? (isDark ? LuxuryColors.gold : LuxuryColors.goldDark)
                   : (isDark ? LuxuryColors.darkCard : LuxuryColors.pureWhite),
               borderRadius: BorderRadius.circular(2),
               border: Border.all(
@@ -93,7 +93,7 @@ class LuxurySearchBar extends StatelessWidget {
                 size: 20,
                 color: hasActiveFilters
                     ? (isDark ? LuxuryColors.pureBlack : LuxuryColors.pureWhite)
-                    : (isDark ? LuxuryColors.pureWhite : LuxuryColors.pureBlack),
+                    : (isDark ? LuxuryColors.pureWhite : LuxuryColors.darkOnyx),
               ),
             ),
           ),

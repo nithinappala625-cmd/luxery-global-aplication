@@ -12,6 +12,7 @@ enum ListingSortOption {
 class ListingFilterState {
   final String? searchQuery;
   final String? categoryId;
+  final String? subcategoryId;
   final double? minPrice;
   final double? maxPrice;
   final String? currency;
@@ -22,6 +23,7 @@ class ListingFilterState {
   const ListingFilterState({
     this.searchQuery,
     this.categoryId,
+    this.subcategoryId,
     this.minPrice,
     this.maxPrice,
     this.currency,
@@ -33,6 +35,7 @@ class ListingFilterState {
   ListingFilterState copyWith({
     String? searchQuery,
     String? categoryId,
+    String? subcategoryId,
     double? minPrice,
     double? maxPrice,
     String? currency,
@@ -40,10 +43,12 @@ class ListingFilterState {
     bool? verifiedOnly,
     ListingSortOption? sortOption,
     bool clearCategory = false,
+    bool clearSubcategory = false,
   }) {
     return ListingFilterState(
       searchQuery: searchQuery ?? this.searchQuery,
       categoryId: clearCategory ? null : (categoryId ?? this.categoryId),
+      subcategoryId: clearSubcategory ? null : (subcategoryId ?? this.subcategoryId),
       minPrice: minPrice ?? this.minPrice,
       maxPrice: maxPrice ?? this.maxPrice,
       currency: currency ?? this.currency,
@@ -111,9 +116,17 @@ class ListingFilterNotifier extends StateNotifier<ListingFilterState> {
 
   void setCategory(String? categoryId) {
     if (categoryId == null) {
-      state = state.copyWith(clearCategory: true);
+      state = state.copyWith(clearCategory: true, clearSubcategory: true);
     } else {
-      state = state.copyWith(categoryId: categoryId);
+      state = state.copyWith(categoryId: categoryId, clearSubcategory: true);
+    }
+  }
+
+  void setSubcategory(String? subcategoryId) {
+    if (subcategoryId == null) {
+      state = state.copyWith(clearSubcategory: true);
+    } else {
+      state = state.copyWith(subcategoryId: subcategoryId);
     }
   }
 
@@ -166,6 +179,10 @@ final filteredListingsProvider = Provider<List<LuxuryListing>>((ref) {
     }
 
     if (filter.categoryId != null && item.categoryId != filter.categoryId) {
+      return false;
+    }
+
+    if (filter.subcategoryId != null && item.subcategoryId != null && item.subcategoryId != filter.subcategoryId) {
       return false;
     }
 

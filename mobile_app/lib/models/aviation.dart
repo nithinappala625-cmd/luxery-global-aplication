@@ -68,4 +68,9 @@ class AircraftListing {
   String get title => '$year $manufacturer $model';
   bool get isSale => aviationType == AviationType.sale;
   bool get isCharter => aviationType == AviationType.charter;
+  String get imageUrl => coverImageUrl;
+  String get category => manufacturer;
+  double get purchasePrice => priceOrHourlyRate;
+  double get hourlyCharterRate => priceOrHourlyRate;
+  int get rangeNm => maxRangeNm;
 }

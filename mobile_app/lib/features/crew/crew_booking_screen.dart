@@ -18,32 +18,33 @@ class CrewBookingScreen extends ConsumerStatefulWidget {
 class _CrewBookingScreenState extends ConsumerState<CrewBookingScreen> {
   final List<String> _roles = [
     'All',
-    'Private Jet',
-    'Superyacht',
-    'Helicopter',
-    'Close Protection',
+    'Private Jet Captain',
+    'Superyacht Master 3000 GT',
+    'VIP Helicopter Pilot',
+    'Armed Close Protection',
   ];
 
-  void _openBookingSheet(EliteCrewProfile crew) {
-    DateTime startDate = DateTime.now().add(const Duration(days: 2));
-    DateTime endDate = DateTime.now().add(const Duration(days: 7));
-    String bookingMode = 'Daily Deployment'; // or 'Monthly Retainer'
+  int _selectedDurationDays = 7;
+
+  void _openBookingSheet(EliteCrewProfile crew, bool isDark) {
+    final textPrimary = LuxuryColors.textPrimary(isDark);
+    final textSecondary = LuxuryColors.textSecondary(isDark);
+    final goldColor = isDark ? LuxuryColors.gold : LuxuryColors.goldDark;
+    final cardBg = isDark ? const Color(0xFF141414) : LuxuryColors.lightCardElevated;
+    final sheetBg = isDark ? const Color(0xFF0D0D0D) : Colors.white;
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color(0xFF0D0D0D),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-        side: BorderSide(color: LuxuryColors.goldBorder, width: 1.0),
+      backgroundColor: sheetBg,
+      shape: RoundedRectangleBorder(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+        side: BorderSide(color: isDark ? LuxuryColors.goldBorder : LuxuryColors.borderLight, width: 1.0),
       ),
       builder: (ctx) {
         return StatefulBuilder(
           builder: (context, setSheetState) {
-            final days = endDate.difference(startDate).inDays;
-            final estimatedCost = bookingMode == 'Daily Deployment'
-                ? days * crew.dayRateInr
-                : crew.monthlyRetainerInr;
+            final estimatedCost = _selectedDurationDays * crew.dayRate;
 
             return Padding(
               padding: EdgeInsets.only(
@@ -60,15 +61,15 @@ class _CrewBookingScreenState extends ConsumerState<CrewBookingScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'RESERVE SOVEREIGN SPECIALIST',
+                        'CONFIDENTIAL CREW CHARTER',
                         style: LuxuryTypography.microCaps.copyWith(
-                          color: LuxuryColors.gold,
+                          color: goldColor,
                           letterSpacing: 2.0,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.close, color: LuxuryColors.mutedGrey, size: 20),
+                        icon: Icon(Icons.close, color: textSecondary, size: 20),
                         onPressed: () => Navigator.pop(ctx),
                       ),
                     ],
@@ -76,63 +77,52 @@ class _CrewBookingScreenState extends ConsumerState<CrewBookingScreen> {
                   const SizedBox(height: 8),
                   Text(
                     crew.name,
-                    style: LuxuryTypography.editorialHeading2.copyWith(color: LuxuryColors.pureWhite),
+                    style: LuxuryTypography.editorialHeading2.copyWith(color: textPrimary),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${crew.role} • ${crew.credentials}',
-                    style: LuxuryTypography.bodySmall.copyWith(color: LuxuryColors.gold),
+                    '${crew.role} • ${crew.dayRateDisplay} / Day',
+                    style: LuxuryTypography.bodyMedium.copyWith(color: goldColor, fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 16),
 
-                  // Mode Selector: Day vs Month
+                  Text('DEPLOYMENT DURATION', style: LuxuryTypography.microCaps.copyWith(color: textSecondary)),
+                  const SizedBox(height: 8),
                   Row(
                     children: [
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () => setSheetState(() => bookingMode = 'Daily Deployment'),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            decoration: BoxDecoration(
-                              color: bookingMode == 'Daily Deployment' ? LuxuryColors.gold : const Color(0xFF141414),
-                              borderRadius: BorderRadius.circular(2),
-                              border: Border.all(color: LuxuryColors.goldBorder),
-                            ),
-                            alignment: Alignment.center,
-                            child: Text(
-                              'DAILY DEPLOYMENT\n${crew.dayRateDisplay}',
-                              textAlign: TextAlign.center,
-                              style: LuxuryTypography.microCaps.copyWith(
-                                color: bookingMode == 'Daily Deployment' ? LuxuryColors.pureBlack : LuxuryColors.platinum,
-                                fontWeight: FontWeight.bold,
+                      for (final days in [3, 7, 14, 30])
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              setSheetState(() => _selectedDurationDays = days);
+                            },
+                            child: Container(
+                              margin: const EdgeInsets.symmetric(horizontal: 4),
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              decoration: BoxDecoration(
+                                color: _selectedDurationDays == days
+                                    ? goldColor
+                                    : (isDark ? const Color(0xFF181818) : LuxuryColors.lightCardElevated),
+                                borderRadius: BorderRadius.circular(2),
+                                border: Border.all(
+                                  color: _selectedDurationDays == days
+                                      ? goldColor
+                                      : (isDark ? LuxuryColors.borderDark : LuxuryColors.borderLight),
+                                ),
+                              ),
+                              alignment: Alignment.center,
+                              child: Text(
+                                '$days Days',
+                                style: LuxuryTypography.microCaps.copyWith(
+                                  color: _selectedDurationDays == days
+                                      ? LuxuryColors.pureWhite
+                                      : textPrimary,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () => setSheetState(() => bookingMode = 'Monthly Retainer'),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            decoration: BoxDecoration(
-                              color: bookingMode == 'Monthly Retainer' ? LuxuryColors.gold : const Color(0xFF141414),
-                              borderRadius: BorderRadius.circular(2),
-                              border: Border.all(color: LuxuryColors.goldBorder),
-                            ),
-                            alignment: Alignment.center,
-                            child: Text(
-                              'ANNUAL / MONTHLY\n${crew.monthlyRetainerDisplay}',
-                              textAlign: TextAlign.center,
-                              style: LuxuryTypography.microCaps.copyWith(
-                                color: bookingMode == 'Monthly Retainer' ? LuxuryColors.pureBlack : LuxuryColors.platinum,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -140,19 +130,19 @@ class _CrewBookingScreenState extends ConsumerState<CrewBookingScreen> {
                   Container(
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF141414),
+                      color: cardBg,
                       borderRadius: BorderRadius.circular(4),
-                      border: Border.all(color: LuxuryColors.goldBorder, width: 0.8),
+                      border: Border.all(color: isDark ? LuxuryColors.goldBorder : LuxuryColors.borderLight, width: 0.8),
                     ),
                     child: Column(
                       children: [
-                        _buildRow('Vetted Experience', '${crew.experienceYears} Years Head of Mission'),
+                        _buildRow('Vetted Experience', '${crew.experienceYears} Years Head of Mission', textSecondary, textPrimary),
                         const SizedBox(height: 6),
-                        _buildRow('Security Clearance', crew.securityClearance),
+                        _buildRow('Security Clearance', crew.securityClearance, textSecondary, textPrimary),
                         const SizedBox(height: 6),
-                        _buildRow('Languages', crew.languages.join(', ')),
+                        _buildRow('Languages', crew.languages.join(', '), textSecondary, textPrimary),
                         const SizedBox(height: 6),
-                        _buildRow('Estimated Investment', '₹${(estimatedCost / 100000).toStringAsFixed(2)} Lakhs'),
+                        _buildRow('Estimated Investment', '₹${(estimatedCost / 100000).toStringAsFixed(2)} Lakhs', textSecondary, textPrimary),
                       ],
                     ),
                   ),
@@ -160,21 +150,20 @@ class _CrewBookingScreenState extends ConsumerState<CrewBookingScreen> {
 
                   LuxuryButton(
                     text: 'INITIATE CONFIDENTIAL CONTRACT',
-                    backgroundColor: LuxuryColors.gold,
-                    textColor: LuxuryColors.pureBlack,
+                    variant: LuxuryButtonVariant.gold,
                     onPressed: () {
                       Navigator.pop(ctx);
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          backgroundColor: const Color(0xFF161616),
+                          backgroundColor: isDark ? const Color(0xFF161616) : Colors.white,
                           content: Row(
                             children: [
-                              const Icon(Icons.verified, color: LuxuryColors.gold, size: 18),
+                              Icon(Icons.verified, color: goldColor, size: 18),
                               const SizedBox(width: 10),
                               Expanded(
                                 child: Text(
                                   'Crew dispatch officer notified. Bilateral engagement contract initiated.',
-                                  style: LuxuryTypography.bodySmall.copyWith(color: LuxuryColors.pureWhite),
+                                  style: LuxuryTypography.bodySmall.copyWith(color: textPrimary),
                                 ),
                               ),
                             ],
@@ -193,17 +182,17 @@ class _CrewBookingScreenState extends ConsumerState<CrewBookingScreen> {
     );
   }
 
-  Widget _buildRow(String label, String value) {
+  Widget _buildRow(String label, String value, Color labelColor, Color valColor) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: LuxuryTypography.bodySmall.copyWith(color: LuxuryColors.mutedGrey)),
+        Text(label, style: LuxuryTypography.bodySmall.copyWith(color: labelColor)),
         const SizedBox(width: 12),
         Expanded(
           child: Text(
             value,
             textAlign: TextAlign.end,
-            style: LuxuryTypography.bodySmall.copyWith(color: LuxuryColors.pureWhite, fontWeight: FontWeight.w500),
+            style: LuxuryTypography.bodySmall.copyWith(color: valColor, fontWeight: FontWeight.w500),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -214,15 +203,24 @@ class _CrewBookingScreenState extends ConsumerState<CrewBookingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final state = ref.watch(crewProvider);
     final notifier = ref.read(crewProvider.notifier);
 
+    final bgColor = LuxuryColors.scaffoldBg(isDark);
+    final textPrimary = LuxuryColors.textPrimary(isDark);
+    final textSecondary = LuxuryColors.textSecondary(isDark);
+    final goldColor = isDark ? LuxuryColors.gold : LuxuryColors.goldDark;
+    final cardBg = LuxuryColors.cardBg(isDark);
+    final borderColor = isDark ? LuxuryColors.borderDark : LuxuryColors.borderLight;
+
     return Scaffold(
-      backgroundColor: LuxuryColors.pureBlack,
+      backgroundColor: bgColor,
       appBar: const LuxuryAppBar(
         title: 'ELITE CREW & PILOTS',
         showBack: true,
         showSearch: true,
+        showThemeToggle: true,
       ),
       body: CustomScrollView(
         slivers: [
@@ -230,8 +228,8 @@ class _CrewBookingScreenState extends ConsumerState<CrewBookingScreen> {
           SliverToBoxAdapter(
             child: Container(
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
-              decoration: const BoxDecoration(
-                border: Border(bottom: BorderSide(color: LuxuryColors.borderDark, width: 0.8)),
+              decoration: BoxDecoration(
+                border: Border(bottom: BorderSide(color: borderColor, width: 0.8)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -239,7 +237,7 @@ class _CrewBookingScreenState extends ConsumerState<CrewBookingScreen> {
                   Text(
                     'NP GROUPS HUMAN CAPITAL',
                     style: LuxuryTypography.microCaps.copyWith(
-                      color: LuxuryColors.gold,
+                      color: goldColor,
                       letterSpacing: 2.2,
                     ),
                   ),
@@ -247,14 +245,14 @@ class _CrewBookingScreenState extends ConsumerState<CrewBookingScreen> {
                   Text(
                     'Jet Captains, Yacht Masters & Armed Escorts',
                     style: LuxuryTypography.editorialHeading1.copyWith(
-                      color: LuxuryColors.pureWhite,
+                      color: textPrimary,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Type-rated command captains, ex-special forces close protection details, and high-altitude aviators available for confidential global deployment.',
                     style: LuxuryTypography.bodyMedium.copyWith(
-                      color: LuxuryColors.mutedGrey,
+                      color: textSecondary,
                     ),
                   ),
                 ],
@@ -279,15 +277,17 @@ class _CrewBookingScreenState extends ConsumerState<CrewBookingScreen> {
                     label: Text(
                       role.toUpperCase(),
                       style: LuxuryTypography.microCaps.copyWith(
-                        color: isSelected ? LuxuryColors.pureBlack : LuxuryColors.platinum,
+                        color: isSelected
+                            ? LuxuryColors.pureWhite
+                            : (isDark ? LuxuryColors.platinum : LuxuryColors.darkOnyx),
                         fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                       ),
                     ),
                     selected: isSelected,
-                    selectedColor: LuxuryColors.gold,
-                    backgroundColor: const Color(0xFF141414),
+                    selectedColor: goldColor,
+                    backgroundColor: isDark ? const Color(0xFF141414) : LuxuryColors.lightCard,
                     side: BorderSide(
-                      color: isSelected ? LuxuryColors.gold : LuxuryColors.borderDark,
+                      color: isSelected ? goldColor : borderColor,
                       width: 0.8,
                     ),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
@@ -308,9 +308,21 @@ class _CrewBookingScreenState extends ConsumerState<CrewBookingScreen> {
                   return Container(
                     margin: const EdgeInsets.only(bottom: 24),
                     decoration: BoxDecoration(
-                      color: LuxuryColors.darkCard,
+                      color: cardBg,
                       borderRadius: BorderRadius.circular(4),
-                      border: Border.all(color: LuxuryColors.goldBorder, width: 0.8),
+                      border: Border.all(
+                        color: isDark ? LuxuryColors.goldBorder : LuxuryColors.borderLight,
+                        width: 0.8,
+                      ),
+                      boxShadow: isDark
+                          ? []
+                          : [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.04),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
                     ),
                     child: Padding(
                       padding: const EdgeInsets.all(16),
@@ -326,7 +338,7 @@ class _CrewBookingScreenState extends ConsumerState<CrewBookingScreen> {
                                 height: 72,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(4),
-                                  border: Border.all(color: LuxuryColors.gold, width: 1.2),
+                                  border: Border.all(color: goldColor, width: 1.2),
                                 ),
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(3),
@@ -344,22 +356,26 @@ class _CrewBookingScreenState extends ConsumerState<CrewBookingScreen> {
                                   children: [
                                     Row(
                                       children: [
-                                        Text(
-                                          crew.name,
-                                          style: LuxuryTypography.editorialHeading3.copyWith(
-                                            color: LuxuryColors.pureWhite,
-                                            fontWeight: FontWeight.w600,
+                                        Flexible(
+                                          child: Text(
+                                            crew.name,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: LuxuryTypography.editorialHeading3.copyWith(
+                                              color: textPrimary,
+                                              fontWeight: FontWeight.w600,
+                                            ),
                                           ),
                                         ),
                                         const SizedBox(width: 6),
-                                        const Icon(Icons.verified, color: LuxuryColors.gold, size: 16),
+                                        Icon(Icons.verified, color: goldColor, size: 16),
                                       ],
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
                                       crew.role.toUpperCase(),
                                       style: LuxuryTypography.microCaps.copyWith(
-                                        color: LuxuryColors.gold,
+                                        color: goldColor,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
@@ -367,7 +383,7 @@ class _CrewBookingScreenState extends ConsumerState<CrewBookingScreen> {
                                     Text(
                                       crew.credentials,
                                       style: LuxuryTypography.bodySmall.copyWith(
-                                        color: LuxuryColors.silver,
+                                        color: textSecondary,
                                         fontSize: 11,
                                       ),
                                     ),
@@ -382,7 +398,7 @@ class _CrewBookingScreenState extends ConsumerState<CrewBookingScreen> {
                           Text(
                             crew.bio,
                             style: LuxuryTypography.bodyMedium.copyWith(
-                              color: LuxuryColors.mutedGrey,
+                              color: textSecondary,
                               height: 1.45,
                             ),
                           ),
@@ -392,29 +408,32 @@ class _CrewBookingScreenState extends ConsumerState<CrewBookingScreen> {
                           Container(
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF161616),
+                              color: isDark ? const Color(0xFF161616) : LuxuryColors.lightCardElevated,
                               borderRadius: BorderRadius.circular(2),
-                              border: Border.all(color: LuxuryColors.borderDark),
+                              border: Border.all(color: borderColor),
                             ),
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('DAILY DEPLOYMENT', style: LuxuryTypography.microCaps.copyWith(color: LuxuryColors.mutedGrey, fontSize: 9)),
-                                    const SizedBox(height: 2),
-                                    Text(crew.dayRateDisplay, style: LuxuryTypography.priceSmall.copyWith(color: LuxuryColors.gold, fontWeight: FontWeight.bold)),
-                                  ],
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text('DAILY DEPLOYMENT', style: LuxuryTypography.microCaps.copyWith(color: textSecondary, fontSize: 9)),
+                                      const SizedBox(height: 2),
+                                      Text(crew.dayRateDisplay, style: LuxuryTypography.priceSmall.copyWith(color: goldColor, fontWeight: FontWeight.bold)),
+                                    ],
+                                  ),
                                 ),
-                                Container(width: 1, height: 28, color: LuxuryColors.borderDark),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    Text('MONTHLY RETAINER', style: LuxuryTypography.microCaps.copyWith(color: LuxuryColors.mutedGrey, fontSize: 9)),
-                                    const SizedBox(height: 2),
-                                    Text(crew.monthlyRetainerDisplay, style: LuxuryTypography.priceSmall.copyWith(color: LuxuryColors.pureWhite, fontWeight: FontWeight.bold)),
-                                  ],
+                                Container(width: 1, height: 28, color: borderColor, margin: const EdgeInsets.symmetric(horizontal: 10)),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Text('MONTHLY RETAINER', style: LuxuryTypography.microCaps.copyWith(color: textSecondary, fontSize: 9)),
+                                      const SizedBox(height: 2),
+                                      Text(crew.monthlyRetainerDisplay, style: LuxuryTypography.priceSmall.copyWith(color: textPrimary, fontWeight: FontWeight.bold)),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
@@ -426,9 +445,9 @@ class _CrewBookingScreenState extends ConsumerState<CrewBookingScreen> {
                             spacing: 8,
                             runSpacing: 8,
                             children: [
-                              _badge(Icons.badge, '${crew.experienceYears} Yrs Exp'),
-                              _badge(Icons.security, crew.securityClearance, isGold: true),
-                              _badge(Icons.translate, crew.languages.first),
+                              _badge(Icons.badge, '${crew.experienceYears} Yrs Exp', isDark),
+                              _badge(Icons.security, crew.securityClearance, isDark, isGold: true),
+                              _badge(Icons.translate, crew.languages.first, isDark),
                             ],
                           ),
                           const SizedBox(height: 16),
@@ -436,9 +455,9 @@ class _CrewBookingScreenState extends ConsumerState<CrewBookingScreen> {
                           // Button
                           LuxuryButton(
                             text: 'RESERVE SPECIALIST',
-                            backgroundColor: LuxuryColors.gold,
-                            textColor: LuxuryColors.pureBlack,
-                            onPressed: () => _openBookingSheet(crew),
+                            variant: LuxuryButtonVariant.gold,
+                            height: 44,
+                            onPressed: () => _openBookingSheet(crew, isDark),
                           ),
                         ],
                       ),
@@ -454,27 +473,33 @@ class _CrewBookingScreenState extends ConsumerState<CrewBookingScreen> {
     );
   }
 
-  Widget _badge(IconData icon, String text, {bool isGold = false}) {
+  Widget _badge(IconData icon, String text, bool isDark, {bool isGold = false}) {
+    final goldColor = isDark ? LuxuryColors.gold : LuxuryColors.goldDark;
     return Container(
+      constraints: const BoxConstraints(maxWidth: 280),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: const Color(0xFF181818),
+        color: isDark ? const Color(0xFF181818) : LuxuryColors.lightCardElevated,
         borderRadius: BorderRadius.circular(2),
         border: Border.all(
-          color: isGold ? LuxuryColors.gold : LuxuryColors.borderDark,
+          color: isGold ? goldColor : (isDark ? LuxuryColors.borderDark : LuxuryColors.borderLight),
           width: 0.8,
         ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 12, color: isGold ? LuxuryColors.gold : LuxuryColors.mutedGrey),
+          Icon(icon, size: 12, color: isGold ? goldColor : LuxuryColors.textSecondary(isDark)),
           const SizedBox(width: 4),
-          Text(
-            text,
-            style: LuxuryTypography.microCaps.copyWith(
-              color: isGold ? LuxuryColors.goldLight : LuxuryColors.platinum,
-              fontWeight: isGold ? FontWeight.bold : FontWeight.w500,
+          Flexible(
+            child: Text(
+              text,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: LuxuryTypography.microCaps.copyWith(
+                color: isGold ? goldColor : LuxuryColors.textPrimary(isDark),
+                fontWeight: isGold ? FontWeight.bold : FontWeight.w500,
+              ),
             ),
           ),
         ],

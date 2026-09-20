@@ -25,14 +25,20 @@ class _RealEstateScreenState extends ConsumerState<RealEstateScreen> {
     'Royal Palace',
   ];
 
-  void _openInquirySheet(LuxuryRealEstate property) {
+  void _openInquirySheet(LuxuryRealEstate property, bool isDark) {
+    final textPrimary = LuxuryColors.textPrimary(isDark);
+    final textSecondary = LuxuryColors.textSecondary(isDark);
+    final goldColor = isDark ? LuxuryColors.gold : LuxuryColors.goldDark;
+    final cardBg = isDark ? const Color(0xFF141414) : LuxuryColors.lightCardElevated;
+    final sheetBg = isDark ? const Color(0xFF0D0D0D) : Colors.white;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color(0xFF0D0D0D),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-        side: BorderSide(color: LuxuryColors.goldBorder, width: 1.0),
+      backgroundColor: sheetBg,
+      shape: RoundedRectangleBorder(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+        side: BorderSide(color: isDark ? LuxuryColors.goldBorder : LuxuryColors.borderLight, width: 1.0),
       ),
       builder: (ctx) {
         return Padding(
@@ -52,13 +58,13 @@ class _RealEstateScreenState extends ConsumerState<RealEstateScreen> {
                   Text(
                     'ACQUISITION DOSSIER',
                     style: LuxuryTypography.microCaps.copyWith(
-                      color: LuxuryColors.gold,
+                      color: goldColor,
                       letterSpacing: 2.0,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.close, color: LuxuryColors.mutedGrey, size: 20),
+                    icon: Icon(Icons.close, color: textSecondary, size: 20),
                     onPressed: () => Navigator.pop(ctx),
                   ),
                 ],
@@ -67,14 +73,14 @@ class _RealEstateScreenState extends ConsumerState<RealEstateScreen> {
               Text(
                 property.title,
                 style: LuxuryTypography.editorialHeading2.copyWith(
-                  color: LuxuryColors.pureWhite,
+                  color: textPrimary,
                 ),
               ),
               const SizedBox(height: 6),
               Text(
                 'Offered at ${property.priceDisplay} • ${property.city}, ${property.country}',
                 style: LuxuryTypography.bodyMedium.copyWith(
-                  color: LuxuryColors.gold,
+                  color: goldColor,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -82,45 +88,32 @@ class _RealEstateScreenState extends ConsumerState<RealEstateScreen> {
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF141414),
-                  border: Border.all(color: LuxuryColors.goldBorder, width: 0.8),
+                  color: cardBg,
+                  border: Border.all(color: isDark ? LuxuryColors.goldBorder : LuxuryColors.borderLight, width: 0.8),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Column(
                   children: [
-                    _buildRow('Freehold Title', property.sovereignFreehold ? 'Sovereign 100% Freehold' : 'Leasehold'),
+                    _buildRow('Freehold Title', property.sovereignFreehold ? 'Sovereign 100% Freehold' : 'Leasehold', textSecondary, textPrimary),
                     const SizedBox(height: 6),
-                    _buildRow('Helipad Access', property.hasHelipad ? 'Certified Helipad On-Site' : 'Nearest Heliport 15m'),
+                    _buildRow('Helipad Access', property.hasHelipad ? 'Certified Helipad On-Site' : 'Nearest Heliport 15m', textSecondary, textPrimary),
                     const SizedBox(height: 6),
-                    _buildRow('Private Marina', property.hasPrivateMarina ? 'Deepwater Berth Included' : 'Mooring by Arrangement'),
+                    _buildRow('Private Marina', property.hasPrivateMarina ? 'Deepwater Berth Included' : 'Mooring by Arrangement', textSecondary, textPrimary),
                     const SizedBox(height: 6),
-                    _buildRow('Security Sanctuary', property.hasArmoredSecurityVault ? 'Ballistic Armored Panic Vault' : 'Perimeter Sensor Net'),
+                    _buildRow('Security Sanctuary', property.hasArmoredSecurityVault ? 'Ballistic Armored Panic Vault' : 'Perimeter Sensor Net', textSecondary, textPrimary),
                   ],
                 ),
               ),
               const SizedBox(height: 20),
               LuxuryButton(
-                text: 'DISPATCH PRIVATE ESCROW DOSSIER',
-                backgroundColor: LuxuryColors.gold,
-                textColor: LuxuryColors.pureBlack,
+                text: 'TRANSACT VIA NP ESCROW',
+                variant: LuxuryButtonVariant.gold,
                 onPressed: () {
                   Navigator.pop(ctx);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      backgroundColor: const Color(0xFF161616),
-                      content: Row(
-                        children: [
-                          const Icon(Icons.verified_user, color: LuxuryColors.gold, size: 18),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Text(
-                              'Confidential NDA & Acquisition dossier sent to family office liaison.',
-                              style: LuxuryTypography.bodySmall.copyWith(color: LuxuryColors.pureWhite),
-                            ),
-                          ),
-                        ],
-                      ),
-                      duration: const Duration(seconds: 4),
+                      content: Text('Private acquisition request dispatched to Senior Escrow Partner for ${property.title}'),
+                      backgroundColor: isDark ? const Color(0xFF141414) : Colors.white,
                     ),
                   );
                 },
@@ -132,27 +125,36 @@ class _RealEstateScreenState extends ConsumerState<RealEstateScreen> {
     );
   }
 
-  Widget _buildRow(String label, String value) {
+  Widget _buildRow(String label, String value, Color labelColor, Color valColor) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: LuxuryTypography.bodySmall.copyWith(color: LuxuryColors.mutedGrey)),
-        Text(value, style: LuxuryTypography.bodySmall.copyWith(color: LuxuryColors.pureWhite, fontWeight: FontWeight.w500)),
+        Text(label, style: LuxuryTypography.bodySmall.copyWith(color: labelColor)),
+        Text(value, style: LuxuryTypography.bodySmall.copyWith(color: valColor, fontWeight: FontWeight.w600)),
       ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final state = ref.watch(realEstateProvider);
     final notifier = ref.read(realEstateProvider.notifier);
 
+    final bgColor = LuxuryColors.scaffoldBg(isDark);
+    final textPrimary = LuxuryColors.textPrimary(isDark);
+    final textSecondary = LuxuryColors.textSecondary(isDark);
+    final goldColor = isDark ? LuxuryColors.gold : LuxuryColors.goldDark;
+    final cardBg = LuxuryColors.cardBg(isDark);
+    final borderColor = isDark ? LuxuryColors.borderDark : LuxuryColors.borderLight;
+
     return Scaffold(
-      backgroundColor: LuxuryColors.pureBlack,
+      backgroundColor: bgColor,
       appBar: const LuxuryAppBar(
         title: 'REAL ESTATE & ISLANDS',
         showBack: true,
         showSearch: true,
+        showThemeToggle: true,
       ),
       body: CustomScrollView(
         slivers: [
@@ -160,8 +162,8 @@ class _RealEstateScreenState extends ConsumerState<RealEstateScreen> {
           SliverToBoxAdapter(
             child: Container(
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
-              decoration: const BoxDecoration(
-                border: Border(bottom: BorderSide(color: LuxuryColors.borderDark, width: 0.8)),
+              decoration: BoxDecoration(
+                border: Border(bottom: BorderSide(color: borderColor, width: 0.8)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -169,7 +171,7 @@ class _RealEstateScreenState extends ConsumerState<RealEstateScreen> {
                   Text(
                     'NP GROUPS SOVEREIGN DOMAINS',
                     style: LuxuryTypography.microCaps.copyWith(
-                      color: LuxuryColors.gold,
+                      color: goldColor,
                       letterSpacing: 2.2,
                     ),
                   ),
@@ -177,14 +179,14 @@ class _RealEstateScreenState extends ConsumerState<RealEstateScreen> {
                   Text(
                     'Private Islands, Mega Penthouses & Historic Châteaux',
                     style: LuxuryTypography.editorialHeading1.copyWith(
-                      color: LuxuryColors.pureWhite,
+                      color: textPrimary,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Vetted sovereign freehold titles, fortified private retreats, and global architectural icons.',
                     style: LuxuryTypography.bodyMedium.copyWith(
-                      color: LuxuryColors.mutedGrey,
+                      color: textSecondary,
                     ),
                   ),
                 ],
@@ -209,15 +211,17 @@ class _RealEstateScreenState extends ConsumerState<RealEstateScreen> {
                     label: Text(
                       type.toUpperCase(),
                       style: LuxuryTypography.microCaps.copyWith(
-                        color: isSelected ? LuxuryColors.pureBlack : LuxuryColors.platinum,
+                        color: isSelected
+                            ? LuxuryColors.pureWhite
+                            : (isDark ? LuxuryColors.platinum : LuxuryColors.darkOnyx),
                         fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                       ),
                     ),
                     selected: isSelected,
-                    selectedColor: LuxuryColors.gold,
-                    backgroundColor: const Color(0xFF141414),
+                    selectedColor: goldColor,
+                    backgroundColor: isDark ? const Color(0xFF141414) : LuxuryColors.lightCard,
                     side: BorderSide(
-                      color: isSelected ? LuxuryColors.gold : LuxuryColors.borderDark,
+                      color: isSelected ? goldColor : borderColor,
                       width: 0.8,
                     ),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
@@ -238,9 +242,21 @@ class _RealEstateScreenState extends ConsumerState<RealEstateScreen> {
                   return Container(
                     margin: const EdgeInsets.only(bottom: 24),
                     decoration: BoxDecoration(
-                      color: LuxuryColors.darkCard,
+                      color: cardBg,
                       borderRadius: BorderRadius.circular(4),
-                      border: Border.all(color: LuxuryColors.goldBorder, width: 0.8),
+                      border: Border.all(
+                        color: isDark ? LuxuryColors.goldBorder : LuxuryColors.borderLight,
+                        width: 0.8,
+                      ),
+                      boxShadow: isDark
+                          ? []
+                          : [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.04),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -265,14 +281,14 @@ class _RealEstateScreenState extends ConsumerState<RealEstateScreen> {
                               child: Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                                 decoration: BoxDecoration(
-                                  color: LuxuryColors.pureBlack.withOpacity(0.85),
+                                  color: Colors.black.withValues(alpha: 0.85),
                                   borderRadius: BorderRadius.circular(2),
                                   border: Border.all(color: LuxuryColors.goldBorder, width: 0.8),
                                 ),
                                 child: Text(
                                   property.estateType.toUpperCase(),
                                   style: LuxuryTypography.microCaps.copyWith(
-                                    color: LuxuryColors.gold,
+                                    color: LuxuryColors.goldLight,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -284,9 +300,9 @@ class _RealEstateScreenState extends ConsumerState<RealEstateScreen> {
                               child: Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                 decoration: BoxDecoration(
-                                  color: LuxuryColors.pureBlack.withOpacity(0.9),
+                                  color: Colors.black.withValues(alpha: 0.9),
                                   borderRadius: BorderRadius.circular(2),
-                                  border: Border.all(color: LuxuryColors.gold, width: 0.8),
+                                  border: Border.all(color: goldColor, width: 0.8),
                                 ),
                                 child: Text(
                                   property.priceDisplay,
@@ -309,7 +325,7 @@ class _RealEstateScreenState extends ConsumerState<RealEstateScreen> {
                               Text(
                                 '${property.city.toUpperCase()}, ${property.country.toUpperCase()}',
                                 style: LuxuryTypography.microCaps.copyWith(
-                                  color: LuxuryColors.champagne,
+                                  color: goldColor,
                                   letterSpacing: 1.8,
                                 ),
                               ),
@@ -317,14 +333,14 @@ class _RealEstateScreenState extends ConsumerState<RealEstateScreen> {
                               Text(
                                 property.title,
                                 style: LuxuryTypography.editorialHeading2.copyWith(
-                                  color: LuxuryColors.pureWhite,
+                                  color: textPrimary,
                                 ),
                               ),
                               const SizedBox(height: 8),
                               Text(
                                 property.description,
                                 style: LuxuryTypography.bodyMedium.copyWith(
-                                  color: LuxuryColors.mutedGrey,
+                                  color: textSecondary,
                                   height: 1.45,
                                 ),
                                 maxLines: 3,
@@ -337,25 +353,32 @@ class _RealEstateScreenState extends ConsumerState<RealEstateScreen> {
                                 spacing: 8,
                                 runSpacing: 8,
                                 children: [
-                                  _featureBadge(Icons.bed, '${property.bedrooms} Beds'),
-                                  _featureBadge(Icons.bathtub, '${property.bathrooms} Baths'),
-                                  _featureBadge(Icons.square_foot, '${property.builtUpAreaSqFt.toInt()} sq ft'),
+                                  _featureBadge(Icons.bed, '${property.bedrooms} Beds', isDark),
+                                  _featureBadge(Icons.bathtub, '${property.bathrooms} Baths', isDark),
+                                  _featureBadge(Icons.square_foot, '${property.builtUpAreaSqFt.toInt()} sq ft', isDark),
                                   if (property.hasHelipad)
-                                    _featureBadge(Icons.flight_takeoff, 'Helipad', isGold: true),
+                                    _featureBadge(Icons.flight_takeoff, 'Helipad', isDark, isHighlight: true),
                                   if (property.hasPrivateMarina)
-                                    _featureBadge(Icons.sailing, 'Marina', isGold: true),
+                                    _featureBadge(Icons.sailing, 'Marina', isDark, isHighlight: true),
                                   if (property.hasArmoredSecurityVault)
-                                    _featureBadge(Icons.shield, 'Armored Safe Room', isGold: true),
+                                    _featureBadge(Icons.shield, 'Vault Room', isDark, isHighlight: true),
                                 ],
                               ),
+
                               const SizedBox(height: 18),
 
-                              // Action Button
-                              LuxuryButton(
-                                text: 'REQUEST ACQUISITION DOSSIER',
-                                backgroundColor: LuxuryColors.gold,
-                                textColor: LuxuryColors.pureBlack,
-                                onPressed: () => _openInquirySheet(property),
+                              // Action Row
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: LuxuryButton(
+                                      text: 'INQUIRE ESCROW DOSSIER',
+                                      variant: LuxuryButtonVariant.gold,
+                                      height: 44,
+                                      onPressed: () => _openInquirySheet(property, isDark),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
@@ -373,27 +396,36 @@ class _RealEstateScreenState extends ConsumerState<RealEstateScreen> {
     );
   }
 
-  Widget _featureBadge(IconData icon, String text, {bool isGold = false}) {
+  Widget _featureBadge(IconData icon, String text, bool isDark, {bool isHighlight = false}) {
+    final goldColor = isDark ? LuxuryColors.gold : LuxuryColors.goldDark;
     return Container(
+      constraints: const BoxConstraints(maxWidth: 280),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: const Color(0xFF181818),
+        color: isHighlight
+            ? goldColor.withValues(alpha: 0.16)
+            : (isDark ? const Color(0xFF181818) : LuxuryColors.lightCardElevated),
         borderRadius: BorderRadius.circular(2),
         border: Border.all(
-          color: isGold ? LuxuryColors.gold : LuxuryColors.borderDark,
-          width: 0.8,
+          color: isHighlight ? goldColor : (isDark ? LuxuryColors.borderDark : LuxuryColors.borderLight),
+          width: 0.6,
         ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 13, color: isGold ? LuxuryColors.gold : LuxuryColors.mutedGrey),
-          const SizedBox(width: 5),
-          Text(
-            text,
-            style: LuxuryTypography.microCaps.copyWith(
-              color: isGold ? LuxuryColors.goldLight : LuxuryColors.platinum,
-              fontWeight: isGold ? FontWeight.bold : FontWeight.w500,
+          Icon(icon, size: 12, color: isHighlight ? goldColor : (isDark ? LuxuryColors.silver : LuxuryColors.slate)),
+          const SizedBox(width: 4),
+          Flexible(
+            child: Text(
+              text,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: isHighlight ? goldColor : LuxuryColors.textPrimary(isDark),
+                fontSize: 10.5,
+                fontWeight: isHighlight ? FontWeight.bold : FontWeight.w500,
+              ),
             ),
           ),
         ],

@@ -90,7 +90,7 @@ class HomeHeroBanner extends StatelessWidget {
                 Text(
                   'Discover, acquire, rent and auction extraordinary assets through a trusted private marketplace.',
                   style: LuxuryTypography.bodyMedium.copyWith(
-                    color: LuxuryColors.softIvory.withOpacity(0.92),
+                    color: LuxuryColors.platinum,
                     fontSize: 13.5,
                     height: 1.45,
                   ),

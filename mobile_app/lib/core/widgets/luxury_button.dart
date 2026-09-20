@@ -88,11 +88,15 @@ class LuxuryButton extends StatelessWidget {
             icon!,
             const SizedBox(width: 8),
           ],
-          Text(
-            text.toUpperCase(),
-            style: LuxuryTypography.buttonLabel.copyWith(
-              color: fg,
-              fontWeight: FontWeight.w600,
+          Flexible(
+            child: Text(
+              text.toUpperCase(),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: LuxuryTypography.buttonLabel.copyWith(
+                color: fg,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ],

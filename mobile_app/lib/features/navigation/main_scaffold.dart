@@ -13,18 +13,29 @@ class MainScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final activeGold = isDark ? LuxuryColors.gold : LuxuryColors.goldDark;
+    final inactiveColor = isDark ? const Color(0xFF7E7E7E) : LuxuryColors.slate;
 
     return Scaffold(
       body: navigationShell,
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF0F0F0F) : LuxuryColors.pureWhite,
+          color: isDark ? const Color(0xFF0C0C0C) : LuxuryColors.lightCard,
           border: Border(
             top: BorderSide(
               color: isDark ? LuxuryColors.borderDark : LuxuryColors.borderLight,
               width: 0.8,
             ),
           ),
+          boxShadow: isDark
+              ? []
+              : [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, -2),
+                  ),
+                ],
         ),
         child: SafeArea(
           child: NavigationBar(
@@ -37,55 +48,33 @@ class MainScaffold extends StatelessWidget {
             },
             backgroundColor: Colors.transparent,
             elevation: 0,
-            indicatorColor: isDark
-                ? LuxuryColors.champagne.withOpacity(0.18)
-                : LuxuryColors.deepForestGreen.withOpacity(0.12),
+            indicatorColor: activeGold.withValues(alpha: 0.16),
             height: 64,
             labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
             destinations: [
               NavigationDestination(
-                icon: const Icon(Icons.home_outlined, size: 22),
-                selectedIcon: Icon(
-                  Icons.home,
-                  size: 22,
-                  color: isDark ? LuxuryColors.champagne : LuxuryColors.deepForestGreen,
-                ),
+                icon: Icon(Icons.home_outlined, size: 22, color: inactiveColor),
+                selectedIcon: Icon(Icons.home, size: 22, color: activeGold),
                 label: 'HOME',
               ),
               NavigationDestination(
-                icon: const Icon(Icons.explore_outlined, size: 22),
-                selectedIcon: Icon(
-                  Icons.explore,
-                  size: 22,
-                  color: isDark ? LuxuryColors.champagne : LuxuryColors.deepForestGreen,
-                ),
+                icon: Icon(Icons.explore_outlined, size: 22, color: inactiveColor),
+                selectedIcon: Icon(Icons.explore, size: 22, color: activeGold),
                 label: 'DISCOVER',
               ),
               NavigationDestination(
-                icon: const Icon(Icons.gavel_outlined, size: 22),
-                selectedIcon: Icon(
-                  Icons.gavel,
-                  size: 22,
-                  color: isDark ? LuxuryColors.champagne : LuxuryColors.deepForestGreen,
-                ),
+                icon: Icon(Icons.gavel_outlined, size: 22, color: inactiveColor),
+                selectedIcon: Icon(Icons.gavel, size: 22, color: activeGold),
                 label: 'AUCTIONS',
               ),
               NavigationDestination(
-                icon: const Icon(Icons.add_circle_outline, size: 22),
-                selectedIcon: Icon(
-                  Icons.add_circle,
-                  size: 22,
-                  color: isDark ? LuxuryColors.champagne : LuxuryColors.deepForestGreen,
-                ),
+                icon: Icon(Icons.add_circle_outline, size: 22, color: inactiveColor),
+                selectedIcon: Icon(Icons.add_circle, size: 22, color: activeGold),
                 label: 'SELL',
               ),
               NavigationDestination(
-                icon: const Icon(Icons.person_outline, size: 22),
-                selectedIcon: Icon(
-                  Icons.person,
-                  size: 22,
-                  color: isDark ? LuxuryColors.champagne : LuxuryColors.deepForestGreen,
-                ),
+                icon: Icon(Icons.person_outline, size: 22, color: inactiveColor),
+                selectedIcon: Icon(Icons.person, size: 22, color: activeGold),
                 label: 'PROFILE',
               ),
             ],

@@ -26,10 +26,12 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  String _selectedMode = 'BUY'; // 'BUY', 'RENT', 'CREW'
+  String _selectedMode = 'BUY'; // 'BUY', 'RENT', 'SELL'
+  String _selectedSubcategoryPill = 'ALL';
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final categories = ref.watch(categoriesProvider);
     final listings = ref.watch(listingsProvider);
     final auctionsState = ref.watch(auctionsProvider);
@@ -39,46 +41,75 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final lockersState = ref.watch(lockersProvider);
     final crewState = ref.watch(crewProvider);
 
+    final bgColor = LuxuryColors.scaffoldBg(isDark);
+    final textPrimary = LuxuryColors.textPrimary(isDark);
+    final textSecondary = LuxuryColors.textSecondary(isDark);
+    final goldAccent = LuxuryColors.goldAccent(isDark);
+    final borderColor = LuxuryColors.border(isDark);
+
     return Scaffold(
-      backgroundColor: LuxuryColors.pureBlack,
+      backgroundColor: bgColor,
       appBar: const LuxuryAppBar(
         showBack: false,
         showSearch: true,
         showWishlist: true,
+        showThemeToggle: true,
       ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const HomeHeroBanner(),
+
+            // ==========================================
+            // TOP ACTION SELECTOR: BUY • RENT • SELL
+            // ==========================================
             Container(
-              margin: const EdgeInsets.fromLTRB(16, 20, 16, 10),
+              margin: const EdgeInsets.fromLTRB(16, 20, 16, 12),
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: const Color(0xFF101010),
+                color: isDark ? const Color(0xFF101010) : LuxuryColors.lightCard,
                 borderRadius: BorderRadius.circular(4),
-                border: Border.all(color: LuxuryColors.goldBorder, width: 1.0),
+                border: Border.all(
+                  color: isDark ? LuxuryColors.goldBorder : LuxuryColors.borderLight,
+                  width: 1.0,
+                ),
+                boxShadow: isDark
+                    ? []
+                    : [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.04),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
               ),
               child: Row(
                 children: [
-                  _modeTab('BUY', '✦ BUY ASSETS'),
-                  _modeTab('RENT', '✈ RENT FLEET & JETS'),
-                  _modeTab('CREW', '❖ ELITE CREW'),
+                  _buildModeTab('BUY', '✦ BUY ASSETS', isDark),
+                  _buildModeTab('RENT', '✈ RENT FLEET', isDark),
+                  _buildModeTab('SELL', '👑 SELL & CONSIGN', isDark),
                 ],
               ),
             ),
-            const SizedBox(height: 20),
+
+            const SizedBox(height: 12),
+
+            // Mode Content Router
             if (_selectedMode == 'BUY') ...[
-              _buildBuySection(categories, realEstateState, lockersState, auctionsState, listings),
+              _buildBuySubcategoryPills(isDark),
+              const SizedBox(height: 20),
+              _buildBuySection(isDark, categories, realEstateState, lockersState, auctionsState, listings, aviationState),
             ] else if (_selectedMode == 'RENT') ...[
-              _buildRentSection(rentalsState, aviationState),
+              _buildRentSection(isDark, rentalsState, aviationState, crewState),
             ] else ...[
-              _buildCrewSection(crewState),
+              _buildSellConsignSection(isDark),
             ],
+
             const SizedBox(height: 36),
-            _buildWealthTierMembershipCard(),
+            _buildWealthTierMembershipCard(isDark),
             const SizedBox(height: 36),
-            _buildPrivateRequestBanner(),
+            _buildPrivateRequestBanner(isDark),
             const SizedBox(height: 36),
             const CurationStatement(),
             const SizedBox(height: 48),
@@ -88,15 +119,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _modeTab(String modeKey, String label) {
+  Widget _buildModeTab(String modeKey, String label, bool isDark) {
     final isSelected = _selectedMode == modeKey;
     return Expanded(
       child: GestureDetector(
         onTap: () => setState(() => _selectedMode = modeKey),
-        child: Container(
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
-            color: isSelected ? LuxuryColors.gold : Colors.transparent,
+            color: isSelected
+                ? (isDark ? LuxuryColors.gold : LuxuryColors.goldDark)
+                : Colors.transparent,
             borderRadius: BorderRadius.circular(2),
           ),
           alignment: Alignment.center,
@@ -104,7 +138,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             label,
             textAlign: TextAlign.center,
             style: LuxuryTypography.microCaps.copyWith(
-              color: isSelected ? LuxuryColors.pureBlack : LuxuryColors.platinum,
+              color: isSelected
+                  ? LuxuryColors.pureWhite
+                  : (isDark ? LuxuryColors.platinum : LuxuryColors.darkOnyx),
               fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
               fontSize: 10.5,
               letterSpacing: 1.0,
@@ -115,31 +151,160 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildBuySection(categories, realEstateState, lockersState, auctionsState, listings) {
+  // ==========================================
+  // SUBCATEGORY PILL BAR (Horizontal Carousel)
+  // ==========================================
+  Widget _buildBuySubcategoryPills(bool isDark) {
+    final subcategories = [
+      {'id': 'ALL', 'label': '✦ ALL ASSETS', 'icon': Icons.auto_awesome},
+      {'id': 'FAST_CARS', 'label': '🏎️ FAST SUPERCARS', 'icon': Icons.flash_on},
+      {'id': 'COMFY_CARS', 'label': '👑 COMFY LIMOUSINES', 'icon': Icons.airline_seat_recline_extra},
+      {'id': 'VINTAGE_CARS', 'label': '🏛️ VINTAGE CARS', 'icon': Icons.history_edu},
+      {'id': 'JETS', 'label': '✈️ PRIVATE JETS', 'icon': Icons.flight_takeoff},
+      {'id': 'HELICOPTERS', 'label': '🚁 VIP HELICOPTERS', 'icon': Icons.toys},
+      {'id': 'ISLANDS', 'label': '🏝️ PRIVATE ISLANDS', 'icon': Icons.wb_sunny},
+      {'id': 'FORTS', 'label': '🏰 FORTS & PALACES', 'icon': Icons.castle},
+      {'id': 'VILLAS', 'label': '💎 ULTRA VILLAS', 'icon': Icons.villa},
+      {'id': 'PENTHOUSES', 'label': '🏙️ SKY PENTHOUSES', 'icon': Icons.apartment},
+      {'id': 'HIGH_COMPLICATIONS', 'label': '⏱️ HIGH COMPLICATIONS', 'icon': Icons.watch},
+      {'id': 'VINTAGE_WATCHES', 'label': '🕰️ VINTAGE WATCHES', 'icon': Icons.alarm_on},
+      {'id': 'NATURAL_DIAMONDS', 'label': '💎 NATURAL DIAMONDS', 'icon': Icons.diamond},
+      {'id': 'LAB_DIAMONDS', 'label': '🧪 LAB DIAMONDS', 'icon': Icons.science},
+      {'id': 'RARE_GEMS', 'label': '🟢 RARE EARTH GEMS', 'icon': Icons.spa},
+      {'id': 'GOLD', 'label': '🪙 24K PURE GOLD', 'icon': Icons.monetization_on},
+      {'id': 'LOCKERS', 'label': '🛡️ HIGH-SECURITY SAFES', 'icon': Icons.shield},
+      {'id': 'YACHTS', 'label': '🛥️ MEGA SUPERYACHTS', 'icon': Icons.directions_boat},
+    ];
+
+    return SizedBox(
+      height: 38,
+      child: ListView.separated(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        scrollDirection: Axis.horizontal,
+        itemCount: subcategories.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        itemBuilder: (context, index) {
+          final item = subcategories[index];
+          final isSelected = _selectedSubcategoryPill == item['id'];
+          final activeColor = isDark ? LuxuryColors.gold : LuxuryColors.goldDark;
+          final inactiveBg = isDark ? LuxuryColors.darkCard : LuxuryColors.lightCard;
+          final inactiveBorder = isDark ? LuxuryColors.borderDark : LuxuryColors.borderLight;
+          final inactiveText = isDark ? LuxuryColors.platinum : LuxuryColors.darkOnyx;
+
+          return GestureDetector(
+            onTap: () {
+              setState(() => _selectedSubcategoryPill = item['id'] as String);
+              _handleSubcategoryNavigation(item['id'] as String);
+            },
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              decoration: BoxDecoration(
+                color: isSelected ? activeColor : inactiveBg,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: isSelected ? activeColor : inactiveBorder,
+                  width: 0.9,
+                ),
+              ),
+              child: Text(
+                item['label'] as String,
+                style: LuxuryTypography.microCaps.copyWith(
+                  color: isSelected ? LuxuryColors.pureWhite : inactiveText,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                  fontSize: 10.5,
+                  letterSpacing: 0.8,
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  void _handleSubcategoryNavigation(String subcategoryKey) {
+    switch (subcategoryKey) {
+      case 'ISLANDS':
+      case 'FORTS':
+      case 'VILLAS':
+      case 'PENTHOUSES':
+        context.push('/real-estate');
+        break;
+      case 'JETS':
+      case 'HELICOPTERS':
+        context.push('/aviation');
+        break;
+      case 'LOCKERS':
+        context.push('/lockers');
+        break;
+      case 'NATURAL_DIAMONDS':
+      case 'LAB_DIAMONDS':
+      case 'RARE_GEMS':
+      case 'GOLD':
+        context.push('/materials');
+        break;
+      case 'FAST_CARS':
+      case 'COMFY_CARS':
+      case 'VINTAGE_CARS':
+        ref.read(listingFilterProvider.notifier).setCategory('cat-cars');
+        context.go('/discover');
+        break;
+      case 'HIGH_COMPLICATIONS':
+      case 'VINTAGE_WATCHES':
+        ref.read(listingFilterProvider.notifier).setCategory('cat-watches');
+        context.go('/discover');
+        break;
+      default:
+        break;
+    }
+  }
+
+  // ==========================================
+  // BUY SECTION: Curated Salons & Spotlights
+  // ==========================================
+  Widget _buildBuySection(
+    bool isDark,
+    categories,
+    realEstateState,
+    lockersState,
+    auctionsState,
+    listings,
+    aviationState,
+  ) {
+    final textPrimary = LuxuryColors.textPrimary(isDark);
+    final textSecondary = LuxuryColors.textSecondary(isDark);
+    final goldAccent = LuxuryColors.goldAccent(isDark);
+    final cardBg = LuxuryColors.cardBg(isDark);
+    final borderColor = isDark ? LuxuryColors.borderDark : LuxuryColors.borderLight;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // 1. Curated Salon Circles/Thumbnails
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('NP GROUPS PORTFOLIO', style: LuxuryTypography.microCaps.copyWith(color: LuxuryColors.gold, letterSpacing: 2.2)),
-                  const SizedBox(height: 4),
-                  Text('CURATED ACQUISITIONS', style: LuxuryTypography.editorialHeading2.copyWith(color: LuxuryColors.pureWhite, letterSpacing: 1.2)),
-                ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('NP GROUPS CURATED SALONS', style: LuxuryTypography.microCaps.copyWith(color: goldAccent, letterSpacing: 2.0)),
+                    const SizedBox(height: 4),
+                    Text('EXPLORE BY VERTICAL', style: LuxuryTypography.editorialHeading2.copyWith(color: textPrimary, fontSize: 18)),
+                  ],
+                ),
               ),
               TextButton(
                 onPressed: () => context.go('/discover'),
-                child: Text('ALL SALONS', style: LuxuryTypography.microCaps.copyWith(color: LuxuryColors.gold, fontWeight: FontWeight.bold)),
+                child: Text('ALL SALONS', style: LuxuryTypography.microCaps.copyWith(color: goldAccent, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
         ),
-        const SizedBox(height: 14),
+        const SizedBox(height: 12),
         SizedBox(
           height: 155,
           child: ListView.separated(
@@ -173,9 +338,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 child: Container(
                   width: 140,
                   decoration: BoxDecoration(
-                    color: LuxuryColors.darkCard,
+                    color: cardBg,
                     borderRadius: BorderRadius.circular(4),
-                    border: Border.all(color: LuxuryColors.borderDark, width: 0.8),
+                    border: Border.all(color: borderColor, width: 0.8),
+                    boxShadow: isDark
+                        ? []
+                        : [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.04),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -187,7 +361,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           height: 85,
                           width: double.infinity,
                           fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) => Container(height: 85, color: const Color(0xFF1E1E1E)),
+                          errorBuilder: (_, __, ___) => Container(
+                            height: 85,
+                            color: isDark ? const Color(0xFF1E1E1E) : const Color(0xFFEFEFEF),
+                          ),
                         ),
                       ),
                       Padding(
@@ -195,9 +372,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(cat.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: LuxuryTypography.bodyMedium.copyWith(fontSize: 11.5, fontWeight: FontWeight.w600, color: LuxuryColors.pureWhite)),
+                            Text(
+                              cat.name,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: LuxuryTypography.bodyMedium.copyWith(
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w600,
+                                color: textPrimary,
+                              ),
+                            ),
                             const SizedBox(height: 2),
-                            Text(cat.tagline ?? 'Curated Salon', maxLines: 1, overflow: TextOverflow.ellipsis, style: LuxuryTypography.bodySmall.copyWith(fontSize: 9.5, color: LuxuryColors.gold)),
+                            Text(
+                              cat.tagline ?? 'Curated Salon',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: LuxuryTypography.bodySmall.copyWith(
+                                fontSize: 9.5,
+                                color: goldAccent,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -208,45 +402,59 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             },
           ),
         ),
+
         const SizedBox(height: 32),
+
+        // 2. Spotlight: Sovereign Real Estate & Private Islands
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('SOVEREIGN DOMAINS', style: LuxuryTypography.microCaps.copyWith(color: LuxuryColors.gold, letterSpacing: 2.0)),
-                  const SizedBox(height: 4),
-                  Text('REAL ESTATE & ISLANDS', style: LuxuryTypography.editorialHeading2.copyWith(color: LuxuryColors.pureWhite)),
-                ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('SOVEREIGN DOMAINS', style: LuxuryTypography.microCaps.copyWith(color: goldAccent, letterSpacing: 2.0)),
+                    const SizedBox(height: 4),
+                    Text('ISLANDS, FORTS & VILLAS', style: LuxuryTypography.editorialHeading2.copyWith(color: textPrimary, fontSize: 18)),
+                  ],
+                ),
               ),
               TextButton(
                 onPressed: () => context.push('/real-estate'),
-                child: Text('EXPLORE ALL', style: LuxuryTypography.microCaps.copyWith(color: LuxuryColors.gold, fontWeight: FontWeight.bold)),
+                child: Text('VIEW ALL (48)', style: LuxuryTypography.microCaps.copyWith(color: goldAccent, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
         ),
         const SizedBox(height: 12),
         SizedBox(
-          height: 240,
+          height: 260,
           child: ListView.separated(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             scrollDirection: Axis.horizontal,
-            itemCount: realEstateState.listings.take(4).length,
+            itemCount: realEstateState.listings.length,
             separatorBuilder: (_, __) => const SizedBox(width: 14),
             itemBuilder: (context, index) {
               final prop = realEstateState.listings[index];
               return GestureDetector(
                 onTap: () => context.push('/real-estate'),
                 child: Container(
-                  width: 250,
+                  width: 260,
                   decoration: BoxDecoration(
-                    color: LuxuryColors.darkCard,
+                    color: cardBg,
                     borderRadius: BorderRadius.circular(4),
-                    border: Border.all(color: LuxuryColors.goldBorder, width: 0.8),
+                    border: Border.all(color: borderColor, width: 0.8),
+                    boxShadow: isDark
+                        ? []
+                        : [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.04),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -255,15 +463,168 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         children: [
                           ClipRRect(
                             borderRadius: const BorderRadius.vertical(top: Radius.circular(3)),
-                            child: LuxuryImage(imageUrl: prop.mediaUrls.first, height: 135, width: double.infinity, fit: BoxFit.cover),
+                            child: LuxuryImage(
+                              imageUrl: prop.mediaUrls.first,
+                              height: 140,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                            ),
                           ),
                           Positioned(
                             top: 8,
                             left: 8,
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                              color: Colors.black.withOpacity(0.85),
-                              child: Text(prop.estateType.toUpperCase(), style: LuxuryTypography.microCaps.copyWith(color: LuxuryColors.gold, fontSize: 8.5)),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withValues(alpha: 0.85),
+                                borderRadius: BorderRadius.circular(2),
+                              ),
+                              child: Text(
+                                prop.estateType.toUpperCase(),
+                                style: LuxuryTypography.microCaps.copyWith(
+                                  color: LuxuryColors.goldLight,
+                                  fontSize: 8.5,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                          if (prop.hasHelipad)
+                            Positioned(
+                              top: 8,
+                              right: 8,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: LuxuryColors.gold.withValues(alpha: 0.9),
+                                  borderRadius: BorderRadius.circular(2),
+                                ),
+                                child: const Text(
+                                  '🚁 HELIPAD',
+                                  style: TextStyle(color: Colors.black, fontSize: 8, fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              prop.title,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(fontWeight: FontWeight.bold, color: textPrimary, fontSize: 13),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              prop.priceDisplay,
+                              style: TextStyle(color: goldAccent, fontWeight: FontWeight.bold, fontSize: 12.5),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              '${prop.location} • ${prop.builtUpAreaSqFt.toInt()} sq ft',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(color: textSecondary, fontSize: 10.5),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+
+        const SizedBox(height: 32),
+
+        // 3. Spotlight: Private Aviation & VIP Helicopters
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('PRIVATE AVIATION HANGAR', style: LuxuryTypography.microCaps.copyWith(color: goldAccent, letterSpacing: 2.0)),
+                    const SizedBox(height: 4),
+                    Text('JETS & VIP HELICOPTERS', style: LuxuryTypography.editorialHeading2.copyWith(color: textPrimary, fontSize: 18)),
+                  ],
+                ),
+              ),
+              TextButton(
+                onPressed: () => context.push('/aviation'),
+                child: Text('VIEW HANGAR', style: LuxuryTypography.microCaps.copyWith(color: goldAccent, fontWeight: FontWeight.bold)),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          height: 260,
+          child: ListView.separated(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            scrollDirection: Axis.horizontal,
+            itemCount: aviationState.jets.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 14),
+            itemBuilder: (context, index) {
+              final jet = aviationState.jets[index];
+              return GestureDetector(
+                onTap: () => context.push('/aviation'),
+                child: Container(
+                  width: 260,
+                  decoration: BoxDecoration(
+                    color: cardBg,
+                    borderRadius: BorderRadius.circular(4),
+                    border: Border.all(color: borderColor, width: 0.8),
+                    boxShadow: isDark
+                        ? []
+                        : [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.04),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Stack(
+                        children: [
+                          ClipRRect(
+                            borderRadius: const BorderRadius.vertical(top: Radius.circular(3)),
+                            child: LuxuryImage(
+                              imageUrl: jet.imageUrl,
+                              height: 140,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          Positioned(
+                            top: 8,
+                            left: 8,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withValues(alpha: 0.85),
+                                borderRadius: BorderRadius.circular(2),
+                              ),
+                              child: Text(
+                                jet.category.toUpperCase(),
+                                style: LuxuryTypography.microCaps.copyWith(
+                                  color: LuxuryColors.goldLight,
+                                  fontSize: 8.5,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
                           ),
                         ],
@@ -273,11 +634,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(prop.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 13)),
+                            Text(
+                              jet.model,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(fontWeight: FontWeight.bold, color: textPrimary, fontSize: 13),
+                            ),
                             const SizedBox(height: 4),
-                            Text(prop.priceDisplay, style: TextStyle(color: LuxuryColors.gold, fontWeight: FontWeight.bold, fontSize: 12)),
+                            Text(
+                              '₹${(jet.purchasePrice / 10000000).toStringAsFixed(1)} Cr Acquisition',
+                              style: TextStyle(color: goldAccent, fontWeight: FontWeight.bold, fontSize: 12.5),
+                            ),
                             const SizedBox(height: 2),
-                            Text(',  •  sq ft', style: const TextStyle(color: Colors.grey, fontSize: 10)),
+                            Text(
+                              '${jet.rangeNm} nm Range • ${jet.passengerCapacity} VIP Seats',
+                              style: TextStyle(color: textSecondary, fontSize: 10.5),
+                            ),
                           ],
                         ),
                       ),
@@ -288,30 +660,35 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             },
           ),
         ),
+
         const SizedBox(height: 32),
+
+        // 4. Spotlight: High-Security Vaults & Armored Safes
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('HIGH-SECURITY PROTECTION', style: LuxuryTypography.microCaps.copyWith(color: LuxuryColors.gold, letterSpacing: 2.0)),
-                  const SizedBox(height: 4),
-                  Text('LUXURY LOCKERS & VAULTS', style: LuxuryTypography.editorialHeading2.copyWith(color: LuxuryColors.pureWhite)),
-                ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('HIGH-SECURITY PROTECTION', style: LuxuryTypography.microCaps.copyWith(color: goldAccent, letterSpacing: 2.0)),
+                    const SizedBox(height: 4),
+                    Text('VAULTS & ARMORED SAFES', style: LuxuryTypography.editorialHeading2.copyWith(color: textPrimary, fontSize: 18)),
+                  ],
+                ),
               ),
               TextButton(
                 onPressed: () => context.push('/lockers'),
-                child: Text('VIEW ALL SAFES', style: LuxuryTypography.microCaps.copyWith(color: LuxuryColors.gold, fontWeight: FontWeight.bold)),
+                child: Text('VIEW ALL SAFES', style: LuxuryTypography.microCaps.copyWith(color: goldAccent, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
         ),
         const SizedBox(height: 12),
         SizedBox(
-          height: 230,
+          height: 260,
           child: ListView.separated(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             scrollDirection: Axis.horizontal,
@@ -322,29 +699,56 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               return GestureDetector(
                 onTap: () => context.push('/lockers'),
                 child: Container(
-                  width: 240,
+                  width: 250,
                   decoration: BoxDecoration(
-                    color: LuxuryColors.darkCard,
+                    color: cardBg,
                     borderRadius: BorderRadius.circular(4),
-                    border: Border.all(color: LuxuryColors.goldBorder, width: 0.8),
+                    border: Border.all(color: borderColor, width: 0.8),
+                    boxShadow: isDark
+                        ? []
+                        : [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.04),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       ClipRRect(
                         borderRadius: const BorderRadius.vertical(top: Radius.circular(3)),
-                        child: LuxuryImage(imageUrl: locker.mediaUrls.first, height: 130, width: double.infinity, fit: BoxFit.cover),
+                        child: LuxuryImage(
+                          imageUrl: locker.mediaUrls.first,
+                          height: 135,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
                       ),
                       Padding(
                         padding: const EdgeInsets.all(10),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(locker.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 12.5)),
+                            Text(
+                              locker.title,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(fontWeight: FontWeight.bold, color: textPrimary, fontSize: 12.5),
+                            ),
                             const SizedBox(height: 4),
-                            Text(locker.priceDisplay, style: TextStyle(color: LuxuryColors.gold, fontWeight: FontWeight.bold, fontSize: 12)),
+                            Text(
+                              locker.priceDisplay,
+                              style: TextStyle(color: goldAccent, fontWeight: FontWeight.bold, fontSize: 12),
+                            ),
                             const SizedBox(height: 2),
-                            Text(' • ', maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.grey, fontSize: 10)),
+                            Text(
+                              '${locker.manufacturer} • ${locker.securityRating}',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(color: textSecondary, fontSize: 10.5),
+                            ),
                           ],
                         ),
                       ),
@@ -355,14 +759,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             },
           ),
         ),
+
         const SizedBox(height: 32),
+
+        // 5. Live VIP Auctions Floor
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 20),
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
-            color: const Color(0xFF111111),
+            color: isDark ? const Color(0xFF111111) : LuxuryColors.lightCard,
             borderRadius: BorderRadius.circular(4),
-            border: Border.all(color: LuxuryColors.goldBorder, width: 1.0),
+            border: Border.all(
+              color: isDark ? LuxuryColors.goldBorder : LuxuryColors.borderLight,
+              width: 1.0,
+            ),
+            boxShadow: isDark
+                ? []
+                : [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.04),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -370,48 +789,97 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      Container(width: 8, height: 8, decoration: const BoxDecoration(color: Colors.redAccent, shape: BoxShape.circle)),
-                      const SizedBox(width: 8),
-                      Text('NP LIVE AUCTIONS FLOOR', style: LuxuryTypography.microCaps.copyWith(color: LuxuryColors.gold, fontWeight: FontWeight.w700, letterSpacing: 2.0)),
-                    ],
+                  Flexible(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: const BoxDecoration(
+                            color: Colors.redAccent,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Flexible(
+                          child: Text(
+                            'NP LIVE AUCTIONS FLOOR',
+                            overflow: TextOverflow.ellipsis,
+                            style: LuxuryTypography.microCaps.copyWith(
+                              color: goldAccent,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 1.0,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  Text('10 LIVE LOTS', style: LuxuryTypography.microCaps.copyWith(color: Colors.white70, fontSize: 10)),
+                  const SizedBox(width: 8),
+                  Text(
+                    '${auctionsState.auctions.length} LIVE LOTS',
+                    style: LuxuryTypography.microCaps.copyWith(
+                      color: textSecondary,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 12),
               if (auctionsState.auctions.isNotEmpty) ...[
-                Text(auctionsState.auctions.first.assetTitle, style: LuxuryTypography.editorialHeading2.copyWith(fontSize: 17, color: Colors.white)),
+                Text(
+                  auctionsState.auctions.first.assetTitle,
+                  style: LuxuryTypography.editorialHeading2.copyWith(
+                    fontSize: 17,
+                    color: textPrimary,
+                  ),
+                ),
                 const SizedBox(height: 6),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('CURRENT HIGH BID', style: LuxuryTypography.microCaps.copyWith(fontSize: 9.5, color: Colors.white60)),
-                    Text('₹  LAKHS', style: LuxuryTypography.priceMedium.copyWith(color: LuxuryColors.gold, fontWeight: FontWeight.bold)),
+                    Flexible(
+                      child: Text(
+                        'CURRENT HIGH BID',
+                        overflow: TextOverflow.ellipsis,
+                        style: LuxuryTypography.microCaps.copyWith(fontSize: 9.5, color: textSecondary),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      '₹${(auctionsState.auctions.first.currentBid / 100000).toStringAsFixed(1)} LAKHS',
+                      style: LuxuryTypography.priceMedium.copyWith(
+                        color: goldAccent,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ],
                 ),
               ],
               const SizedBox(height: 14),
               LuxuryButton(
                 text: 'ENTER LIVE BIDDING FLOOR',
-                backgroundColor: LuxuryColors.gold,
-                textColor: LuxuryColors.pureBlack,
+                variant: LuxuryButtonVariant.gold,
                 height: 40,
                 onPressed: () => context.push('/auctions'),
               ),
             ],
           ),
         ),
+
         const SizedBox(height: 32),
+
+        // 6. Featured Curated Acquisitions
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('COLLECTOR HIGHLIGHTS', style: LuxuryTypography.microCaps.copyWith(color: LuxuryColors.gold, letterSpacing: 2.2)),
+              Text('COLLECTOR HIGHLIGHTS', style: LuxuryTypography.microCaps.copyWith(color: goldAccent, letterSpacing: 2.2)),
               const SizedBox(height: 4),
-              Text('FEATURED ASSETS', style: LuxuryTypography.editorialHeading2.copyWith(color: LuxuryColors.pureWhite)),
+              Text('FEATURED ACQUISITIONS', style: LuxuryTypography.editorialHeading2.copyWith(color: textPrimary)),
             ],
           ),
         ),
@@ -424,73 +892,113 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           separatorBuilder: (_, __) => const SizedBox(height: 16),
           itemBuilder: (context, index) {
             final item = listings[index];
-            return LuxuryListingCard(listing: item, onTap: () => context.push('/listings/'));
+            return LuxuryListingCard(
+              listing: item,
+              onTap: () => context.push('/listing/${item.id}'),
+            );
           },
         ),
       ],
     );
   }
 
-  Widget _buildRentSection(rentalsState, aviationState) {
+  // ==========================================
+  // RENT SECTION: Fleet, Jets & Elite Crew
+  // ==========================================
+  Widget _buildRentSection(bool isDark, rentalsState, aviationState, crewState) {
+    final textPrimary = LuxuryColors.textPrimary(isDark);
+    final textSecondary = LuxuryColors.textSecondary(isDark);
+    final goldAccent = LuxuryColors.goldAccent(isDark);
+    final cardBg = LuxuryColors.cardBg(isDark);
+    final borderColor = isDark ? LuxuryColors.borderDark : LuxuryColors.borderLight;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // 1. Luxe Drive Fleet
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('NP LUXE FLEET HIRE', style: LuxuryTypography.microCaps.copyWith(color: LuxuryColors.gold, letterSpacing: 2.0)),
-                  const SizedBox(height: 4),
-                  Text('WEDDINGS, GALAS & CONVOYS', style: LuxuryTypography.editorialHeading2.copyWith(color: LuxuryColors.pureWhite)),
-                ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('NP LUXE DRIVE FLEET', style: LuxuryTypography.microCaps.copyWith(color: goldAccent, letterSpacing: 2.0)),
+                    const SizedBox(height: 4),
+                    Text('WEDDINGS, GALAS & CONVOYS', style: LuxuryTypography.editorialHeading2.copyWith(color: textPrimary, fontSize: 18)),
+                  ],
+                ),
               ),
               TextButton(
                 onPressed: () => context.push('/rentals'),
-                child: Text('ALL FLEET', style: LuxuryTypography.microCaps.copyWith(color: LuxuryColors.gold, fontWeight: FontWeight.bold)),
+                child: Text('ALL FLEET', style: LuxuryTypography.microCaps.copyWith(color: goldAccent, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
         ),
         const SizedBox(height: 12),
         SizedBox(
-          height: 235,
+          height: 255,
           child: ListView.separated(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             scrollDirection: Axis.horizontal,
-            itemCount: rentalsState.vehicles.take(5).length,
+            itemCount: rentalsState.vehicles.length,
             separatorBuilder: (_, __) => const SizedBox(width: 14),
             itemBuilder: (context, index) {
               final car = rentalsState.vehicles[index];
               return GestureDetector(
                 onTap: () => context.push('/rentals'),
                 child: Container(
-                  width: 230,
+                  width: 240,
                   decoration: BoxDecoration(
-                    color: LuxuryColors.darkCard,
+                    color: cardBg,
                     borderRadius: BorderRadius.circular(4),
-                    border: Border.all(color: LuxuryColors.goldBorder, width: 0.8),
+                    border: Border.all(color: borderColor, width: 0.8),
+                    boxShadow: isDark
+                        ? []
+                        : [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.04),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       ClipRRect(
                         borderRadius: const BorderRadius.vertical(top: Radius.circular(3)),
-                        child: LuxuryImage(imageUrl: car.coverImageUrl, height: 130, width: double.infinity, fit: BoxFit.cover),
+                        child: LuxuryImage(
+                          imageUrl: car.coverImageUrl,
+                          height: 135,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
                       ),
                       Padding(
                         padding: const EdgeInsets.all(10),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(car.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 13)),
+                            Text(
+                              car.title,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(fontWeight: FontWeight.bold, color: textPrimary, fontSize: 13),
+                            ),
                             const SizedBox(height: 4),
-                            Text('₹ K / Day • ', style: TextStyle(color: LuxuryColors.gold, fontWeight: FontWeight.w600, fontSize: 11)),
+                            Text(
+                              '₹${(car.dailyRate / 1000).toInt()}K / Day Escort',
+                              style: TextStyle(color: goldAccent, fontWeight: FontWeight.w600, fontSize: 11.5),
+                            ),
                             const SizedBox(height: 2),
-                            const Text('VIP Marriage Escort & Chauffeur', style: TextStyle(color: Colors.grey, fontSize: 10)),
+                            Text(
+                              'VIP Marriage & Chauffeur Protocol',
+                              style: TextStyle(color: textSecondary, fontSize: 10),
+                            ),
                           ],
                         ),
                       ),
@@ -501,63 +1009,84 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             },
           ),
         ),
+
         const SizedBox(height: 32),
+
+        // 2. Private Jet Charters
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('PRIVATE JETS & HELICOPTERS', style: LuxuryTypography.microCaps.copyWith(color: LuxuryColors.gold, letterSpacing: 2.0)),
-                  const SizedBox(height: 4),
-                  Text('VIP TRANSFERS & CHARTERS', style: LuxuryTypography.editorialHeading2.copyWith(color: LuxuryColors.pureWhite)),
-                ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('AVIATION CHARTERS', style: LuxuryTypography.microCaps.copyWith(color: goldAccent, letterSpacing: 2.0)),
+                    const SizedBox(height: 4),
+                    Text('JETS & HELICOPTER FLIGHTS', style: LuxuryTypography.editorialHeading2.copyWith(color: textPrimary, fontSize: 18)),
+                  ],
+                ),
               ),
               TextButton(
                 onPressed: () => context.push('/aviation'),
-                child: Text('VIEW JETS', style: LuxuryTypography.microCaps.copyWith(color: LuxuryColors.gold, fontWeight: FontWeight.bold)),
+                child: Text('CHARTER NOW', style: LuxuryTypography.microCaps.copyWith(color: goldAccent, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
         ),
         const SizedBox(height: 12),
         SizedBox(
-          height: 235,
+          height: 260,
           child: ListView.separated(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             scrollDirection: Axis.horizontal,
-            itemCount: aviationState.salesListings.take(4).length,
+            itemCount: aviationState.jets.length,
             separatorBuilder: (_, __) => const SizedBox(width: 14),
             itemBuilder: (context, index) {
-              final jet = aviationState.salesListings[index];
+              final jet = aviationState.jets[index];
               return GestureDetector(
                 onTap: () => context.push('/aviation'),
                 child: Container(
-                  width: 230,
+                  width: 250,
                   decoration: BoxDecoration(
-                    color: LuxuryColors.darkCard,
+                    color: cardBg,
                     borderRadius: BorderRadius.circular(4),
-                    border: Border.all(color: LuxuryColors.borderDark),
+                    border: Border.all(color: borderColor, width: 0.8),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       ClipRRect(
                         borderRadius: const BorderRadius.vertical(top: Radius.circular(3)),
-                        child: LuxuryImage(imageUrl: jet.mediaUrls.first, height: 130, width: double.infinity, fit: BoxFit.cover),
+                        child: LuxuryImage(
+                          imageUrl: jet.imageUrl,
+                          height: 135,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
                       ),
                       Padding(
                         padding: const EdgeInsets.all(10),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(jet.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 13)),
+                            Text(
+                              jet.model,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(fontWeight: FontWeight.bold, color: textPrimary, fontSize: 13),
+                            ),
                             const SizedBox(height: 4),
-                            Text('₹  Crore •  Pax', style: TextStyle(color: LuxuryColors.gold, fontSize: 11)),
+                            Text(
+                              '₹${(jet.hourlyCharterRate / 1000).toInt()}K / Flight Hour',
+                              style: TextStyle(color: goldAccent, fontWeight: FontWeight.w600, fontSize: 11.5),
+                            ),
                             const SizedBox(height: 2),
-                            Text(' NM Range • Mach ', style: const TextStyle(color: Colors.grey, fontSize: 10)),
+                            Text(
+                              'Worldwide VIP Dispatch Available',
+                              style: TextStyle(color: textSecondary, fontSize: 10),
+                            ),
                           ],
                         ),
                       ),
@@ -568,30 +1097,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             },
           ),
         ),
-      ],
-    );
-  }
 
-  Widget _buildCrewSection(crewState) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+        const SizedBox(height: 32),
+
+        // 3. Elite Crew Booking
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('CONFIDENTIAL HUMAN TALENT', style: LuxuryTypography.microCaps.copyWith(color: LuxuryColors.gold, letterSpacing: 2.0)),
-                  const SizedBox(height: 4),
-                  Text('CAPTAINS, PILOTS & SECURITY', style: LuxuryTypography.editorialHeading2.copyWith(color: LuxuryColors.pureWhite)),
-                ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('CREW & CLOSE PROTECTION', style: LuxuryTypography.microCaps.copyWith(color: goldAccent, letterSpacing: 2.0)),
+                    const SizedBox(height: 4),
+                    Text('PILOTS & 3000 GT MASTERS', style: LuxuryTypography.editorialHeading2.copyWith(color: textPrimary, fontSize: 18)),
+                  ],
+                ),
               ),
               TextButton(
                 onPressed: () => context.push('/crew'),
-                child: Text('ALL CREW', style: LuxuryTypography.microCaps.copyWith(color: LuxuryColors.gold, fontWeight: FontWeight.bold)),
+                child: Text('VIEW ROSTER', style: LuxuryTypography.microCaps.copyWith(color: goldAccent, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -602,24 +1129,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           physics: const NeverScrollableScrollPhysics(),
           padding: const EdgeInsets.symmetric(horizontal: 20),
           itemCount: crewState.profiles.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 16),
+          separatorBuilder: (_, __) => const SizedBox(height: 14),
           itemBuilder: (context, index) {
             final crew = crewState.profiles[index];
             return Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: LuxuryColors.darkCard,
+                color: cardBg,
                 borderRadius: BorderRadius.circular(4),
-                border: Border.all(color: LuxuryColors.goldBorder, width: 0.8),
+                border: Border.all(color: borderColor, width: 0.8),
               ),
               child: Row(
                 children: [
                   Container(
-                    width: 60,
-                    height: 60,
+                    width: 58,
+                    height: 58,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(4),
-                      border: Border.all(color: LuxuryColors.gold),
+                      border: Border.all(color: goldAccent),
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(3),
@@ -633,26 +1160,39 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       children: [
                         Row(
                           children: [
-                            Text(crew.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+                            Flexible(
+                              child: Text(
+                                crew.name,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(color: textPrimary, fontWeight: FontWeight.bold, fontSize: 13.5),
+                              ),
+                            ),
                             const SizedBox(width: 4),
-                            const Icon(Icons.verified, color: LuxuryColors.gold, size: 14),
+                            Icon(Icons.verified, color: goldAccent, size: 14),
                           ],
                         ),
                         const SizedBox(height: 2),
-                        Text(crew.role.toUpperCase(), style: LuxuryTypography.microCaps.copyWith(color: LuxuryColors.gold, fontSize: 9)),
+                        Text(
+                          crew.role.toUpperCase(),
+                          style: LuxuryTypography.microCaps.copyWith(color: goldAccent, fontSize: 9),
+                        ),
                         const SizedBox(height: 4),
-                        Text(' • ', style: const TextStyle(color: Colors.grey, fontSize: 11)),
+                        Text(
+                          '₹${(crew.dayRate / 1000).toInt()}K / Day • Retainer: ₹${(crew.monthlyRetainer / 100000).toStringAsFixed(1)}L',
+                          style: TextStyle(color: textSecondary, fontSize: 11),
+                        ),
                       ],
                     ),
                   ),
                   OutlinedButton(
                     onPressed: () => context.push('/crew'),
                     style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: LuxuryColors.gold, width: 0.8),
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      side: BorderSide(color: goldAccent, width: 0.9),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
                     ),
-                    child: Text('BOOK', style: LuxuryTypography.microCaps.copyWith(color: LuxuryColors.gold)),
+                    child: Text('BOOK', style: LuxuryTypography.microCaps.copyWith(color: goldAccent)),
                   ),
                 ],
               ),
@@ -663,18 +1203,235 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildWealthTierMembershipCard() {
+  // ==========================================
+  // SELL SECTION: VIP Consignment Portal
+  // ==========================================
+  Widget _buildSellConsignSection(bool isDark) {
+    final textPrimary = LuxuryColors.textPrimary(isDark);
+    final textSecondary = LuxuryColors.textSecondary(isDark);
+    final goldAccent = LuxuryColors.goldAccent(isDark);
+    final cardBg = LuxuryColors.cardBg(isDark);
+    final borderColor = isDark ? LuxuryColors.borderDark : LuxuryColors.borderLight;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Container(
+            padding: const EdgeInsets.all(22),
+            decoration: BoxDecoration(
+              gradient: isDark
+                  ? const LinearGradient(
+                      colors: [Color(0xFF1E1805), Color(0xFF0D0A02)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    )
+                  : const LinearGradient(
+                      colors: [Color(0xFFFAF6EB), Color(0xFFF3EBD4)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+              borderRadius: BorderRadius.circular(4),
+              border: Border.all(color: goldAccent, width: 1.2),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'CONSIGNMENT CONCIERGE',
+                      style: LuxuryTypography.microCaps.copyWith(
+                        color: goldAccent,
+                        letterSpacing: 2.2,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: goldAccent,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                      child: const Text(
+                        'HNWI GATEWAY',
+                        style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 8.5),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  'List Your Sovereign Asset',
+                  style: LuxuryTypography.editorialHeading2.copyWith(color: textPrimary, fontSize: 21),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Connect with verified ultra-high-net-worth collectors, sovereign wealth syndicates, and accredited institutions across 48 jurisdictions.',
+                  style: LuxuryTypography.bodyMedium.copyWith(color: textSecondary, fontSize: 13),
+                ),
+                const SizedBox(height: 20),
+                LuxuryButton(
+                  text: '✦ LAUNCH 5-STEP LISTING WIZARD',
+                  variant: LuxuryButtonVariant.gold,
+                  height: 48,
+                  onPressed: () => context.push('/sell/new'),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 24),
+
+          Text(
+            'SELLER PILLARS & GUARANTEES',
+            style: LuxuryTypography.microCaps.copyWith(color: goldAccent, letterSpacing: 2.0),
+          ),
+          const SizedBox(height: 12),
+
+          // Pillar 1: Escrow & Title Security
+          _buildSellerFeatureCard(
+            isDark: isDark,
+            icon: Icons.shield,
+            title: 'Tier-1 Institutional Escrow',
+            subtitle: '100% safeguarded funds through registered sovereign escrow agents and legal title verification.',
+          ),
+          const SizedBox(height: 12),
+
+          // Pillar 2: Assay & Provenance
+          _buildSellerFeatureCard(
+            isDark: isDark,
+            icon: Icons.biotech,
+            title: 'Assay & Provenance Certification',
+            subtitle: 'Independent GIA, IGI, VdS, and MCA physical authentication prior to syndicate release.',
+          ),
+          const SizedBox(height: 12),
+
+          // Pillar 3: Confidential Deal Rooms
+          _buildSellerFeatureCard(
+            isDark: isDark,
+            icon: Icons.vpn_key,
+            title: 'Bespoke Confidential Deal Rooms',
+            subtitle: 'End-to-end encrypted private negotiating rooms with legally binding NDA signatures.',
+          ),
+
+          const SizedBox(height: 24),
+
+          // Action Buttons
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () => context.push('/seller/register'),
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(color: goldAccent, width: 1.0),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
+                  ),
+                  child: Text(
+                    'BECOME FOUNDING DEALER',
+                    textAlign: TextAlign.center,
+                    style: LuxuryTypography.microCaps.copyWith(color: goldAccent, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () => context.go('/sell'),
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(color: borderColor, width: 1.0),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
+                  ),
+                  child: Text(
+                    'SELLER DASHBOARD',
+                    textAlign: TextAlign.center,
+                    style: LuxuryTypography.microCaps.copyWith(color: textPrimary, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSellerFeatureCard({
+    required bool isDark,
+    required IconData icon,
+    required String title,
+    required String subtitle,
+  }) {
+    final textPrimary = LuxuryColors.textPrimary(isDark);
+    final textSecondary = LuxuryColors.textSecondary(isDark);
+    final goldAccent = LuxuryColors.goldAccent(isDark);
+    final cardBg = LuxuryColors.cardBg(isDark);
+    final borderColor = isDark ? LuxuryColors.borderDark : LuxuryColors.borderLight;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: cardBg,
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: borderColor, width: 0.8),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: goldAccent.withValues(alpha: 0.12),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: goldAccent, size: 20),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: TextStyle(color: textPrimary, fontWeight: FontWeight.bold, fontSize: 14)),
+                const SizedBox(height: 3),
+                Text(subtitle, style: TextStyle(color: textSecondary, fontSize: 11.5, height: 1.4)),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ==========================================
+  // WEALTH MEMBERSHIP TIERS (4 Brackets)
+  // ==========================================
+  Widget _buildWealthTierMembershipCard(bool isDark) {
+    final textPrimary = LuxuryColors.textPrimary(isDark);
+    final textSecondary = LuxuryColors.textSecondary(isDark);
+    final goldAccent = LuxuryColors.goldAccent(isDark);
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF1C1605), Color(0xFF0C0A03)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        gradient: isDark
+            ? const LinearGradient(
+                colors: [Color(0xFF1C1605), Color(0xFF0C0A03)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              )
+            : const LinearGradient(
+                colors: [Color(0xFFFAF6EC), Color(0xFFF0E5CC)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
         borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: LuxuryColors.gold, width: 1.2),
+        border: Border.all(color: goldAccent, width: 1.2),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -682,48 +1439,58 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'SOVEREIGN WEALTH PRIVILEGES',
-                style: LuxuryTypography.microCaps.copyWith(
-                  color: LuxuryColors.gold,
-                  letterSpacing: 2.2,
-                  fontWeight: FontWeight.bold,
+              Expanded(
+                child: Text(
+                  'SOVEREIGN WEALTH PRIVILEGES',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: LuxuryTypography.microCaps.copyWith(
+                    color: goldAccent,
+                    letterSpacing: 1.2,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
+              const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(color: LuxuryColors.gold, borderRadius: BorderRadius.circular(2)),
-                child: const Text('4 WEALTH BRACKETS', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 8.5)),
+                decoration: BoxDecoration(
+                  color: goldAccent,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+                child: const Text(
+                  '4 WEALTH BRACKETS',
+                  style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 8.5),
+                ),
               ),
             ],
           ),
           const SizedBox(height: 10),
           Text(
             'Patron Acquisition Authority',
-            style: LuxuryTypography.editorialHeading2.copyWith(color: LuxuryColors.pureWhite, fontSize: 20),
+            style: LuxuryTypography.editorialHeading2.copyWith(color: textPrimary, fontSize: 20),
           ),
           const SizedBox(height: 8),
           Text(
             'Membership scales precisely with buying capacity: Sovereign Select (₹10K), Privé Gold (₹1L), Obsidian Royal (₹15L), and Dynasty Syndicate (₹1Cr).',
-            style: LuxuryTypography.bodyMedium.copyWith(color: LuxuryColors.platinum, fontSize: 12.5),
+            style: LuxuryTypography.bodyMedium.copyWith(color: textSecondary, fontSize: 12.5),
           ),
           const SizedBox(height: 16),
           Row(
             children: [
-              _tierPill('₹10K', '< ₹1 Cr'),
+              _tierPill('₹10K', '< ₹1 Cr', isDark),
               const SizedBox(width: 8),
-              _tierPill('₹1L', '₹1-50 Cr'),
+              _tierPill('₹1L', '₹1-50 Cr', isDark),
               const SizedBox(width: 8),
-              _tierPill('₹15L', '₹50-500 Cr'),
+              _tierPill('₹15L', '₹50-500 Cr', isDark),
               const SizedBox(width: 8),
-              _tierPill('₹1Cr', '> ₹500 Cr', isHighTier: true),
+              _tierPill('₹1Cr', '> ₹500 Cr', isDark, isHighTier: true),
             ],
           ),
           const SizedBox(height: 18),
           LuxuryButton(
             text: 'VIEW WEALTH TIERS & PRIVILEGES',
-            backgroundColor: LuxuryColors.gold,
-            textColor: LuxuryColors.pureBlack,
+            variant: LuxuryButtonVariant.gold,
             onPressed: () => context.push('/membership'),
           ),
         ],
@@ -731,50 +1498,92 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _tierPill(String fee, String cap, {bool isHighTier = false}) {
+  Widget _tierPill(String fee, String cap, bool isDark, {bool isHighTier = false}) {
+    final activeGold = isDark ? LuxuryColors.gold : LuxuryColors.goldDark;
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
-          color: isHighTier ? LuxuryColors.gold.withOpacity(0.2) : const Color(0xFF141414),
+          color: isHighTier
+              ? activeGold.withValues(alpha: 0.18)
+              : (isDark ? const Color(0xFF141414) : Colors.white),
           borderRadius: BorderRadius.circular(2),
-          border: Border.all(color: isHighTier ? LuxuryColors.gold : LuxuryColors.borderDark),
+          border: Border.all(
+            color: isHighTier ? activeGold : (isDark ? LuxuryColors.borderDark : LuxuryColors.borderLight),
+          ),
         ),
         alignment: Alignment.center,
         child: Column(
           children: [
-            Text(fee, style: TextStyle(color: isHighTier ? LuxuryColors.goldLight : Colors.white, fontWeight: FontWeight.bold, fontSize: 11)),
+            Text(
+              fee,
+              style: TextStyle(
+                color: isHighTier ? activeGold : LuxuryColors.textPrimary(isDark),
+                fontWeight: FontWeight.bold,
+                fontSize: 11,
+              ),
+            ),
             const SizedBox(height: 2),
-            Text(cap, style: const TextStyle(color: Colors.grey, fontSize: 8.5)),
+            Text(
+              cap,
+              style: TextStyle(color: LuxuryColors.textSecondary(isDark), fontSize: 8.5),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildPrivateRequestBanner() {
+  // ==========================================
+  // CONFIDENTIAL ACQUISITION REQUEST
+  // ==========================================
+  Widget _buildPrivateRequestBanner(bool isDark) {
+    final textPrimary = LuxuryColors.textPrimary(isDark);
+    final textSecondary = LuxuryColors.textSecondary(isDark);
+    final goldAccent = LuxuryColors.goldAccent(isDark);
+    final cardBg = LuxuryColors.cardBg(isDark);
+    final borderColor = isDark ? LuxuryColors.borderDark : LuxuryColors.borderLight;
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: LuxuryColors.darkCard,
+        color: cardBg,
         borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: LuxuryColors.borderDark),
+        border: Border.all(color: borderColor),
+        boxShadow: isDark
+            ? []
+            : [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.04),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
+                ),
+              ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(Icons.shield, color: LuxuryColors.gold, size: 18),
+              Icon(Icons.shield, color: goldAccent, size: 18),
               const SizedBox(width: 8),
-              Text('PRIVATE REQUEST SERVICE', style: LuxuryTypography.microCaps.copyWith(color: LuxuryColors.gold, letterSpacing: 2.0)),
+              Text(
+                'PRIVATE REQUEST SERVICE',
+                style: LuxuryTypography.microCaps.copyWith(color: goldAccent, letterSpacing: 2.0),
+              ),
             ],
           ),
           const SizedBox(height: 8),
-          const Text('Looking for an Unlisted Asset?', style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold)),
+          Text(
+            'Looking for an Unlisted Asset?',
+            style: TextStyle(color: textPrimary, fontSize: 17, fontWeight: FontWeight.bold),
+          ),
           const SizedBox(height: 4),
-          const Text('Post a confidential acquisition request. Verified dealers and family offices match your criteria privately.', style: TextStyle(color: Colors.grey, fontSize: 12)),
+          Text(
+            'Post a confidential acquisition request. Verified dealers and family offices match your criteria privately.',
+            style: TextStyle(color: textSecondary, fontSize: 12),
+          ),
           const SizedBox(height: 14),
           LuxuryButton(
             text: 'SUBMIT CONFIDENTIAL REQUEST',

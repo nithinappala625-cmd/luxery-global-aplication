@@ -32,23 +32,32 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
     final listings = ref.watch(filteredListingsProvider);
     final filter = ref.watch(listingFilterProvider);
     final categories = ref.watch(categoriesProvider);
+    final subcategories = filter.categoryId != null
+        ? ref.watch(subcategoriesByCategoryProvider(filter.categoryId!))
+        : const [];
 
     final hasFilters = filter.categoryId != null ||
+        filter.subcategoryId != null ||
         filter.currency != null ||
         filter.minPrice != null ||
         filter.maxPrice != null;
 
+    final goldColor = isDark ? LuxuryColors.gold : LuxuryColors.goldDark;
+    final bgColor = LuxuryColors.scaffoldBg(isDark);
+
     return Scaffold(
+      backgroundColor: bgColor,
       appBar: const LuxuryAppBar(
         title: 'NP GROUPS DISCOVERY',
         showBack: false,
         showWishlist: true,
+        showThemeToggle: true,
       ),
       body: Column(
         children: [
           // Search & Filter header
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 10),
             child: LuxurySearchBar(
               controller: _searchController,
               onChanged: (val) {
@@ -69,11 +78,13 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                 _buildQuickCategoryChip(
                   label: 'ALL ASSETS',
                   isSelected: filter.categoryId == null,
+                  isDark: isDark,
                   onTap: () => ref.read(listingFilterProvider.notifier).setCategory(null),
                 ),
                 ...categories.map((c) => _buildQuickCategoryChip(
                       label: c.name.toUpperCase(),
                       isSelected: filter.categoryId == c.id,
+                      isDark: isDark,
                       onTap: () {
                         if (c.slug == 'rentals') {
                           context.push('/rentals');
@@ -94,6 +105,32 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
             ),
           ),
 
+          // Subcategory Filter Chips Row (if subcategories available)
+          if (subcategories.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            SizedBox(
+              height: 32,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                children: [
+                  _buildSubcategoryChip(
+                    label: 'ALL',
+                    isSelected: filter.subcategoryId == null,
+                    isDark: isDark,
+                    onTap: () => ref.read(listingFilterProvider.notifier).setSubcategory(null),
+                  ),
+                  ...subcategories.map((s) => _buildSubcategoryChip(
+                        label: s.name.toUpperCase(),
+                        isSelected: filter.subcategoryId == s.id,
+                        isDark: isDark,
+                        onTap: () => ref.read(listingFilterProvider.notifier).setSubcategory(s.id),
+                      )),
+                ],
+              ),
+            ),
+          ],
+
           const SizedBox(height: 8),
 
           // Results Count and Sort Indicator
@@ -105,7 +142,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                 Text(
                   '${listings.length} VERIFIED POSSESSIONS',
                   style: LuxuryTypography.microCaps.copyWith(
-                    color: LuxuryColors.mutedGrey,
+                    color: LuxuryColors.textSecondary(isDark),
                     letterSpacing: 1.5,
                   ),
                 ),
@@ -116,15 +153,16 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                       Text(
                         _sortLabel(filter.sortOption),
                         style: LuxuryTypography.microCaps.copyWith(
-                          color: isDark ? LuxuryColors.champagne : LuxuryColors.deepForestGreen,
+                          color: goldColor,
                           letterSpacing: 1.2,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                       const SizedBox(width: 4),
                       Icon(
                         Icons.keyboard_arrow_down,
                         size: 14,
-                        color: isDark ? LuxuryColors.champagne : LuxuryColors.deepForestGreen,
+                        color: goldColor,
                       ),
                     ],
                   ),
@@ -150,18 +188,23 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                           Icon(
                             Icons.search_off_outlined,
                             size: 40,
-                            color: LuxuryColors.mutedGrey.withOpacity(0.6),
+                            color: LuxuryColors.mutedGrey.withValues(alpha: 0.6),
                           ),
                           const SizedBox(height: 16),
                           Text(
                             'NO MATCHING CURATED ASSETS',
-                            style: LuxuryTypography.editorialHeading2.copyWith(fontSize: 16),
+                            style: LuxuryTypography.editorialHeading2.copyWith(
+                              fontSize: 16,
+                              color: LuxuryColors.textPrimary(isDark),
+                            ),
                           ),
                           const SizedBox(height: 8),
                           Text(
                             'Try adjusting your search criteria, price range, or category filter.',
                             textAlign: TextAlign.center,
-                            style: LuxuryTypography.bodySmall,
+                            style: LuxuryTypography.bodySmall.copyWith(
+                              color: LuxuryColors.textSecondary(isDark),
+                            ),
                           ),
                         ],
                       ),
@@ -175,7 +218,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                       final item = listings[index];
                       return LuxuryListingCard(
                         listing: item,
-                        onTap: () => context.push('/listings/${item.id}'),
+                        onTap: () => context.push('/listing/${item.id}'),
                       );
                     },
                   ),
@@ -188,21 +231,21 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
   Widget _buildQuickCategoryChip({
     required String label,
     required bool isSelected,
+    required bool isDark,
     required VoidCallback onTap,
   }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
+    final goldColor = isDark ? LuxuryColors.gold : LuxuryColors.goldDark;
     return Padding(
       padding: const EdgeInsets.only(right: 8),
       child: GestureDetector(
         onTap: onTap,
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
+          duration: const Duration(milliseconds: 180),
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           decoration: BoxDecoration(
             color: isSelected
-                ? (isDark ? LuxuryColors.champagne : LuxuryColors.deepForestGreen)
-                : (isDark ? LuxuryColors.darkCard : LuxuryColors.cardLight),
+                ? goldColor
+                : (isDark ? LuxuryColors.darkCard : LuxuryColors.lightCard),
             borderRadius: BorderRadius.circular(2),
             border: Border.all(
               color: isSelected
@@ -216,11 +259,53 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
               label,
               style: LuxuryTypography.microCaps.copyWith(
                 color: isSelected
-                    ? (isDark ? LuxuryColors.pureBlack : LuxuryColors.pureWhite)
-                    : (isDark ? LuxuryColors.softIvory : LuxuryColors.darkText),
+                    ? LuxuryColors.pureWhite
+                    : LuxuryColors.textPrimary(isDark),
                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                 fontSize: 10,
                 letterSpacing: 1.2,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSubcategoryChip({
+    required String label,
+    required bool isSelected,
+    required bool isDark,
+    required VoidCallback onTap,
+  }) {
+    final goldColor = isDark ? LuxuryColors.gold : LuxuryColors.goldDark;
+    return Padding(
+      padding: const EdgeInsets.only(right: 6),
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? goldColor.withValues(alpha: 0.18)
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isSelected
+                  ? goldColor
+                  : (isDark ? LuxuryColors.borderDark : LuxuryColors.borderLight),
+              width: 0.7,
+            ),
+          ),
+          child: Center(
+            child: Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? goldColor : LuxuryColors.textSecondary(isDark),
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                fontSize: 9.5,
+                letterSpacing: 0.8,
               ),
             ),
           ),

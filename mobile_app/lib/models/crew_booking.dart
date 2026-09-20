@@ -34,6 +34,9 @@ class EliteCrewProfile {
     required this.pastDeployments,
     required this.securityClearance,
   });
+
+  double get dayRate => dayRateInr;
+  double get monthlyRetainer => monthlyRetainerInr;
 }
 
 class CrewBookingRequest {
