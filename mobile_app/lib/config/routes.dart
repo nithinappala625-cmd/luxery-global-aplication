@@ -21,8 +21,12 @@ import '../features/profile/profile_screen.dart';
 import '../features/rentals/luxe_drive_screen.dart';
 import '../features/real_estate/real_estate_screen.dart';
 import '../features/lockers/lockers_screen.dart';
+import '../features/cars/cars_screen.dart';
 import '../features/crew/crew_booking_screen.dart';
+import '../features/jewelry/jewelry_screen.dart';
+import '../features/marine/marine_screen.dart';
 import '../features/sell/sell_wizard_screen.dart';
+import '../features/watches/watches_screen.dart';
 import '../features/sell/seller_dashboard_screen.dart';
 import '../features/sell/seller_registration_screen.dart';
 import '../features/seller_profile/seller_profile_screen.dart';
@@ -222,6 +226,26 @@ final appRouter = GoRouter(
       parentNavigatorKey: _rootNavigatorKey,
       path: '/legal',
       builder: (context, state) => const LegalScreen(),
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: '/marine',
+      builder: (context, state) => const MarineScreen(),
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: '/cars',
+      builder: (context, state) => const CarsScreen(),
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: '/watches',
+      builder: (context, state) => const WatchesScreen(),
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: '/jewelry',
+      builder: (context, state) => const JewelryScreen(),
     ),
   ],
 );

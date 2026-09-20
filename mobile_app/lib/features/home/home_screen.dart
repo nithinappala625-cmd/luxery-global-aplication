@@ -4,19 +4,9 @@ import 'package:go_router/go_router.dart';
 import '../../core/constants/colors.dart';
 import '../../core/constants/typography.dart';
 import '../../core/widgets/luxury_app_bar.dart';
+import '../../core/widgets/luxury_asset_card.dart';
 import '../../core/widgets/luxury_button.dart';
-import '../../core/widgets/luxury_listing_card.dart';
-import '../../core/widgets/luxury_image.dart';
-import '../../providers/categories_provider.dart';
-import '../../providers/listings_provider.dart';
-import '../../providers/auctions_provider.dart';
-import '../../providers/rentals_provider.dart';
-import '../../providers/aviation_provider.dart';
-import '../../providers/real_estate_provider.dart';
-import '../../providers/lockers_provider.dart';
-import '../../providers/crew_provider.dart';
 import 'widgets/curation_statement.dart';
-import 'widgets/hero_banner.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -26,107 +16,206 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  String _selectedMode = 'BUY'; // 'BUY', 'RENT', 'SELL'
-  String _selectedSubcategoryPill = 'ALL';
+  String _mode = 'BUY';
+
+  static const String _gulfstreamUrl =
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5f/Gulfstream_G650ER%2C_EBACE_2018%2C_Le_Grand-Saconnex_%28BL7C0749%29.jpg/1280px-Gulfstream_G650ER%2C_EBACE_2018%2C_Le_Grand-Saconnex_%28BL7C0749%29.jpg';
+  static const String _yachtUrl =
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/4/47/Nautilus_73-meter_%28239_ft%29_long_motor_yacht._Location_Poole_Quay._Dorset.jpg/1280px-Nautilus_73-meter_%28239_ft%29_long_motor_yacht._Location_Poole_Quay._Dorset.jpg';
+  static const String _bugattiUrl =
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/1/18/Bugatti_Chiron_1.jpg/1280px-Bugatti_Chiron_1.jpg';
+  static const String _rollsUrl =
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1c/2019_Rolls-Royce_Phantom_V12_Automatic_6.75.jpg/1280px-2019_Rolls-Royce_Phantom_V12_Automatic_6.75.jpg';
+
+  // Category data
+  final List<_Category> _categories = const [
+    _Category('PRIVATE AVIATION', _gulfstreamUrl2, '/aviation', Icons.flight),
+    _Category('MARINE & YACHTS', _yachtUrl2, '/marine', Icons.directions_boat),
+    _Category('LUXURY AUTOMOBILES', _bugattiUrl2, '/cars', Icons.directions_car),
+    _Category('REAL ESTATE', 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800', '/real-estate', Icons.villa),
+    _Category('LUXURY WATCHES', 'https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=800', '/watches', Icons.watch),
+    _Category('JEWELS & GEMS', 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800', '/jewelry', Icons.diamond),
+    _Category('LOCKERS & VAULTS', 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800', '/lockers', Icons.lock),
+    _Category('LIVE AUCTIONS', 'https://images.unsplash.com/photo-1578932750294-f5075e85f44a?w=800', '/auctions', Icons.gavel),
+    _Category('FINE ART', 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800', '/auctions', Icons.palette),
+    _Category('PRIVATE ISLANDS', 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800', '/real-estate', Icons.beach_access),
+  ];
+
+  static const String _gulfstreamUrl2 =
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5f/Gulfstream_G650ER%2C_EBACE_2018%2C_Le_Grand-Saconnex_%28BL7C0749%29.jpg/1280px-Gulfstream_G650ER%2C_EBACE_2018%2C_Le_Grand-Saconnex_%28BL7C0749%29.jpg';
+  static const String _yachtUrl2 =
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/4/47/Nautilus_73-meter_%28239_ft%29_long_motor_yacht._Location_Poole_Quay._Dorset.jpg/1280px-Nautilus_73-meter_%28239_ft%29_long_motor_yacht._Location_Poole_Quay._Dorset.jpg';
+  static const String _bugattiUrl2 =
+      'https://thumb.wikimedia.org/wikipedia/commons/thumb/1/18/Bugatti_Chiron_1.jpg/1280px-Bugatti_Chiron_1.jpg';
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final categories = ref.watch(categoriesProvider);
-    final listings = ref.watch(listingsProvider);
-    final auctionsState = ref.watch(auctionsProvider);
-    final rentalsState = ref.watch(rentalsProvider);
-    final aviationState = ref.watch(aviationProvider);
-    final realEstateState = ref.watch(realEstateProvider);
-    final lockersState = ref.watch(lockersProvider);
-    final crewState = ref.watch(crewProvider);
-
-    final bgColor = LuxuryColors.scaffoldBg(isDark);
-    final textPrimary = LuxuryColors.textPrimary(isDark);
-    final textSecondary = LuxuryColors.textSecondary(isDark);
-    final goldAccent = LuxuryColors.goldAccent(isDark);
-    final borderColor = LuxuryColors.border(isDark);
+    final bg = isDark ? LuxuryColors.pureBlack : LuxuryColors.lightScaffold;
 
     return Scaffold(
-      backgroundColor: bgColor,
-      appBar: const LuxuryAppBar(
-        showBack: false,
-        showSearch: true,
-        showWishlist: true,
-        showThemeToggle: true,
-      ),
+      backgroundColor: bg,
+      appBar: const LuxuryAppBar(showBack: false, showSearch: true, showWishlist: true, showThemeToggle: true),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const HomeHeroBanner(),
-
-            // ==========================================
-            // TOP ACTION SELECTOR: BUY • RENT • SELL
-            // ==========================================
-            Container(
-              margin: const EdgeInsets.fromLTRB(16, 20, 16, 12),
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF101010) : LuxuryColors.lightCard,
-                borderRadius: BorderRadius.circular(4),
-                border: Border.all(
-                  color: isDark ? LuxuryColors.goldBorder : LuxuryColors.borderLight,
-                  width: 1.0,
-                ),
-                boxShadow: isDark
-                    ? []
-                    : [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.04),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-              ),
-              child: Row(
-                children: [
-                  _buildModeTab('BUY', '✦ BUY ASSETS', isDark),
-                  _buildModeTab('RENT', '✈ RENT FLEET', isDark),
-                  _buildModeTab('SELL', '👑 SELL & CONSIGN', isDark),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 12),
-
-            // Mode Content Router
-            if (_selectedMode == 'BUY') ...[
-              _buildBuySubcategoryPills(isDark),
-              const SizedBox(height: 20),
-              _buildWealthTierMembershipCard(isDark),
-              const SizedBox(height: 24),
-              _buildBuySection(isDark, categories, realEstateState, lockersState, auctionsState, listings, aviationState),
-            ] else if (_selectedMode == 'RENT') ...[
-              _buildRentSection(isDark, rentalsState, aviationState, crewState),
-            ] else ...[
-              _buildSellConsignSection(isDark),
-            ],
-
-            const SizedBox(height: 36),
+            _buildHero(isDark),
+            _buildModeSelector(isDark),
+            _buildSectionHeading('CURATED COLLECTIONS', '10 Elite Verticals', isDark),
+            _buildCategoryGrid(isDark),
+            _buildMembershipCard(isDark),
+            _buildSectionHeading("TODAY'S FEATURED DROPS", '4 Hand-Selected Assets', isDark),
+            _buildFeaturedGrid(isDark),
+            _buildLiveAuctionBanner(isDark),
             _buildPrivateRequestBanner(isDark),
-            const SizedBox(height: 36),
+            const SizedBox(height: 16),
             const CurationStatement(),
-            const SizedBox(height: 48),
+            const SizedBox(height: 32),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildModeTab(String modeKey, String label, bool isDark) {
-    final isSelected = _selectedMode == modeKey;
+  Widget _buildHero(bool isDark) {
+    return SizedBox(
+      height: 300,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.network(
+            _gulfstreamUrl,
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => Container(color: const Color(0xFF0A0A0A)),
+          ),
+          // gradient overlay
+          const DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0x33000000), Color(0xF0000000)],
+                stops: [0.0, 1.0],
+              ),
+            ),
+          ),
+          // NP GROUPS badge top right
+          Positioned(
+            top: 12,
+            right: 16,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              decoration: BoxDecoration(
+                color: Colors.black.withValues(alpha: 0.7),
+                border: Border.all(color: LuxuryColors.gold, width: 0.8),
+              ),
+              child: Text(
+                'NP GROUPS',
+                style: LuxuryTypography.microCaps.copyWith(
+                  color: LuxuryColors.gold,
+                  fontSize: 9,
+                  letterSpacing: 2.5,
+                ),
+              ),
+            ),
+          ),
+          // content bottom
+          Positioned(
+            left: 20,
+            right: 20,
+            bottom: 20,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'GLOBAL LUXURY SYNDICATE',
+                  style: LuxuryTypography.microCaps.copyWith(
+                    color: LuxuryColors.champagne,
+                    fontSize: 10,
+                    letterSpacing: 3.0,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'Acquire.\nCharter. Consign.',
+                  style: LuxuryTypography.editorialHero.copyWith(
+                    color: Colors.white,
+                    fontSize: 30,
+                    height: 1.1,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      _statChip('48 Countries'),
+                      const SizedBox(width: 8),
+                      _statChip('1,200+ Sellers'),
+                      const SizedBox(width: 8),
+                      _statChip('4 Wealth Tiers'),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _statChip(String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.6),
+        border: Border.all(color: LuxuryColors.goldBorder, width: 0.8),
+        borderRadius: BorderRadius.circular(2),
+      ),
+      child: Text(
+        label,
+        style: LuxuryTypography.microCaps.copyWith(
+          color: LuxuryColors.champagneLight,
+          fontSize: 9,
+          letterSpacing: 1.0,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildModeSelector(bool isDark) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF101010) : Colors.white,
+        border: Border.all(color: LuxuryColors.gold, width: 1.0),
+        borderRadius: BorderRadius.circular(4),
+        boxShadow: isDark
+            ? []
+            : [BoxShadow(color: LuxuryColors.gold.withValues(alpha: 0.12), blurRadius: 8)],
+      ),
+      child: Row(
+        children: [
+          _modeTab('✦ BUY', 'BUY', isDark),
+          _modeTab('✈ BOOK', 'BOOK', isDark),
+          _modeTab('♛ SELL', 'SELL', isDark),
+        ],
+      ),
+    );
+  }
+
+  Widget _modeTab(String label, String mode, bool isDark) {
+    final isSelected = _mode == mode;
     return Expanded(
       child: GestureDetector(
-        onTap: () => setState(() => _selectedMode = modeKey),
+        onTap: () => setState(() => _mode = mode),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(vertical: 12),
+          padding: const EdgeInsets.symmetric(vertical: 11),
           decoration: BoxDecoration(
             color: isSelected
                 ? (isDark ? LuxuryColors.gold : LuxuryColors.goldDark)
@@ -136,14 +225,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           alignment: Alignment.center,
           child: Text(
             label,
-            textAlign: TextAlign.center,
             style: LuxuryTypography.microCaps.copyWith(
               color: isSelected
-                  ? LuxuryColors.pureWhite
-                  : (isDark ? LuxuryColors.platinum : LuxuryColors.darkOnyx),
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-              fontSize: 10.5,
+                  ? Colors.black
+                  : (isDark ? LuxuryColors.platinum : LuxuryColors.slate),
+              fontSize: 11,
               letterSpacing: 1.0,
+              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
             ),
           ),
         ),
@@ -151,1422 +239,121 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  // ==========================================
-  // SUBCATEGORY PILL BAR (Horizontal Carousel)
-  // ==========================================
-  Widget _buildBuySubcategoryPills(bool isDark) {
-    final subcategories = [
-      {'id': 'ALL', 'label': '✦ ALL ASSETS', 'icon': Icons.auto_awesome},
-      {'id': 'FAST_CARS', 'label': '🏎️ FAST SUPERCARS', 'icon': Icons.flash_on},
-      {'id': 'COMFY_CARS', 'label': '👑 COMFY LIMOUSINES', 'icon': Icons.airline_seat_recline_extra},
-      {'id': 'VINTAGE_CARS', 'label': '🏛️ VINTAGE CARS', 'icon': Icons.history_edu},
-      {'id': 'JETS', 'label': '✈️ PRIVATE JETS', 'icon': Icons.flight_takeoff},
-      {'id': 'HELICOPTERS', 'label': '🚁 VIP HELICOPTERS', 'icon': Icons.toys},
-      {'id': 'ISLANDS', 'label': '🏝️ PRIVATE ISLANDS', 'icon': Icons.wb_sunny},
-      {'id': 'FORTS', 'label': '🏰 FORTS & PALACES', 'icon': Icons.castle},
-      {'id': 'VILLAS', 'label': '💎 ULTRA VILLAS', 'icon': Icons.villa},
-      {'id': 'PENTHOUSES', 'label': '🏙️ SKY PENTHOUSES', 'icon': Icons.apartment},
-      {'id': 'HIGH_COMPLICATIONS', 'label': '⏱️ HIGH COMPLICATIONS', 'icon': Icons.watch},
-      {'id': 'VINTAGE_WATCHES', 'label': '🕰️ VINTAGE WATCHES', 'icon': Icons.alarm_on},
-      {'id': 'NATURAL_DIAMONDS', 'label': '💎 NATURAL DIAMONDS', 'icon': Icons.diamond},
-      {'id': 'LAB_DIAMONDS', 'label': '🧪 LAB DIAMONDS', 'icon': Icons.science},
-      {'id': 'RARE_GEMS', 'label': '🟢 RARE EARTH GEMS', 'icon': Icons.spa},
-      {'id': 'GOLD', 'label': '🪙 24K PURE GOLD', 'icon': Icons.monetization_on},
-      {'id': 'LOCKERS', 'label': '🛡️ HIGH-SECURITY SAFES', 'icon': Icons.shield},
-      {'id': 'YACHTS', 'label': '🛥️ MEGA SUPERYACHTS', 'icon': Icons.directions_boat},
-    ];
-
-    return SizedBox(
-      height: 38,
-      child: ListView.separated(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        scrollDirection: Axis.horizontal,
-        itemCount: subcategories.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
-        itemBuilder: (context, index) {
-          final item = subcategories[index];
-          final isSelected = _selectedSubcategoryPill == item['id'];
-          final activeColor = isDark ? LuxuryColors.gold : LuxuryColors.goldDark;
-          final inactiveBg = isDark ? LuxuryColors.darkCard : LuxuryColors.lightCard;
-          final inactiveBorder = isDark ? LuxuryColors.borderDark : LuxuryColors.borderLight;
-          final inactiveText = isDark ? LuxuryColors.platinum : LuxuryColors.darkOnyx;
-
-          return GestureDetector(
-            onTap: () {
-              setState(() => _selectedSubcategoryPill = item['id'] as String);
-              _handleSubcategoryNavigation(item['id'] as String);
-            },
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 180),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              decoration: BoxDecoration(
-                color: isSelected ? activeColor : inactiveBg,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: isSelected ? activeColor : inactiveBorder,
-                  width: 0.9,
-                ),
-              ),
-              child: Text(
-                item['label'] as String,
-                style: LuxuryTypography.microCaps.copyWith(
-                  color: isSelected ? LuxuryColors.pureWhite : inactiveText,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-                  fontSize: 10.5,
-                  letterSpacing: 0.8,
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  void _handleSubcategoryNavigation(String subcategoryKey) {
-    switch (subcategoryKey) {
-      case 'ISLANDS':
-      case 'FORTS':
-      case 'VILLAS':
-      case 'PENTHOUSES':
-        context.push('/real-estate');
-        break;
-      case 'JETS':
-      case 'HELICOPTERS':
-        context.push('/aviation');
-        break;
-      case 'LOCKERS':
-        context.push('/lockers');
-        break;
-      case 'NATURAL_DIAMONDS':
-      case 'LAB_DIAMONDS':
-      case 'RARE_GEMS':
-      case 'GOLD':
-        context.push('/materials');
-        break;
-      case 'FAST_CARS':
-      case 'COMFY_CARS':
-      case 'VINTAGE_CARS':
-        ref.read(listingFilterProvider.notifier).setCategory('cat-cars');
-        context.go('/discover');
-        break;
-      case 'HIGH_COMPLICATIONS':
-      case 'VINTAGE_WATCHES':
-        ref.read(listingFilterProvider.notifier).setCategory('cat-watches');
-        context.go('/discover');
-        break;
-      default:
-        break;
-    }
-  }
-
-  // ==========================================
-  // BUY SECTION: Curated Salons & Spotlights
-  // ==========================================
-  Widget _buildBuySection(
-    bool isDark,
-    categories,
-    realEstateState,
-    lockersState,
-    auctionsState,
-    listings,
-    aviationState,
-  ) {
-    final textPrimary = LuxuryColors.textPrimary(isDark);
-    final textSecondary = LuxuryColors.textSecondary(isDark);
-    final goldAccent = LuxuryColors.goldAccent(isDark);
-    final cardBg = LuxuryColors.cardBg(isDark);
-    final borderColor = isDark ? LuxuryColors.borderDark : LuxuryColors.borderLight;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // 1. Curated Salon Circles/Thumbnails
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('NP GROUPS CURATED SALONS', style: LuxuryTypography.microCaps.copyWith(color: goldAccent, letterSpacing: 2.0)),
-                    const SizedBox(height: 4),
-                    Text('EXPLORE BY VERTICAL', style: LuxuryTypography.editorialHeading2.copyWith(color: textPrimary, fontSize: 18)),
-                  ],
-                ),
-              ),
-              TextButton(
-                onPressed: () => context.go('/discover'),
-                child: Text('ALL SALONS', style: LuxuryTypography.microCaps.copyWith(color: goldAccent, fontWeight: FontWeight.bold)),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 12),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: categories.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 1.35,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-            ),
-            itemBuilder: (context, index) {
-              final cat = categories[index];
-              return GestureDetector(
-                onTap: () {
-                  if (cat.slug == 'real_estate') {
-                    context.push('/real-estate');
-                  } else if (cat.slug == 'lockers') {
-                    context.push('/lockers');
-                  } else if (cat.slug == 'crew') {
-                    context.push('/crew');
-                  } else if (cat.slug == 'rentals') {
-                    context.push('/rentals');
-                  } else if (cat.slug == 'aviation') {
-                    context.push('/aviation');
-                  } else if (cat.slug == 'materials') {
-                    context.push('/materials');
-                  } else if (cat.slug == 'auctions') {
-                    context.push('/auctions');
-                  } else {
-                    ref.read(listingFilterProvider.notifier).setCategory(cat.id);
-                    context.go('/discover');
-                  }
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: cardBg,
-                    borderRadius: BorderRadius.circular(4),
-                    border: Border.all(color: borderColor, width: 0.8),
-                    boxShadow: isDark
-                        ? []
-                        : [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.04),
-                              blurRadius: 6,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: ClipRRect(
-                          borderRadius: const BorderRadius.vertical(top: Radius.circular(3)),
-                          child: Image.network(
-                            cat.bannerUrl,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => Container(
-                              color: isDark ? const Color(0xFF1E1E1E) : const Color(0xFFEFEFEF),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              cat.name,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: LuxuryTypography.bodyMedium.copyWith(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
-                                color: textPrimary,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              cat.tagline ?? 'Curated Salon',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: LuxuryTypography.bodySmall.copyWith(
-                                fontSize: 10,
-                                color: goldAccent,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-
-        const SizedBox(height: 32),
-
-        // 2. Spotlight: Sovereign Real Estate & Private Islands
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('SOVEREIGN DOMAINS', style: LuxuryTypography.microCaps.copyWith(color: goldAccent, letterSpacing: 2.0)),
-                    const SizedBox(height: 4),
-                    Text('ISLANDS, FORTS & VILLAS', style: LuxuryTypography.editorialHeading2.copyWith(color: textPrimary, fontSize: 18)),
-                  ],
-                ),
-              ),
-              TextButton(
-                onPressed: () => context.push('/real-estate'),
-                child: Text('VIEW ALL (48)', style: LuxuryTypography.microCaps.copyWith(color: goldAccent, fontWeight: FontWeight.bold)),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 12),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: realEstateState.listings.take(4).length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 0.68,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-            ),
-            itemBuilder: (context, index) {
-              final prop = realEstateState.listings[index];
-              return GestureDetector(
-                onTap: () => context.push('/real-estate'),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: cardBg,
-                    borderRadius: BorderRadius.circular(4),
-                    border: Border.all(color: borderColor, width: 0.8),
-                    boxShadow: isDark
-                        ? []
-                        : [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.04),
-                              blurRadius: 6,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Stack(
-                        children: [
-                          ClipRRect(
-                            borderRadius: const BorderRadius.vertical(top: Radius.circular(3)),
-                            child: LuxuryImage(
-                              imageUrl: prop.mediaUrls.first,
-                              height: 120,
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          Positioned(
-                            top: 6,
-                            left: 6,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                              decoration: BoxDecoration(
-                                color: Colors.black.withValues(alpha: 0.85),
-                                borderRadius: BorderRadius.circular(2),
-                              ),
-                              child: Text(
-                                prop.estateType.toUpperCase(),
-                                style: LuxuryTypography.microCaps.copyWith(
-                                  color: LuxuryColors.goldLight,
-                                  fontSize: 8,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                          if (prop.hasHelipad)
-                            Positioned(
-                              top: 6,
-                              right: 6,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: LuxuryColors.gold.withValues(alpha: 0.9),
-                                  borderRadius: BorderRadius.circular(2),
-                                ),
-                                child: const Text(
-                                  '🚁 HELIPAD',
-                                  style: TextStyle(color: Colors.black, fontSize: 7.5, fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              prop.title,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(fontWeight: FontWeight.bold, color: textPrimary, fontSize: 11.5, height: 1.2),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              prop.priceDisplay,
-                              style: TextStyle(color: goldAccent, fontWeight: FontWeight.bold, fontSize: 11),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              '${prop.location} • ${prop.builtUpAreaSqFt.toInt()} sq ft',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(color: textSecondary, fontSize: 9.5),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-
-        const SizedBox(height: 32),
-
-        // 3. Spotlight: Private Aviation & VIP Helicopters
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('PRIVATE AVIATION HANGAR', style: LuxuryTypography.microCaps.copyWith(color: goldAccent, letterSpacing: 2.0)),
-                    const SizedBox(height: 4),
-                    Text('JETS & VIP HELICOPTERS', style: LuxuryTypography.editorialHeading2.copyWith(color: textPrimary, fontSize: 18)),
-                  ],
-                ),
-              ),
-              TextButton(
-                onPressed: () => context.push('/aviation'),
-                child: Text('VIEW HANGAR', style: LuxuryTypography.microCaps.copyWith(color: goldAccent, fontWeight: FontWeight.bold)),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 12),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: aviationState.jets.take(4).length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 0.68,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-            ),
-            itemBuilder: (context, index) {
-              final jet = aviationState.jets[index];
-              final isHeli = jet.model.toLowerCase().contains('helicopter') || jet.model.toLowerCase().contains('s-76') || jet.model.toLowerCase().contains('ach130');
-              return GestureDetector(
-                onTap: () => context.push('/aviation'),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: cardBg,
-                    borderRadius: BorderRadius.circular(4),
-                    border: Border.all(color: borderColor, width: 0.8),
-                    boxShadow: isDark
-                        ? []
-                        : [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.04),
-                              blurRadius: 6,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Stack(
-                        children: [
-                          ClipRRect(
-                            borderRadius: const BorderRadius.vertical(top: Radius.circular(3)),
-                            child: LuxuryImage(
-                              imageUrl: jet.imageUrl,
-                              height: 120,
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          Positioned(
-                            top: 6,
-                            left: 6,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-                              decoration: BoxDecoration(
-                                color: Colors.black.withValues(alpha: 0.85),
-                                borderRadius: BorderRadius.circular(2),
-                              ),
-                              child: Text(
-                                isHeli ? 'VIP HELICOPTER' : 'PRIVATE JET',
-                                style: LuxuryTypography.microCaps.copyWith(
-                                  color: LuxuryColors.goldLight,
-                                  fontSize: 8,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              jet.model,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(fontWeight: FontWeight.bold, color: textPrimary, fontSize: 11.5, height: 1.2),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              '₹${(jet.purchasePrice / 10000000).toStringAsFixed(1)} Cr',
-                              style: TextStyle(color: goldAccent, fontWeight: FontWeight.bold, fontSize: 11),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              '${jet.rangeNm} nm • ${jet.passengerCapacity} VIP Seats',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(color: textSecondary, fontSize: 9.5),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-
-        const SizedBox(height: 32),
-
-        // 4. Spotlight: High-Security Vaults & Armored Safes
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('HIGH-SECURITY PROTECTION', style: LuxuryTypography.microCaps.copyWith(color: goldAccent, letterSpacing: 2.0)),
-                    const SizedBox(height: 4),
-                    Text('VAULTS & ARMORED SAFES', style: LuxuryTypography.editorialHeading2.copyWith(color: textPrimary, fontSize: 18)),
-                  ],
-                ),
-              ),
-              TextButton(
-                onPressed: () => context.push('/lockers'),
-                child: Text('VIEW ALL SAFES', style: LuxuryTypography.microCaps.copyWith(color: goldAccent, fontWeight: FontWeight.bold)),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 12),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: lockersState.lockers.take(4).length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 0.68,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-            ),
-            itemBuilder: (context, index) {
-              final locker = lockersState.lockers[index];
-              return GestureDetector(
-                onTap: () => context.push('/lockers'),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: cardBg,
-                    borderRadius: BorderRadius.circular(4),
-                    border: Border.all(color: borderColor, width: 0.8),
-                    boxShadow: isDark
-                        ? []
-                        : [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.04),
-                              blurRadius: 6,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ClipRRect(
-                        borderRadius: const BorderRadius.vertical(top: Radius.circular(3)),
-                        child: LuxuryImage(
-                          imageUrl: locker.mediaUrls.first,
-                          height: 120,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              locker.title,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(fontWeight: FontWeight.bold, color: textPrimary, fontSize: 11.5, height: 1.2),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              locker.priceDisplay,
-                              style: TextStyle(color: goldAccent, fontWeight: FontWeight.bold, fontSize: 11),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              '${locker.manufacturer} • ${locker.securityRating}',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(color: textSecondary, fontSize: 9.5),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-
-        const SizedBox(height: 32),
-
-        // 5. Live VIP Auctions Floor
-        Container(
-          margin: const EdgeInsets.symmetric(horizontal: 20),
-          padding: const EdgeInsets.all(18),
-          decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF111111) : LuxuryColors.lightCard,
-            borderRadius: BorderRadius.circular(4),
-            border: Border.all(
-              color: isDark ? LuxuryColors.goldBorder : LuxuryColors.borderLight,
-              width: 1.0,
-            ),
-            boxShadow: isDark
-                ? []
-                : [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.04),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Flexible(
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 8,
-                          height: 8,
-                          decoration: const BoxDecoration(
-                            color: Colors.redAccent,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Flexible(
-                          child: Text(
-                            'NP LIVE AUCTIONS FLOOR',
-                            overflow: TextOverflow.ellipsis,
-                            style: LuxuryTypography.microCaps.copyWith(
-                              color: goldAccent,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 1.0,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    '${auctionsState.auctions.length} LIVE LOTS',
-                    style: LuxuryTypography.microCaps.copyWith(
-                      color: textSecondary,
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              if (auctionsState.auctions.isNotEmpty) ...[
-                Text(
-                  auctionsState.auctions.first.assetTitle,
-                  style: LuxuryTypography.editorialHeading2.copyWith(
-                    fontSize: 17,
-                    color: textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Flexible(
-                      child: Text(
-                        'CURRENT HIGH BID',
-                        overflow: TextOverflow.ellipsis,
-                        style: LuxuryTypography.microCaps.copyWith(fontSize: 9.5, color: textSecondary),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      '₹${(auctionsState.auctions.first.currentBid / 100000).toStringAsFixed(1)} LAKHS',
-                      style: LuxuryTypography.priceMedium.copyWith(
-                        color: goldAccent,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-              const SizedBox(height: 14),
-              LuxuryButton(
-                text: 'ENTER LIVE BIDDING FLOOR',
-                variant: LuxuryButtonVariant.gold,
-                height: 40,
-                onPressed: () => context.push('/auctions'),
-              ),
-            ],
-          ),
-        ),
-
-        const SizedBox(height: 32),
-
-        // 6. Featured Curated Acquisitions
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('COLLECTOR HIGHLIGHTS', style: LuxuryTypography.microCaps.copyWith(color: goldAccent, letterSpacing: 2.2)),
-              const SizedBox(height: 4),
-              Text('FEATURED ACQUISITIONS', style: LuxuryTypography.editorialHeading2.copyWith(color: textPrimary)),
-            ],
-          ),
-        ),
-        const SizedBox(height: 14),
-        ListView.separated(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          itemCount: listings.take(4).length,
-          separatorBuilder: (_, __) => const SizedBox(height: 16),
-          itemBuilder: (context, index) {
-            final item = listings[index];
-            return LuxuryListingCard(
-              listing: item,
-              onTap: () => context.push('/listing/${item.id}'),
-            );
-          },
-        ),
-      ],
-    );
-  }
-
-  // ==========================================
-  // RENT SECTION: Fleet, Jets & Elite Crew
-  // ==========================================
-  Widget _buildRentSection(bool isDark, rentalsState, aviationState, crewState) {
-    final textPrimary = LuxuryColors.textPrimary(isDark);
-    final textSecondary = LuxuryColors.textSecondary(isDark);
-    final goldAccent = LuxuryColors.goldAccent(isDark);
-    final cardBg = LuxuryColors.cardBg(isDark);
-    final borderColor = isDark ? LuxuryColors.borderDark : LuxuryColors.borderLight;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // 1. Luxe Drive Fleet
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('NP LUXE DRIVE FLEET', style: LuxuryTypography.microCaps.copyWith(color: goldAccent, letterSpacing: 2.0)),
-                    const SizedBox(height: 4),
-                    Text('WEDDINGS, GALAS & CONVOYS', style: LuxuryTypography.editorialHeading2.copyWith(color: textPrimary, fontSize: 18)),
-                  ],
-                ),
-              ),
-              TextButton(
-                onPressed: () => context.push('/rentals'),
-                child: Text('ALL FLEET', style: LuxuryTypography.microCaps.copyWith(color: goldAccent, fontWeight: FontWeight.bold)),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 12),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: rentalsState.vehicles.take(4).length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 0.68,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-            ),
-            itemBuilder: (context, index) {
-              final car = rentalsState.vehicles[index];
-              return GestureDetector(
-                onTap: () => context.push('/rentals'),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: cardBg,
-                    borderRadius: BorderRadius.circular(4),
-                    border: Border.all(color: borderColor, width: 0.8),
-                    boxShadow: isDark
-                        ? []
-                        : [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.04),
-                              blurRadius: 6,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ClipRRect(
-                        borderRadius: const BorderRadius.vertical(top: Radius.circular(3)),
-                        child: LuxuryImage(
-                          imageUrl: car.coverImageUrl,
-                          height: 120,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              car.title,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(fontWeight: FontWeight.bold, color: textPrimary, fontSize: 11.5, height: 1.2),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              '₹${(car.dailyRate / 1000).toInt()}K / Day',
-                              style: TextStyle(color: goldAccent, fontWeight: FontWeight.w600, fontSize: 11),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              'Chauffeur & Protocol Escort',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(color: textSecondary, fontSize: 9.5),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-
-        const SizedBox(height: 32),
-
-        // 2. Private Jet Charters
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('AVIATION CHARTERS', style: LuxuryTypography.microCaps.copyWith(color: goldAccent, letterSpacing: 2.0)),
-                    const SizedBox(height: 4),
-                    Text('JETS & HELICOPTER FLIGHTS', style: LuxuryTypography.editorialHeading2.copyWith(color: textPrimary, fontSize: 18)),
-                  ],
-                ),
-              ),
-              TextButton(
-                onPressed: () => context.push('/aviation'),
-                child: Text('CHARTER NOW', style: LuxuryTypography.microCaps.copyWith(color: goldAccent, fontWeight: FontWeight.bold)),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 12),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: aviationState.jets.take(4).length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 0.68,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-            ),
-            itemBuilder: (context, index) {
-              final jet = aviationState.jets[index];
-              return GestureDetector(
-                onTap: () => context.push('/aviation'),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: cardBg,
-                    borderRadius: BorderRadius.circular(4),
-                    border: Border.all(color: borderColor, width: 0.8),
-                    boxShadow: isDark
-                        ? []
-                        : [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.04),
-                              blurRadius: 6,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ClipRRect(
-                        borderRadius: const BorderRadius.vertical(top: Radius.circular(3)),
-                        child: LuxuryImage(
-                          imageUrl: jet.imageUrl,
-                          height: 120,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              jet.model,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(fontWeight: FontWeight.bold, color: textPrimary, fontSize: 11.5, height: 1.2),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              '₹${(jet.hourlyCharterRate / 1000).toInt()}K / Flight Hr',
-                              style: TextStyle(color: goldAccent, fontWeight: FontWeight.w600, fontSize: 11),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              'VIP Dispatch Worldwide',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(color: textSecondary, fontSize: 9.5),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-
-        const SizedBox(height: 32),
-
-        // 3. Elite Crew Booking
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('CREW & CLOSE PROTECTION', style: LuxuryTypography.microCaps.copyWith(color: goldAccent, letterSpacing: 2.0)),
-                    const SizedBox(height: 4),
-                    Text('PILOTS & 3000 GT MASTERS', style: LuxuryTypography.editorialHeading2.copyWith(color: textPrimary, fontSize: 18)),
-                  ],
-                ),
-              ),
-              TextButton(
-                onPressed: () => context.push('/crew'),
-                child: Text('VIEW ROSTER', style: LuxuryTypography.microCaps.copyWith(color: goldAccent, fontWeight: FontWeight.bold)),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 12),
-        ListView.separated(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          itemCount: crewState.profiles.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 14),
-          itemBuilder: (context, index) {
-            final crew = crewState.profiles[index];
-            return Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: cardBg,
-                borderRadius: BorderRadius.circular(4),
-                border: Border.all(color: borderColor, width: 0.8),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 58,
-                    height: 58,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(4),
-                      border: Border.all(color: goldAccent),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(3),
-                      child: LuxuryImage(imageUrl: crew.avatarUrl, fit: BoxFit.cover),
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Flexible(
-                              child: Text(
-                                crew.name,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(color: textPrimary, fontWeight: FontWeight.bold, fontSize: 13.5),
-                              ),
-                            ),
-                            const SizedBox(width: 4),
-                            Icon(Icons.verified, color: goldAccent, size: 14),
-                          ],
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          crew.role.toUpperCase(),
-                          style: LuxuryTypography.microCaps.copyWith(color: goldAccent, fontSize: 9),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '₹${(crew.dayRate / 1000).toInt()}K / Day • Retainer: ₹${(crew.monthlyRetainer / 100000).toStringAsFixed(1)}L',
-                          style: TextStyle(color: textSecondary, fontSize: 11),
-                        ),
-                      ],
-                    ),
-                  ),
-                  OutlinedButton(
-                    onPressed: () => context.push('/crew'),
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: goldAccent, width: 0.9),
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
-                    ),
-                    child: Text('BOOK', style: LuxuryTypography.microCaps.copyWith(color: goldAccent)),
-                  ),
-                ],
-              ),
-            );
-          },
-        ),
-      ],
-    );
-  }
-
-  // ==========================================
-  // SELL SECTION: VIP Consignment Portal
-  // ==========================================
-  Widget _buildSellConsignSection(bool isDark) {
-    final textPrimary = LuxuryColors.textPrimary(isDark);
-    final textSecondary = LuxuryColors.textSecondary(isDark);
-    final goldAccent = LuxuryColors.goldAccent(isDark);
-    final cardBg = LuxuryColors.cardBg(isDark);
-    final borderColor = isDark ? LuxuryColors.borderDark : LuxuryColors.borderLight;
-
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header
-          Container(
-            padding: const EdgeInsets.all(22),
-            decoration: BoxDecoration(
-              gradient: isDark
-                  ? const LinearGradient(
-                      colors: [Color(0xFF1E1805), Color(0xFF0D0A02)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    )
-                  : const LinearGradient(
-                      colors: [Color(0xFFFAF6EB), Color(0xFFF3EBD4)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-              borderRadius: BorderRadius.circular(4),
-              border: Border.all(color: goldAccent, width: 1.2),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'CONSIGNMENT CONCIERGE',
-                      style: LuxuryTypography.microCaps.copyWith(
-                        color: goldAccent,
-                        letterSpacing: 2.2,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: goldAccent,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                      child: const Text(
-                        'HNWI GATEWAY',
-                        style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 8.5),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  'List Your Sovereign Asset',
-                  style: LuxuryTypography.editorialHeading2.copyWith(color: textPrimary, fontSize: 21),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Connect with verified ultra-high-net-worth collectors, sovereign wealth syndicates, and accredited institutions across 48 jurisdictions.',
-                  style: LuxuryTypography.bodyMedium.copyWith(color: textSecondary, fontSize: 13),
-                ),
-                const SizedBox(height: 20),
-                LuxuryButton(
-                  text: '✦ LAUNCH 5-STEP LISTING WIZARD',
-                  variant: LuxuryButtonVariant.gold,
-                  height: 48,
-                  onPressed: () => context.push('/sell/new'),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 24),
-
-          Text(
-            'SELLER PILLARS & GUARANTEES',
-            style: LuxuryTypography.microCaps.copyWith(color: goldAccent, letterSpacing: 2.0),
-          ),
-          const SizedBox(height: 12),
-
-          // Pillar 1: Escrow & Title Security
-          _buildSellerFeatureCard(
-            isDark: isDark,
-            icon: Icons.shield,
-            title: 'Tier-1 Institutional Escrow',
-            subtitle: '100% safeguarded funds through registered sovereign escrow agents and legal title verification.',
-          ),
-          const SizedBox(height: 12),
-
-          // Pillar 2: Assay & Provenance
-          _buildSellerFeatureCard(
-            isDark: isDark,
-            icon: Icons.biotech,
-            title: 'Assay & Provenance Certification',
-            subtitle: 'Independent GIA, IGI, VdS, and MCA physical authentication prior to syndicate release.',
-          ),
-          const SizedBox(height: 12),
-
-          // Pillar 3: Confidential Deal Rooms
-          _buildSellerFeatureCard(
-            isDark: isDark,
-            icon: Icons.vpn_key,
-            title: 'Bespoke Confidential Deal Rooms',
-            subtitle: 'End-to-end encrypted private negotiating rooms with legally binding NDA signatures.',
-          ),
-
-          const SizedBox(height: 24),
-
-          // Action Buttons
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () => context.push('/seller/register'),
-                  style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: goldAccent, width: 1.0),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
-                  ),
-                  child: Text(
-                    'BECOME FOUNDING DEALER',
-                    textAlign: TextAlign.center,
-                    style: LuxuryTypography.microCaps.copyWith(color: goldAccent, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () => context.go('/sell'),
-                  style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: borderColor, width: 1.0),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
-                  ),
-                  child: Text(
-                    'SELLER DASHBOARD',
-                    textAlign: TextAlign.center,
-                    style: LuxuryTypography.microCaps.copyWith(color: textPrimary, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSellerFeatureCard({
-    required bool isDark,
-    required IconData icon,
-    required String title,
-    required String subtitle,
-  }) {
-    final textPrimary = LuxuryColors.textPrimary(isDark);
-    final textSecondary = LuxuryColors.textSecondary(isDark);
-    final goldAccent = LuxuryColors.goldAccent(isDark);
-    final cardBg = LuxuryColors.cardBg(isDark);
-    final borderColor = isDark ? LuxuryColors.borderDark : LuxuryColors.borderLight;
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: cardBg,
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: borderColor, width: 0.8),
-      ),
+  Widget _buildSectionHeading(String title, String subtitle, bool isDark) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 28, 16, 14),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: goldAccent.withValues(alpha: 0.12),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, color: goldAccent, size: 20),
-          ),
-          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: TextStyle(color: textPrimary, fontWeight: FontWeight.bold, fontSize: 14)),
-                const SizedBox(height: 3),
-                Text(subtitle, style: TextStyle(color: textSecondary, fontSize: 11.5, height: 1.4)),
+                Text(
+                  title,
+                  style: LuxuryTypography.editorialHeading2.copyWith(
+                    color: isDark ? LuxuryColors.pureWhite : LuxuryColors.darkOnyx,
+                    letterSpacing: 1.5,
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Container(
+                  width: 32,
+                  height: 1,
+                  color: LuxuryColors.gold,
+                ),
               ],
             ),
           ),
-        ],
-      ),
-    );
-  }
-
-  // ==========================================
-  // WEALTH MEMBERSHIP TIERS (4 Brackets)
-  // ==========================================
-  Widget _buildWealthTierMembershipCard(bool isDark) {
-    final textPrimary = LuxuryColors.textPrimary(isDark);
-    final textSecondary = LuxuryColors.textSecondary(isDark);
-    final goldAccent = LuxuryColors.goldAccent(isDark);
-
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20),
-      padding: const EdgeInsets.all(22),
-      decoration: BoxDecoration(
-        gradient: isDark
-            ? const LinearGradient(
-                colors: [Color(0xFF1C1605), Color(0xFF0C0A03)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              )
-            : const LinearGradient(
-                colors: [Color(0xFFFAF6EC), Color(0xFFF0E5CC)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: goldAccent, width: 1.2),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(
-                  'SOVEREIGN WEALTH PRIVILEGES',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: LuxuryTypography.microCaps.copyWith(
-                    color: goldAccent,
-                    letterSpacing: 1.2,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: goldAccent,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-                child: const Text(
-                  '4 WEALTH BRACKETS',
-                  style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 8.5),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
           Text(
-            'Patron Acquisition Authority',
-            style: LuxuryTypography.editorialHeading2.copyWith(color: textPrimary, fontSize: 20),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Membership scales precisely with buying capacity: Sovereign Select (₹10K), Privé Gold (₹1L), Obsidian Royal (₹15L), and Dynasty Syndicate (₹1Cr).',
-            style: LuxuryTypography.bodyMedium.copyWith(color: textSecondary, fontSize: 12.5),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              _tierPill('₹10K', '< ₹1 Cr', isDark),
-              const SizedBox(width: 8),
-              _tierPill('₹1L', '₹1-50 Cr', isDark),
-              const SizedBox(width: 8),
-              _tierPill('₹15L', '₹50-500 Cr', isDark),
-              const SizedBox(width: 8),
-              _tierPill('₹1Cr', '> ₹500 Cr', isDark, isHighTier: true),
-            ],
-          ),
-          const SizedBox(height: 18),
-          LuxuryButton(
-            text: 'VIEW WEALTH TIERS & PRIVILEGES',
-            variant: LuxuryButtonVariant.gold,
-            onPressed: () => context.push('/membership'),
+            subtitle,
+            style: LuxuryTypography.microCaps.copyWith(
+              color: LuxuryColors.gold,
+              fontSize: 9,
+              letterSpacing: 1.5,
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _tierPill(String fee, String cap, bool isDark, {bool isHighTier = false}) {
-    final activeGold = isDark ? LuxuryColors.gold : LuxuryColors.goldDark;
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        decoration: BoxDecoration(
-          color: isHighTier
-              ? activeGold.withValues(alpha: 0.18)
-              : (isDark ? const Color(0xFF141414) : Colors.white),
-          borderRadius: BorderRadius.circular(2),
-          border: Border.all(
-            color: isHighTier ? activeGold : (isDark ? LuxuryColors.borderDark : LuxuryColors.borderLight),
-          ),
+  Widget _buildCategoryGrid(bool isDark) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          childAspectRatio: 0.85,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
         ),
-        alignment: Alignment.center,
-        child: Column(
+        itemCount: _categories.length,
+        itemBuilder: (context, i) => _buildCategoryCard(_categories[i], isDark),
+      ),
+    );
+  }
+
+  Widget _buildCategoryCard(_Category cat, bool isDark) {
+    return GestureDetector(
+      onTap: () => context.push(cat.route),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(6),
+        child: Stack(
+          fit: StackFit.expand,
           children: [
-            Text(
-              fee,
-              style: TextStyle(
-                color: isHighTier ? activeGold : LuxuryColors.textPrimary(isDark),
-                fontWeight: FontWeight.bold,
-                fontSize: 11,
+            Image.network(
+              cat.imageUrl,
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => Container(
+                color: const Color(0xFF1A1A1A),
+                child: Icon(cat.icon, color: LuxuryColors.gold, size: 36),
               ),
             ),
-            const SizedBox(height: 2),
-            Text(
-              cap,
-              style: TextStyle(color: LuxuryColors.textSecondary(isDark), fontSize: 8.5),
+            // gradient overlay
+            const DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Color(0x22000000), Color(0xDD000000)],
+                  stops: [0.3, 1.0],
+                ),
+              ),
+            ),
+            Positioned(
+              left: 10,
+              right: 10,
+              bottom: 10,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Expanded(
+                    child: Text(
+                      cat.name,
+                      style: LuxuryTypography.microCaps.copyWith(
+                        color: Colors.white,
+                        fontSize: 10,
+                        letterSpacing: 1.2,
+                        fontWeight: FontWeight.w700,
+                      ),
+                      maxLines: 2,
+                    ),
+                  ),
+                  Text(
+                    'EXPLORE →',
+                    style: LuxuryTypography.microCaps.copyWith(
+                      color: LuxuryColors.gold,
+                      fontSize: 8,
+                      letterSpacing: 1.0,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -1574,64 +361,398 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  // ==========================================
-  // CONFIDENTIAL ACQUISITION REQUEST
-  // ==========================================
-  Widget _buildPrivateRequestBanner(bool isDark) {
-    final textPrimary = LuxuryColors.textPrimary(isDark);
-    final textSecondary = LuxuryColors.textSecondary(isDark);
-    final goldAccent = LuxuryColors.goldAccent(isDark);
-    final cardBg = LuxuryColors.cardBg(isDark);
-    final borderColor = isDark ? LuxuryColors.borderDark : LuxuryColors.borderLight;
-
+  Widget _buildMembershipCard(bool isDark) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20),
+      margin: const EdgeInsets.fromLTRB(16, 24, 16, 0),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: cardBg,
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: borderColor),
-        boxShadow: isDark
-            ? []
-            : [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.04),
-                  blurRadius: 6,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+        gradient: const LinearGradient(
+          colors: [Color(0xFF1A1508), Color(0xFF0A0A0A)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        border: Border.all(color: LuxuryColors.gold, width: 1.0),
+        borderRadius: BorderRadius.circular(6),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.shield, color: goldAccent, size: 18),
+              const Icon(Icons.diamond, color: LuxuryColors.gold, size: 16),
               const SizedBox(width: 8),
               Text(
-                'PRIVATE REQUEST SERVICE',
-                style: LuxuryTypography.microCaps.copyWith(color: goldAccent, letterSpacing: 2.0),
+                'PATRON ACQUISITION AUTHORITY',
+                style: LuxuryTypography.microCaps.copyWith(
+                  color: LuxuryColors.gold,
+                  fontSize: 10,
+                  letterSpacing: 2.0,
+                ),
               ),
             ],
           ),
           const SizedBox(height: 8),
           Text(
-            'Looking for an Unlisted Asset?',
-            style: TextStyle(color: textPrimary, fontSize: 17, fontWeight: FontWeight.bold),
+            'Exclusive access unlocked\nby your wealth tier.',
+            style: LuxuryTypography.editorialHeading3.copyWith(
+              color: Colors.white,
+              fontSize: 16,
+              height: 1.3,
+            ),
           ),
-          const SizedBox(height: 4),
-          Text(
-            'Post a confidential acquisition request. Verified dealers and family offices match your criteria privately.',
-            style: TextStyle(color: textSecondary, fontSize: 12),
+          const SizedBox(height: 16),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _tierPill('₹10K', '< ₹1 Cr'),
+                const SizedBox(width: 8),
+                _tierPill('₹1L', '₹1–50 Cr'),
+                const SizedBox(width: 8),
+                _tierPill('₹15L', '₹50–500 Cr'),
+                const SizedBox(width: 8),
+                _tierPill('₹1 Cr', '> ₹500 Cr'),
+              ],
+            ),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           LuxuryButton(
-            text: 'SUBMIT CONFIDENTIAL REQUEST',
-            variant: LuxuryButtonVariant.secondary,
-            height: 42,
-            onPressed: () => context.push('/requests'),
+            text: 'VIEW WEALTH TIERS & PRIVILEGES',
+            variant: LuxuryButtonVariant.gold,
+            height: 46,
+            width: double.infinity,
+            onPressed: () => context.push('/membership'),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _tierPill(String fee, String range) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: LuxuryColors.gold.withValues(alpha: 0.12),
+        border: Border.all(color: LuxuryColors.goldBorder, width: 0.8),
+        borderRadius: BorderRadius.circular(3),
+      ),
+      child: Column(
+        children: [
+          Text(
+            fee,
+            style: LuxuryTypography.microCaps.copyWith(
+              color: LuxuryColors.gold,
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.5,
+            ),
+          ),
+          Text(
+            range,
+            style: LuxuryTypography.microCaps.copyWith(
+              color: LuxuryColors.platinum,
+              fontSize: 9,
+              letterSpacing: 0.5,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFeaturedGrid(bool isDark) {
+    final items = [
+      _FeaturedItem(
+        imageUrl: _gulfstreamUrl,
+        title: 'Gulfstream G700',
+        category: 'PRIVATE JET',
+        price: '₹578 Cr',
+        subtitle: '7,750 nm • 19 VIP Seats',
+        route: '/aviation',
+      ),
+      _FeaturedItem(
+        imageUrl: _yachtUrl,
+        title: 'Oceanco 73m Superyacht',
+        category: 'MEGA YACHT',
+        price: '₹850 Cr',
+        subtitle: '73m LOA • 12 Guests',
+        route: '/marine',
+      ),
+      _FeaturedItem(
+        imageUrl: _bugattiUrl,
+        title: 'Bugatti Chiron SS',
+        category: 'EXOTIC CAR',
+        price: '₹32 Cr',
+        subtitle: '1,600 HP • Track Spec',
+        route: '/cars',
+      ),
+      _FeaturedItem(
+        imageUrl: _rollsUrl,
+        title: 'Rolls-Royce Phantom VIII',
+        category: 'LUXURY LIMOUSINE',
+        price: '₹4.8 Cr',
+        subtitle: '6.75L V12 • Starlight Roof',
+        route: '/cars',
+        badgeText: 'MEMBERS ONLY',
+      ),
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          childAspectRatio: 0.62,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
+        ),
+        itemCount: items.length,
+        itemBuilder: (context, i) {
+          final item = items[i];
+          return LuxuryAssetCard(
+            imageUrl: item.imageUrl,
+            title: item.title,
+            category: item.category,
+            price: item.price,
+            subtitle: item.subtitle,
+            badgeText: item.badgeText,
+            isDark: isDark,
+            isMembersOnly: item.badgeText == 'MEMBERS ONLY',
+            onBuy: () => context.push(item.route),
+            onBook: () => context.push(item.route),
+            onSell: () => context.push('/sell'),
+            onTap: () => context.push(item.route),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildLiveAuctionBanner(bool isDark) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 24, 16, 0),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF0C0C0C) : Colors.white,
+        border: Border.all(color: LuxuryColors.gold, width: 1.0),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Column(
+        children: [
+          // Red live header
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+            decoration: const BoxDecoration(
+              color: Color(0xFFFF2A2A),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(5)),
+            ),
+            child: Row(
+              children: [
+                const _PulsingDot(),
+                const SizedBox(width: 8),
+                Text(
+                  'NP LIVE AUCTIONS FLOOR',
+                  style: LuxuryTypography.microCaps.copyWith(
+                    color: Colors.white,
+                    fontSize: 10,
+                    letterSpacing: 2.0,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const Spacer(),
+                Text(
+                  '12 LIVE LOTS',
+                  style: LuxuryTypography.microCaps.copyWith(
+                    color: Colors.white,
+                    fontSize: 9,
+                    letterSpacing: 1.0,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Ferrari 250 GTO (1962) — Le Mans Provenance',
+                  style: LuxuryTypography.editorialHeading3.copyWith(
+                    color: isDark ? Colors.white : LuxuryColors.darkOnyx,
+                    fontSize: 15,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Text(
+                      'CURRENT BID: ',
+                      style: LuxuryTypography.microCaps.copyWith(
+                        color: LuxuryColors.mutedGrey,
+                        fontSize: 9,
+                      ),
+                    ),
+                    Text(
+                      '₹340 Cr',
+                      style: LuxuryTypography.priceMedium.copyWith(
+                        color: LuxuryColors.gold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                LuxuryButton(
+                  text: 'ENTER LIVE BIDDING FLOOR',
+                  variant: LuxuryButtonVariant.gold,
+                  height: 46,
+                  width: double.infinity,
+                  onPressed: () => context.push('/auctions'),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPrivateRequestBanner(bool isDark) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF0A0A0A) : LuxuryColors.softIvory,
+        border: Border.all(
+          color: isDark ? LuxuryColors.borderDark : LuxuryColors.borderLight,
+          width: 0.8,
+        ),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.private_connectivity, color: LuxuryColors.gold, size: 28),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'PRIVATE ACQUISITION REQUEST',
+                  style: LuxuryTypography.microCaps.copyWith(
+                    color: LuxuryColors.gold,
+                    fontSize: 9,
+                    letterSpacing: 1.5,
+                  ),
+                ),
+                Text(
+                  'Can\'t find what you seek? Our brokers will source it.',
+                  style: LuxuryTypography.bodyMedium.copyWith(
+                    color: isDark ? LuxuryColors.platinum : LuxuryColors.slate,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          GestureDetector(
+            onTap: () => context.push('/requests'),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                border: Border.all(color: LuxuryColors.gold, width: 0.8),
+                borderRadius: BorderRadius.circular(2),
+              ),
+              child: Text(
+                'REQUEST',
+                style: LuxuryTypography.microCaps.copyWith(
+                  color: LuxuryColors.gold,
+                  fontSize: 9,
+                  letterSpacing: 1.5,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Data Models ─────────────────────────────────────────────────────────────
+
+class _Category {
+  final String name;
+  final String imageUrl;
+  final String route;
+  final IconData icon;
+  const _Category(this.name, this.imageUrl, this.route, this.icon);
+}
+
+class _FeaturedItem {
+  final String imageUrl;
+  final String title;
+  final String category;
+  final String price;
+  final String subtitle;
+  final String route;
+  final String? badgeText;
+  const _FeaturedItem({
+    required this.imageUrl,
+    required this.title,
+    required this.category,
+    required this.price,
+    required this.subtitle,
+    required this.route,
+    this.badgeText,
+  });
+}
+
+// ─── Pulsing dot widget ────────────────────────────────────────────────────
+
+class _PulsingDot extends StatefulWidget {
+  const _PulsingDot();
+
+  @override
+  State<_PulsingDot> createState() => _PulsingDotState();
+}
+
+class _PulsingDotState extends State<_PulsingDot>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _ctrl;
+  late Animation<double> _anim;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    )..repeat(reverse: true);
+    _anim = Tween<double>(begin: 0.4, end: 1.0).animate(_ctrl);
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _anim,
+      child: Container(
+        width: 8,
+        height: 8,
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.circle,
+        ),
       ),
     );
   }

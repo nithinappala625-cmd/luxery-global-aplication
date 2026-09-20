@@ -3,8 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants/colors.dart';
 import '../../core/constants/typography.dart';
 import '../../core/widgets/luxury_app_bar.dart';
+import '../../core/widgets/luxury_asset_card.dart';
 import '../../core/widgets/luxury_button.dart';
-import '../../core/widgets/luxury_image.dart';
+import '../../core/widgets/section_action_bar.dart';
 import '../../models/luxury_locker.dart';
 import '../../providers/lockers_provider.dart';
 
@@ -16,11 +17,15 @@ class LockersScreen extends ConsumerStatefulWidget {
 }
 
 class _LockersScreenState extends ConsumerState<LockersScreen> {
+  String _mode = 'BUY';
+  String _subTab = 'ALL';
+
+  static const _subTabs = ['ALL', 'WALK-IN VAULTS', 'ARMORED SAFES', 'YACHT & JET SAFES'];
+
   void _openConsultationSheet(LuxuryLocker locker, bool isDark) {
     final textPrimary = LuxuryColors.textPrimary(isDark);
     final textSecondary = LuxuryColors.textSecondary(isDark);
     final goldColor = isDark ? LuxuryColors.gold : LuxuryColors.goldDark;
-    final cardBg = isDark ? const Color(0xFF141414) : LuxuryColors.lightCardElevated;
     final sheetBg = isDark ? const Color(0xFF0D0D0D) : Colors.white;
 
     showModalBottomSheet(
@@ -29,7 +34,10 @@ class _LockersScreenState extends ConsumerState<LockersScreen> {
       backgroundColor: sheetBg,
       shape: RoundedRectangleBorder(
         borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-        side: BorderSide(color: isDark ? LuxuryColors.goldBorder : LuxuryColors.borderLight, width: 1.0),
+        side: BorderSide(
+          color: isDark ? LuxuryColors.goldBorder : LuxuryColors.borderLight,
+          width: 1.0,
+        ),
       ),
       builder: (ctx) {
         return Padding(
@@ -67,53 +75,28 @@ class _LockersScreenState extends ConsumerState<LockersScreen> {
               ),
               const SizedBox(height: 6),
               Text(
-                'Turnkey Commission: ${locker.priceDisplay} • ${locker.manufacturer}',
-                style: LuxuryTypography.bodyMedium.copyWith(color: goldColor, fontWeight: FontWeight.w600),
+                'Commission: ${locker.priceDisplay} • ${locker.manufacturer}',
+                style: LuxuryTypography.bodySmall.copyWith(color: goldColor, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: cardBg,
-                  border: Border.all(color: isDark ? LuxuryColors.goldBorder : LuxuryColors.borderLight, width: 0.8),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Column(
-                  children: [
-                    _buildRow('Security Standard', locker.securityRating, textSecondary, textPrimary),
-                    const SizedBox(height: 6),
-                    _buildRow('Locking System', locker.lockingMechanism, textSecondary, textPrimary),
-                    const SizedBox(height: 6),
-                    _buildRow('Watch Winders', '${locker.watchWindersCount} Programmable Rotors', textSecondary, textPrimary),
-                    const SizedBox(height: 6),
-                    _buildRow('Armored Weight', '${locker.weightKg.toInt()} kg Solid Steel / Composite', textSecondary, textPrimary),
-                    const SizedBox(height: 6),
-                    _buildRow('Fire Rating', '${locker.fireRatingHours} Hours Continuous Thermal Barrier', textSecondary, textPrimary),
-                  ],
-                ),
+              const SizedBox(height: 12),
+              Text(
+                'Includes confidential armored installation, ballistic testing certification, biometric programming, and 10-year concierge service.',
+                style: LuxuryTypography.bodySmall.copyWith(color: textSecondary),
               ),
               const SizedBox(height: 20),
               LuxuryButton(
-                text: 'COMMISSION ARCHITECTURAL SURVEY',
+                text: 'DISPATCH ARMAMENT SPECIALIST',
                 variant: LuxuryButtonVariant.gold,
+                height: 48,
                 onPressed: () {
                   Navigator.pop(ctx);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       backgroundColor: isDark ? const Color(0xFF161616) : Colors.white,
-                      content: Row(
-                        children: [
-                          Icon(Icons.shield_outlined, color: goldColor, size: 18),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Text(
-                              'White-glove vault engineering team assigned. Confidential site survey scheduled.',
-                              style: LuxuryTypography.bodySmall.copyWith(color: textPrimary),
-                            ),
-                          ),
-                        ],
+                      content: Text(
+                        'White-glove vault engineering team assigned. Confidential survey scheduled.',
+                        style: LuxuryTypography.bodySmall.copyWith(color: textPrimary),
                       ),
-                      duration: const Duration(seconds: 4),
                     ),
                   );
                 },
@@ -125,263 +108,265 @@ class _LockersScreenState extends ConsumerState<LockersScreen> {
     );
   }
 
-  Widget _buildRow(String label, String value, Color labelColor, Color valColor) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(label, style: LuxuryTypography.bodySmall.copyWith(color: labelColor)),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Text(
-            value,
-            textAlign: TextAlign.end,
-            style: LuxuryTypography.bodySmall.copyWith(color: valColor, fontWeight: FontWeight.w500),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-      ],
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final state = ref.watch(lockersProvider);
+    final bg = isDark ? LuxuryColors.pureBlack : LuxuryColors.lightScaffold;
 
-    final bgColor = LuxuryColors.scaffoldBg(isDark);
-    final textPrimary = LuxuryColors.textPrimary(isDark);
-    final textSecondary = LuxuryColors.textSecondary(isDark);
-    final goldColor = isDark ? LuxuryColors.gold : LuxuryColors.goldDark;
-    final cardBg = LuxuryColors.cardBg(isDark);
-    final borderColor = isDark ? LuxuryColors.borderDark : LuxuryColors.borderLight;
+    final filtered = state.filteredLockers.where((locker) {
+      if (_subTab == 'ALL') return true;
+      if (_subTab == 'WALK-IN VAULTS') return locker.vaultType.toLowerCase().contains('walk-in') || locker.vaultType.toLowerCase().contains('room');
+      if (_subTab == 'ARMORED SAFES') return locker.vaultType.toLowerCase().contains('safe') || locker.vaultType.toLowerCase().contains('free-standing');
+      if (_subTab == 'YACHT & JET SAFES') return locker.vaultType.toLowerCase().contains('yacht') || locker.vaultType.toLowerCase().contains('bespoke');
+      return true;
+    }).toList();
 
     return Scaffold(
-      backgroundColor: bgColor,
+      backgroundColor: bg,
       appBar: const LuxuryAppBar(
         title: 'HIGH-SECURITY VAULTS',
         showBack: true,
         showSearch: true,
         showThemeToggle: true,
       ),
-      body: CustomScrollView(
-        slivers: [
-          // Editorial Header
-          SliverToBoxAdapter(
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
-              decoration: BoxDecoration(
-                border: Border(bottom: BorderSide(color: borderColor, width: 0.8)),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'NP GROUPS SOVEREIGN SANCTUARIES',
-                    style: LuxuryTypography.microCaps.copyWith(
-                      color: goldColor,
-                      letterSpacing: 2.2,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    'Bespoke Armored Safes & Walk-In Panic Vaults',
-                    style: LuxuryTypography.editorialHeading1.copyWith(
-                      color: textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'German & Austrian ballistic engineering: Döttling, Stockinger, Buben & Zörweg. Certified VdS ratings, watch winders, and biometric encryption.',
-                    style: LuxuryTypography.bodyMedium.copyWith(
-                      color: textSecondary,
-                    ),
-                  ),
-                ],
-              ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            SectionActionBar(
+              selectedMode: _mode,
+              onModeChanged: (m) => setState(() => _mode = m),
+              isDark: isDark,
+              buyLabel: '✦ ACQUIRE',
+              bookLabel: '🔒 COMMISSION',
+              sellLabel: '♛ CONSIGN',
             ),
-          ),
 
-          // Locker List
-          SliverPadding(
-            padding: const EdgeInsets.all(20),
-            sliver: SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  final locker = state.filteredLockers[index];
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 24),
-                    decoration: BoxDecoration(
-                      color: cardBg,
-                      borderRadius: BorderRadius.circular(4),
-                      border: Border.all(
-                        color: isDark ? LuxuryColors.goldBorder : LuxuryColors.borderLight,
-                        width: 0.8,
+            // Subcategories Pill Strip
+            SizedBox(
+              height: 44,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                itemCount: _subTabs.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 8),
+                itemBuilder: (context, i) {
+                  final tab = _subTabs[i];
+                  final isSelected = _subTab == tab;
+                  return GestureDetector(
+                    onTap: () => setState(() => _subTab = tab),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                      decoration: BoxDecoration(
+                        color: isSelected ? LuxuryColors.gold : Colors.transparent,
+                        border: Border.all(
+                          color: isSelected ? LuxuryColors.gold : LuxuryColors.goldBorder,
+                          width: 0.8,
+                        ),
+                        borderRadius: BorderRadius.circular(3),
                       ),
-                      boxShadow: isDark
-                          ? []
-                          : [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.04),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Image Stack
-                        Stack(
-                          children: [
-                            SizedBox(
-                              height: 220,
-                              width: double.infinity,
-                              child: ClipRRect(
-                                borderRadius: const BorderRadius.vertical(top: Radius.circular(3)),
-                                child: LuxuryImage(
-                                  imageUrl: locker.mediaUrls.isNotEmpty ? locker.mediaUrls.first : '',
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                            Positioned(
-                              top: 12,
-                              left: 12,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                                decoration: BoxDecoration(
-                                  color: Colors.black.withValues(alpha: 0.85),
-                                  borderRadius: BorderRadius.circular(2),
-                                  border: Border.all(color: LuxuryColors.goldBorder, width: 0.8),
-                                ),
-                                child: Text(
-                                  locker.manufacturer.toUpperCase(),
-                                  style: LuxuryTypography.microCaps.copyWith(
-                                    color: LuxuryColors.goldLight,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Positioned(
-                              bottom: 12,
-                              right: 12,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                decoration: BoxDecoration(
-                                  color: Colors.black.withValues(alpha: 0.9),
-                                  borderRadius: BorderRadius.circular(2),
-                                  border: Border.all(color: goldColor, width: 0.8),
-                                ),
-                                child: Text(
-                                  locker.priceDisplay,
-                                  style: LuxuryTypography.priceMedium.copyWith(
-                                    color: LuxuryColors.pureWhite,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
+                      child: Text(
+                        tab,
+                        style: LuxuryTypography.microCaps.copyWith(
+                          color: isSelected
+                              ? Colors.black
+                              : (isDark ? LuxuryColors.platinum : LuxuryColors.slate),
+                          fontSize: 10,
+                          letterSpacing: 1.2,
+                          fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                         ),
-
-                        // Info
-                        Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                locker.vaultType.toUpperCase(),
-                                style: LuxuryTypography.microCaps.copyWith(
-                                  color: goldColor,
-                                  letterSpacing: 1.8,
-                                ),
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                locker.title,
-                                style: LuxuryTypography.editorialHeading2.copyWith(
-                                  color: textPrimary,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                locker.description,
-                                style: LuxuryTypography.bodyMedium.copyWith(
-                                  color: textSecondary,
-                                  height: 1.45,
-                                ),
-                              ),
-                              const SizedBox(height: 14),
-
-                              // Key badges
-                              Wrap(
-                                spacing: 8,
-                                runSpacing: 8,
-                                children: [
-                                  _specBadge(Icons.verified, locker.securityRating, isDark, isGold: true),
-                                  _specBadge(Icons.fingerprint, locker.lockingMechanism, isDark),
-                                  _specBadge(Icons.watch, '${locker.watchWindersCount} Winders', isDark),
-                                  _specBadge(Icons.fitness_center, '${locker.weightKg.toInt()} kg', isDark),
-                                  _specBadge(Icons.local_fire_department, '${locker.fireRatingHours}h Fire Shield', isDark),
-                                ],
-                              ),
-                              const SizedBox(height: 18),
-
-                              LuxuryButton(
-                                text: 'COMMISSION BESPOKE SAFE',
-                                variant: LuxuryButtonVariant.gold,
-                                height: 44,
-                                onPressed: () => _openConsultationSheet(locker, isDark),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   );
                 },
-                childCount: state.filteredLockers.length,
               ),
             ),
-          ),
-        ],
+            const SizedBox(height: 8),
+
+            if (_mode == 'SELL')
+              _buildConsignmentPanel(isDark)
+            else if (_mode == 'BOOK')
+              _buildCommissionPanel(isDark)
+            else
+              _buildGrid(isDark, filtered),
+
+            const SizedBox(height: 32),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _specBadge(IconData icon, String text, bool isDark, {bool isGold = false}) {
-    final goldColor = isDark ? LuxuryColors.gold : LuxuryColors.goldDark;
-    return Container(
-      constraints: const BoxConstraints(maxWidth: 280),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF181818) : LuxuryColors.lightCardElevated,
-        borderRadius: BorderRadius.circular(2),
-        border: Border.all(
-          color: isGold ? goldColor : (isDark ? LuxuryColors.borderDark : LuxuryColors.borderLight),
-          width: 0.8,
+  Widget _buildGrid(bool isDark, List<LuxuryLocker> lockers) {
+    if (lockers.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.all(40),
+        child: Center(
+          child: Text(
+            'No matching vaults found in this collection.',
+            style: LuxuryTypography.bodyMedium.copyWith(color: LuxuryColors.mutedGrey),
+          ),
         ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          childAspectRatio: 0.62,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
+        ),
+        itemCount: lockers.length,
+        itemBuilder: (context, index) {
+          final locker = lockers[index];
+          final imgUrl = locker.mediaUrls.isNotEmpty ? locker.mediaUrls.first : '';
+          final spec = '${locker.manufacturer} • ${locker.vaultType}';
+
+          return LuxuryAssetCard(
+            imageUrl: imgUrl,
+            title: locker.title,
+            category: locker.manufacturer.toUpperCase(),
+            price: locker.priceDisplay,
+            subtitle: spec,
+            badgeText: locker.priceInr >= 50000000 ? 'ARMORED' : null,
+            isDark: isDark,
+            onBuy: () => _openConsultationSheet(locker, isDark),
+            onBook: () => _openConsultationSheet(locker, isDark),
+            onSell: () => setState(() => _mode = 'SELL'),
+            onTap: () => _openConsultationSheet(locker, isDark),
+          );
+        },
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 13, color: isGold ? goldColor : LuxuryColors.textSecondary(isDark)),
-          const SizedBox(width: 5),
-          Flexible(
-            child: Text(
-              text,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+    );
+  }
+
+  Widget _buildCommissionPanel(bool isDark) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF0C141E), Color(0xFF050505)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          border: Border.all(color: LuxuryColors.gold, width: 1.0),
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Icon(Icons.shield_outlined, color: LuxuryColors.gold, size: 32),
+            const SizedBox(height: 14),
+            Text(
+              'BESPOKE VAULT ARCHITECTURE & ENGINEERING',
               style: LuxuryTypography.microCaps.copyWith(
-                color: isGold ? goldColor : LuxuryColors.textPrimary(isDark),
-                fontWeight: isGold ? FontWeight.bold : FontWeight.w500,
+                color: LuxuryColors.gold,
+                fontSize: 11,
+                letterSpacing: 2.0,
               ),
             ),
+            const SizedBox(height: 8),
+            Text(
+              'Turnkey High-Security Sanctuary\nEngineered to Order.',
+              style: LuxuryTypography.editorialHeading2.copyWith(
+                color: Colors.white,
+                fontSize: 18,
+                height: 1.3,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Custom ballistic panic rooms, multi-layered biometric access, electromagnetic pulse (EMP) shielding, and integrated Swiss watch winders. Certified VdS class VI-KB ratings.',
+              style: LuxuryTypography.bodyMedium.copyWith(
+                color: LuxuryColors.platinum,
+                fontSize: 13,
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 20),
+            LuxuryButton(
+              text: 'REQUEST ENGINEERING CONSULTATION',
+              variant: LuxuryButtonVariant.gold,
+              height: 50,
+              width: double.infinity,
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Engineering desk scheduled confidential site assessment.'),
+                    backgroundColor: Color(0xFF161616),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildConsignmentPanel(bool isDark) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF1A1508), Color(0xFF050505)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
-        ],
+          border: Border.all(color: LuxuryColors.gold, width: 1.0),
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Icon(Icons.lock_clock, color: LuxuryColors.gold, size: 32),
+            const SizedBox(height: 14),
+            Text(
+              'HIGH-VALUE SAFE CONSIGNMENT',
+              style: LuxuryTypography.microCaps.copyWith(
+                color: LuxuryColors.gold,
+                fontSize: 11,
+                letterSpacing: 2.0,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Sell or Relocate Certified\nLuxury Armored Safes.',
+              style: LuxuryTypography.editorialHeading2.copyWith(
+                color: Colors.white,
+                fontSize: 18,
+                height: 1.3,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Döttling, Stockinger, and Buben & Zörweg safes hold high secondary collector value. Our bonded rigging teams handle secure confidential extraction and delivery.',
+              style: LuxuryTypography.bodyMedium.copyWith(
+                color: LuxuryColors.platinum,
+                fontSize: 13,
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 20),
+            LuxuryButton(
+              text: 'SUBMIT SAFE FOR CONSIGNMENT',
+              variant: LuxuryButtonVariant.gold,
+              height: 50,
+              width: double.infinity,
+              onPressed: () {},
+            ),
+          ],
+        ),
       ),
     );
   }

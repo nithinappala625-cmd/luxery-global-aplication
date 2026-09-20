@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/constants/colors.dart';
 import '../../core/constants/typography.dart';
 import '../../core/widgets/luxury_app_bar.dart';
+import '../../core/widgets/luxury_asset_card.dart';
 import '../../core/widgets/luxury_listing_card.dart';
 import '../../providers/categories_provider.dart';
 import '../../providers/listings_provider.dart';
@@ -210,14 +211,32 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
                       ),
                     ),
                   )
-                : ListView.separated(
-                    padding: const EdgeInsets.all(20),
+                : GridView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 0.62,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10,
+                    ),
                     itemCount: listings.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 20),
                     itemBuilder: (context, index) {
                       final item = listings[index];
-                      return LuxuryListingCard(
-                        listing: item,
+                      final imgUrl = item.images.isNotEmpty ? item.images.first.originalUrl : '';
+                      final priceStr = item.price >= 10000000
+                          ? '₹ ${(item.price / 10000000).toStringAsFixed(2)} Cr'
+                          : '₹ ${(item.price / 100000).toStringAsFixed(1)} L';
+                      return LuxuryAssetCard(
+                        imageUrl: imgUrl,
+                        title: item.title,
+                        category: (item.categoryName ?? 'GLOBAL ASSET').toUpperCase(),
+                        price: priceStr,
+                        subtitle: item.location.formattedLocation,
+                        badgeText: item.isFeatured ? 'FEATURED' : null,
+                        isDark: isDark,
+                        onBuy: () => context.push('/listing/${item.id}'),
+                        onBook: () => context.push('/listing/${item.id}'),
+                        onSell: () => context.push('/sell'),
                         onTap: () => context.push('/listing/${item.id}'),
                       );
                     },

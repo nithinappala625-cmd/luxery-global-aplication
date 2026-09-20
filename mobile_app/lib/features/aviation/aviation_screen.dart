@@ -3,9 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants/colors.dart';
 import '../../core/constants/typography.dart';
 import '../../core/widgets/luxury_app_bar.dart';
+import '../../core/widgets/luxury_asset_card.dart';
 import '../../core/widgets/luxury_button.dart';
-import '../../models/aviation.dart';
-import '../../providers/aviation_provider.dart';
+import '../../core/widgets/section_action_bar.dart';
 
 class AviationScreen extends ConsumerStatefulWidget {
   const AviationScreen({super.key});
@@ -14,294 +14,202 @@ class AviationScreen extends ConsumerStatefulWidget {
   ConsumerState<AviationScreen> createState() => _AviationScreenState();
 }
 
-class _AviationScreenState extends ConsumerState<AviationScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+class _AviationScreenState extends ConsumerState<AviationScreen> {
+  String _mode = 'BUY';
+  String _subTab = 'JETS';
 
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-  }
+  static const _subTabs = ['JETS', 'HELICOPTERS', 'AIR BOATS'];
 
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
+  static final List<_AviationItem> _jets = const [
+    _AviationItem(
+      id: 'g700',
+      title: 'Gulfstream G700',
+      category: 'PRIVATE JET',
+      imageUrl:
+          'https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5f/Gulfstream_G650ER%2C_EBACE_2018%2C_Le_Grand-Saconnex_%28BL7C0749%29.jpg/1280px-Gulfstream_G650ER%2C_EBACE_2018%2C_Le_Grand-Saconnex_%28BL7C0749%29.jpg',
+      price: '₹578 Cr',
+      chartPrice: '₹28L/hr',
+      spec: '7,750 nm • 19 VIP Seats',
+      subType: 'JETS',
+    ),
+    _AviationItem(
+      id: 'gl7500',
+      title: 'Bombardier Global 7500',
+      category: 'PRIVATE JET',
+      imageUrl:
+          'https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cc/N182QS-Global7500-120823.png/1280px-N182QS-Global7500-120823.png',
+      price: '₹512 Cr',
+      chartPrice: '₹25L/hr',
+      spec: '7,700 nm • 17 VIP Seats',
+      subType: 'JETS',
+    ),
+    _AviationItem(
+      id: 'f10x',
+      title: 'Dassault Falcon 10X',
+      category: 'PRIVATE JET',
+      imageUrl: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800',
+      price: '₹555 Cr',
+      chartPrice: '₹26L/hr',
+      spec: '7,500 nm • 18 VIP Seats',
+      subType: 'JETS',
+    ),
+    _AviationItem(
+      id: 'acj220',
+      title: 'Airbus ACJ TwoTwenty',
+      category: 'PRIVATE JET',
+      imageUrl: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800',
+      price: '₹370 Cr',
+      chartPrice: '₹18L/hr',
+      spec: '5,650 nm • 25 VIP Seats',
+      subType: 'JETS',
+    ),
+    _AviationItem(
+      id: 'cit',
+      title: 'Cessna Citation Longitude',
+      category: 'PRIVATE JET',
+      imageUrl: 'https://images.unsplash.com/photo-1530521954074-e64f6810b32d?w=800',
+      price: '₹85 Cr',
+      chartPrice: '₹8L/hr',
+      spec: '3,500 nm • 12 Seats',
+      subType: 'JETS',
+    ),
+    _AviationItem(
+      id: 'pc24',
+      title: 'Pilatus PC-24',
+      category: 'PRIVATE JET',
+      imageUrl: 'https://images.unsplash.com/photo-1474302770737-173ee21bab63?w=800',
+      price: '₹70 Cr',
+      chartPrice: '₹6L/hr',
+      spec: '2,000 nm • 10 Seats',
+      subType: 'JETS',
+    ),
+  ];
 
-  void _openInquirySheet(AircraftListing jet) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final nameController = TextEditingController();
-    final contactController = TextEditingController();
+  static final List<_AviationItem> _helicopters = const [
+    _AviationItem(
+      id: 's76d',
+      title: 'Sikorsky S-76D',
+      category: 'VIP HELICOPTER',
+      imageUrl:
+          'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Sikorsky_S-76D%2C_Heli_Air_Monaco_JP7367553.jpg/1280px-Sikorsky_S-76D%2C_Heli_Air_Monaco_JP7367553.jpg',
+      price: '₹39 Cr',
+      chartPrice: '₹4L/hr',
+      spec: '450 nm • 8 VIP Seats',
+      subType: 'HELICOPTERS',
+    ),
+    _AviationItem(
+      id: 'h145',
+      title: 'Airbus H145',
+      category: 'VIP HELICOPTER',
+      imageUrl:
+          'https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b0/Airbus_Helicopter_H145_%28D-HDSQ%29-20240621-RM-101724.jpg/1280px-Airbus_Helicopter_H145_%28D-HDSQ%29-20240621-RM-101724.jpg',
+      price: '₹28 Cr',
+      chartPrice: '₹3L/hr',
+      spec: '600 nm • 9 Seats',
+      subType: 'HELICOPTERS',
+    ),
+    _AviationItem(
+      id: 'b525',
+      title: 'Bell 525 Relentless',
+      category: 'VIP HELICOPTER',
+      imageUrl: 'https://images.unsplash.com/photo-1534430480872-3498386e7856?w=800',
+      price: '₹65 Cr',
+      chartPrice: '₹6L/hr',
+      spec: '500 nm • 20 Seats',
+      subType: 'HELICOPTERS',
+    ),
+    _AviationItem(
+      id: 'aw139',
+      title: 'Leonardo AW139',
+      category: 'VIP HELICOPTER',
+      imageUrl: 'https://images.unsplash.com/photo-1540962351504-03099e0a754b?w=800',
+      price: '₹31 Cr',
+      chartPrice: '₹3.5L/hr',
+      spec: '573 nm • 15 Seats',
+      subType: 'HELICOPTERS',
+    ),
+  ];
 
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: isDark ? const Color(0xFF141414) : Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (ctx) {
-        return Padding(
-          padding: EdgeInsets.only(
-            left: 20,
-            right: 20,
-            top: 20,
-            bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    jet.isSale ? 'AIRCRAFT ACQUISITION' : 'CHARTER FLIGHT DESK',
-                    style: LuxuryTypography.microCaps.copyWith(
-                      color: LuxuryColors.champagne,
-                      letterSpacing: 2.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close, size: 20),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 6),
-              Text(
-                jet.title,
-                style: LuxuryTypography.editorialHeading2.copyWith(fontSize: 18),
-              ),
-              Text(
-                'Broker / Operator: ${jet.brokerName}',
-                style: const TextStyle(color: Colors.grey, fontSize: 12),
-              ),
-              const Divider(height: 24),
-              TextField(
-                controller: nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Patron / Principal Name',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: contactController,
-                decoration: const InputDecoration(
-                  labelText: 'Confidential Phone / WhatsApp',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 14),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF0D140F) : const Color(0xFFEBF3ED),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  jet.complianceDisclaimer,
-                  style: TextStyle(
-                    fontSize: 10.5,
-                    color: isDark ? Colors.white70 : Colors.black87,
-                    height: 1.35,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              LuxuryButton(
-                text: 'TRANSMIT MANDATE TO BROKER',
-                variant: LuxuryButtonVariant.gold,
-                onPressed: () {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Acquisition inquiry dispatched. The accredited broker will verify credentials via private phone.'),
-                      backgroundColor: LuxuryColors.deepForestGreen,
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
+  static final List<_AviationItem> _airBoats = const [
+    _AviationItem(
+      id: 'tbm960',
+      title: 'Daher TBM 960',
+      category: 'TURBOPROP',
+      imageUrl: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800',
+      price: '₹60 Cr',
+      chartPrice: '₹5L/hr',
+      spec: '1,730 nm • 5 Seats',
+      subType: 'AIR BOATS',
+    ),
+    _AviationItem(
+      id: 'da62',
+      title: 'Diamond DA62',
+      category: 'TURBOPROP',
+      imageUrl: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800',
+      price: '₹18 Cr',
+      chartPrice: '₹2L/hr',
+      spec: '1,000 nm • 7 Seats',
+      subType: 'AIR BOATS',
+    ),
+  ];
+
+  List<_AviationItem> get _currentItems {
+    switch (_subTab) {
+      case 'JETS':
+        return _jets;
+      case 'HELICOPTERS':
+        return _helicopters;
+      case 'AIR BOATS':
+        return _airBoats;
+      default:
+        return _jets;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final state = ref.watch(aviationProvider);
+    final bg = isDark ? LuxuryColors.pureBlack : LuxuryColors.lightScaffold;
 
     return Scaffold(
-      appBar: const LuxuryAppBar(
-        title: 'PRIVATE AVIATION',
-        showBack: true,
-      ),
-      body: Column(
-        children: [
-          // Compliance Banner
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            color: isDark ? const Color(0xFF141E16) : const Color(0xFFEBF3ED),
-            child: Row(
-              children: [
-                const Icon(Icons.verified_user_outlined, size: 16, color: LuxuryColors.champagne),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'All aircraft subject to Pre-Purchase Inspection (PPI) & Civil Aviation Authority audit.',
-                    style: TextStyle(
-                      fontSize: 10.5,
-                      color: isDark ? Colors.white70 : Colors.black87,
-                    ),
-                  ),
-                ),
-              ],
+      backgroundColor: bg,
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            pinned: true,
+            backgroundColor: bg,
+            elevation: 0,
+            scrolledUnderElevation: 0,
+            expandedHeight: 0,
+            flexibleSpace: FlexibleSpaceBar(
+              titlePadding: EdgeInsets.zero,
+              title: const LuxuryAppBar(
+                showBack: true,
+                title: 'PRIVATE AVIATION',
+                showSearch: true,
+                showWishlist: false,
+                showThemeToggle: false,
+              ),
             ),
           ),
-
-          // Tabs
-          TabBar(
-            controller: _tabController,
-            indicatorColor: LuxuryColors.champagne,
-            labelColor: LuxuryColors.champagne,
-            unselectedLabelColor: isDark ? Colors.white54 : Colors.black54,
-            labelStyle: LuxuryTypography.microCaps.copyWith(letterSpacing: 2.0, fontWeight: FontWeight.bold),
-            tabs: const [
-              Tab(text: 'BUY AIRCRAFT'),
-              Tab(text: 'CHARTER AIRCRAFT'),
-            ],
-          ),
-
-          Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                // Tab 1: BUY AIRCRAFT
-                ListView.separated(
-                  padding: const EdgeInsets.all(20),
-                  itemCount: state.salesListings.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 20),
-                  itemBuilder: (context, index) {
-                    final jet = state.salesListings[index];
-                    return _buildJetCard(jet, isDark);
-                  },
-                ),
-
-                // Tab 2: CHARTER AIRCRAFT
-                ListView.separated(
-                  padding: const EdgeInsets.all(20),
-                  itemCount: state.charterRoutes.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 20),
-                  itemBuilder: (context, index) {
-                    final jet = state.charterRoutes[index];
-                    return _buildCharterCard(jet, isDark);
-                  },
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildJetCard(AircraftListing jet, bool isDark) {
-    return Container(
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF141414) : Colors.white,
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(
-          color: isDark ? LuxuryColors.borderDark : LuxuryColors.borderLight,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Stack(
-            children: [
-              ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(3)),
-                child: Image.network(
-                  jet.coverImageUrl,
-                  height: 180,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              Positioned(
-                top: 12,
-                right: 12,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.8),
-                    borderRadius: BorderRadius.circular(2),
-                    border: Border.all(color: LuxuryColors.champagne, width: 0.8),
-                  ),
-                  child: Text(
-                    'TAIL: ${jet.tailNumber}',
-                    style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16),
+          SliverToBoxAdapter(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        jet.title,
-                        style: LuxuryTypography.editorialHeading2.copyWith(fontSize: 16),
-                      ),
-                    ),
-                    Text(
-                      '\$ ${(jet.priceOrHourlyRate / 1000000).toStringAsFixed(1)}M',
-                      style: TextStyle(
-                        color: LuxuryColors.champagne,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ],
+                SectionActionBar(
+                  selectedMode: _mode,
+                  onModeChanged: (m) => setState(() => _mode = m),
+                  isDark: isDark,
+                  buyLabel: '✦ ACQUIRE',
+                  bookLabel: '✈ CHARTER',
+                  sellLabel: '♛ CONSIGN',
                 ),
-                const SizedBox(height: 6),
-                Text(
-                  '${jet.passengerCapacity} Pax  •  Range: ${jet.maxRangeNm} NM  •  TTAF: ${jet.totalAirframeHours} Hrs (${jet.flightCycles} Cycles)',
-                  style: TextStyle(fontSize: 11, color: isDark ? Colors.white70 : Colors.black87),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Avionics: ${jet.avionicsSuite}',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 10.5, color: isDark ? Colors.white60 : Colors.black54),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Hangar: ${jet.hangarLocation}  •  Broker: ${jet.brokerName}',
-                  style: const TextStyle(fontSize: 10.5, color: LuxuryColors.champagne),
-                ),
-                const SizedBox(height: 14),
-                LuxuryButton(
-                  text: 'REQUEST AIRCRAFT DOSSIER & SPEC SHEET',
-                  variant: LuxuryButtonVariant.gold,
-                  height: 40,
-                  onPressed: () => _openInquirySheet(jet),
-                ),
+                _buildSubTabStrip(isDark),
+                const SizedBox(height: 8),
+                if (_mode == 'SELL')
+                  _buildConsignmentPanel(isDark)
+                else
+                  _buildGrid(isDark),
+                const SizedBox(height: 32),
               ],
             ),
           ),
@@ -310,76 +218,194 @@ class _AviationScreenState extends ConsumerState<AviationScreen>
     );
   }
 
-  Widget _buildCharterCard(AircraftListing jet, bool isDark) {
-    return Container(
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF141414) : Colors.white,
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(
-          color: isDark ? LuxuryColors.borderDark : LuxuryColors.borderLight,
-        ),
+  Widget _buildSubTabStrip(bool isDark) {
+    return SizedBox(
+      height: 44,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        itemCount: _subTabs.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        itemBuilder: (context, i) {
+          final tab = _subTabs[i];
+          final selected = _subTab == tab;
+          return GestureDetector(
+            onTap: () => setState(() => _subTab = tab),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
+              decoration: BoxDecoration(
+                color: selected ? LuxuryColors.gold : Colors.transparent,
+                border: Border.all(
+                  color: selected ? LuxuryColors.gold : LuxuryColors.goldBorder,
+                  width: 0.8,
+                ),
+                borderRadius: BorderRadius.circular(3),
+              ),
+              child: Text(
+                tab,
+                style: LuxuryTypography.microCaps.copyWith(
+                  color: selected
+                      ? Colors.black
+                      : (isDark ? LuxuryColors.platinum : LuxuryColors.slate),
+                  fontSize: 10,
+                  letterSpacing: 1.2,
+                  fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                ),
+              ),
+            ),
+          );
+        },
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(3)),
-            child: Image.network(
-              jet.coverImageUrl,
-              height: 160,
+    );
+  }
+
+  Widget _buildGrid(bool isDark) {
+    final items = _currentItems;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          childAspectRatio: 0.62,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
+        ),
+        itemCount: items.length,
+        itemBuilder: (context, i) {
+          final item = items[i];
+          return LuxuryAssetCard(
+            imageUrl: item.imageUrl,
+            title: item.title,
+            category: item.category,
+            price: _mode == 'BOOK' ? item.chartPrice : item.price,
+            subtitle: item.spec,
+            isDark: isDark,
+            onBuy: () {},
+            onBook: () {},
+            onSell: () => setState(() => _mode = 'SELL'),
+            onTap: () {},
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildConsignmentPanel(bool isDark) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF1A1508), Color(0xFF0A0A0A)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          border: Border.all(color: LuxuryColors.gold, width: 1.0),
+          borderRadius: BorderRadius.circular(6),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Icon(Icons.flight_takeoff, color: LuxuryColors.gold, size: 32),
+            const SizedBox(height: 14),
+            Text(
+              'AIRCRAFT CONSIGNMENT DESK',
+              style: LuxuryTypography.microCaps.copyWith(
+                color: LuxuryColors.gold,
+                fontSize: 11,
+                letterSpacing: 2.0,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Submit your aircraft to our\nPrivate Aviation Syndicate.',
+              style: LuxuryTypography.editorialHeading2.copyWith(
+                color: Colors.white,
+                fontSize: 18,
+                height: 1.3,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'GIA-equivalent airworthiness certification required. Access to 1,200+ verified UHNWI buyers across 48 countries.',
+              style: LuxuryTypography.bodyMedium.copyWith(
+                color: LuxuryColors.platinum,
+                fontSize: 13,
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 20),
+            ..._consignStep('1', 'Submit aircraft details & documents'),
+            ..._consignStep('2', 'Airworthiness certification review'),
+            ..._consignStep('3', 'Syndicate listing & price discovery'),
+            ..._consignStep('4', 'Matched with vetted buyer'),
+            const SizedBox(height: 20),
+            LuxuryButton(
+              text: 'SUBMIT AIRCRAFT FOR EVALUATION',
+              variant: LuxuryButtonVariant.gold,
+              height: 50,
               width: double.infinity,
-              fit: BoxFit.cover,
+              onPressed: () {},
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  List<Widget> _consignStep(String num, String label) {
+    return [
+      Row(
+        children: [
+          Container(
+            width: 22,
+            height: 22,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: LuxuryColors.gold.withValues(alpha: 0.15),
+              border: Border.all(color: LuxuryColors.goldBorder, width: 0.8),
+              shape: BoxShape.circle,
+            ),
+            child: Text(
+              num,
+              style: LuxuryTypography.microCaps.copyWith(
+                color: LuxuryColors.gold,
+                fontSize: 9,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        jet.title,
-                        style: LuxuryTypography.editorialHeading2.copyWith(fontSize: 16),
-                      ),
-                    ),
-                    Text(
-                      '${jet.currency} ${(jet.priceOrHourlyRate / (jet.currency == "INR" ? 100000 : 1000)).toStringAsFixed(1)}${jet.currency == "INR" ? " Lakh" : "K"}',
-                      style: TextStyle(
-                        color: LuxuryColors.champagne,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                Row(
-                  children: [
-                    const Icon(Icons.flight_takeoff, size: 16, color: LuxuryColors.champagne),
-                    const SizedBox(width: 6),
-                    Text('${jet.departureCity}  ➔  ${jet.destinationCity ?? "On Demand Route"}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  'Capacity: ${jet.passengerCapacity} VIP Passengers  •  Operator: ${jet.brokerName}',
-                  style: TextStyle(fontSize: 11, color: isDark ? Colors.white60 : Colors.black54),
-                ),
-                const SizedBox(height: 14),
-                LuxuryButton(
-                  text: 'BOOK PRIVATE CHARTER',
-                  variant: LuxuryButtonVariant.gold,
-                  height: 40,
-                  onPressed: () => _openInquirySheet(jet),
-                ),
-              ],
+          const SizedBox(width: 10),
+          Text(
+            label,
+            style: LuxuryTypography.bodyMedium.copyWith(
+              color: LuxuryColors.platinum,
+              fontSize: 12,
             ),
           ),
         ],
       ),
-    );
+      const SizedBox(height: 8),
+    ];
   }
+}
+
+// ─── Data Model ───────────────────────────────────────────────────────────────
+
+class _AviationItem {
+  final String id, title, category, imageUrl, price, chartPrice, spec, subType;
+  const _AviationItem({
+    required this.id,
+    required this.title,
+    required this.category,
+    required this.imageUrl,
+    required this.price,
+    required this.chartPrice,
+    required this.spec,
+    required this.subType,
+  });
 }

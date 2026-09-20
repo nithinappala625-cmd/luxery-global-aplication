@@ -14,7 +14,7 @@ void main() {
     GoogleFonts.config.allowRuntimeFetching = false;
   });
 
-  testWidgets('NP GROUPS HomeScreen renders in Dark Mode with BUY/RENT/SELL tabs', (WidgetTester tester) async {
+  testWidgets('NP GROUPS HomeScreen renders in Dark Mode with BUY/BOOK/SELL tabs and collections', (WidgetTester tester) async {
     tester.view.physicalSize = const Size(1220, 2712);
     tester.view.devicePixelRatio = 2.5;
 
@@ -36,19 +36,15 @@ void main() {
     expect(find.text('NP GROUPS'), findsWidgets);
     expect(find.text('GLOBAL LUXURY SYNDICATE'), findsWidgets);
 
-    // Verify top mode tabs: BUY • RENT • SELL
-    expect(find.text('✦ BUY ASSETS'), findsOneWidget);
-    expect(find.text('✈ RENT FLEET'), findsOneWidget);
-    expect(find.text('👑 SELL & CONSIGN'), findsOneWidget);
+    // Verify top mode tabs: BUY • BOOK • SELL
+    expect(find.text('✦ BUY'), findsOneWidget);
+    expect(find.text('✈ BOOK'), findsOneWidget);
+    expect(find.text('♛ SELL'), findsOneWidget);
 
-    // Verify specialized subcategories pill bar
-    expect(find.text('✦ ALL ASSETS'), findsOneWidget);
-    expect(find.text('🏎️ FAST SUPERCARS'), findsOneWidget);
-
-    // Verify Sovereign spots
-    expect(find.text('SOVEREIGN DOMAINS'), findsOneWidget);
-    expect(find.text('PRIVATE AVIATION HANGAR'), findsOneWidget);
-    expect(find.text('HIGH-SECURITY PROTECTION'), findsOneWidget);
+    // Verify collections heading & categories
+    expect(find.text('CURATED COLLECTIONS'), findsOneWidget);
+    expect(find.text('PATRON ACQUISITION AUTHORITY'), findsOneWidget);
+    expect(find.text("TODAY'S FEATURED DROPS"), findsOneWidget);
   });
 
   testWidgets('NP GROUPS HomeScreen renders in Opulent White Light Mode cleanly', (WidgetTester tester) async {
@@ -71,29 +67,24 @@ void main() {
 
     // Verify Light mode renders without throwing layout errors
     expect(find.text('NP GROUPS'), findsWidgets);
-    expect(find.text('✦ BUY ASSETS'), findsOneWidget);
-    expect(find.text('✈ RENT FLEET'), findsOneWidget);
-    expect(find.text('👑 SELL & CONSIGN'), findsOneWidget);
+    expect(find.text('✦ BUY'), findsOneWidget);
+    expect(find.text('✈ BOOK'), findsOneWidget);
+    expect(find.text('♛ SELL'), findsOneWidget);
 
-    // Tap on RENT FLEET tab
-    await tester.tap(find.text('✈ RENT FLEET'));
+    // Tap on BOOK tab
+    await tester.tap(find.text('✈ BOOK'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 200));
 
-    expect(find.text('NP LUXE DRIVE FLEET'), findsOneWidget);
-    expect(find.text('AVIATION CHARTERS'), findsOneWidget);
-
-    // Tap on SELL & CONSIGN tab
-    await tester.tap(find.text('👑 SELL & CONSIGN'));
+    // Tap on SELL tab
+    await tester.tap(find.text('♛ SELL'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 200));
 
-    expect(find.text('CONSIGNMENT CONCIERGE'), findsOneWidget);
-    expect(find.text('List Your Sovereign Asset'), findsOneWidget);
-    expect(find.text('✦ LAUNCH 5-STEP LISTING WIZARD'), findsOneWidget);
+    expect(find.text('PATRON ACQUISITION AUTHORITY'), findsOneWidget);
   });
 
-  testWidgets('NP GROUPS DiscoverScreen renders with subcategories bar', (WidgetTester tester) async {
+  testWidgets('NP GROUPS DiscoverScreen renders with 2-col side-by-side grid', (WidgetTester tester) async {
     tester.view.physicalSize = const Size(1220, 2712);
     tester.view.devicePixelRatio = 2.5;
 
@@ -115,7 +106,7 @@ void main() {
     expect(find.text('ALL ASSETS'), findsWidgets);
   });
 
-  testWidgets('NP GROUPS RealEstateScreen renders private domains cleanly', (WidgetTester tester) async {
+  testWidgets('NP GROUPS RealEstateScreen renders sovereign domains with side-by-side cards', (WidgetTester tester) async {
     tester.view.physicalSize = const Size(1220, 2712);
     tester.view.devicePixelRatio = 2.5;
 
@@ -133,7 +124,10 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
 
-    expect(find.text('REAL ESTATE & ISLANDS'), findsOneWidget);
+    expect(find.text('SOVEREIGN DOMAINS'), findsOneWidget);
+    expect(find.text('✦ ACQUIRE'), findsOneWidget);
+    expect(find.text('📍 SITE VISIT'), findsOneWidget);
+    expect(find.text('♛ CONSIGN'), findsOneWidget);
   });
 
   testWidgets('NP GROUPS LockersScreen renders armored safes and vaults', (WidgetTester tester) async {
@@ -155,6 +149,9 @@ void main() {
     await tester.pump(const Duration(milliseconds: 300));
 
     expect(find.text('HIGH-SECURITY VAULTS'), findsOneWidget);
+    expect(find.text('✦ ACQUIRE'), findsOneWidget);
+    expect(find.text('🔒 COMMISSION'), findsOneWidget);
+    expect(find.text('♛ CONSIGN'), findsOneWidget);
   });
 
   testWidgets('NP GROUPS CrewBookingScreen renders elite pilots and security roster', (WidgetTester tester) async {
