@@ -228,7 +228,7 @@ class MaterialsScreen extends ConsumerWidget {
                             ),
                             const SizedBox(height: 14),
                             LuxuryButton(
-                              text: 'INQUIRE B2B TRANSACTION & ASSAY DOSSIER',
+                              text: 'INQUIRE B2B ASSAY DOSSIER',
                               variant: LuxuryButtonVariant.gold,
                               height: 40,
                               onPressed: () => _openInquiryModal(context, item),
