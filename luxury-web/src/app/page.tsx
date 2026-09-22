@@ -1,35 +1,44 @@
 import HeroSection from '@/components/home/HeroSection';
-import StatsBar from '@/components/home/StatsBar';
-import Ticker from '@/components/layout/Ticker';
-import LiveAuctionBanner from '@/components/home/LiveAuctionBanner';
-import CategoryGrid from '@/components/home/CategoryGrid';
-import FeaturedListings from '@/components/home/FeaturedListings';
-import MembershipPreview from '@/components/home/MembershipPreview';
-import HowItWorks from '@/components/home/HowItWorks';
-import WhyNPGroups from '@/components/home/WhyNPGroups';
-import AppDownload from '@/components/home/AppDownload';
-import { getCategories, getListings } from '@/lib/api';
+import EditorialSection from '@/components/home/EditorialSection';
+import CategoryShowcase from '@/components/home/CategoryShowcase';
+import CollectionGrid from '@/components/home/CollectionGrid';
+import PrivateAccessSection from '@/components/home/PrivateAccessSection';
+import OffMarketSection from '@/components/home/OffMarketSection';
+import MembershipSection from '@/components/home/MembershipSection';
+import NetworkSection from '@/components/home/NetworkSection';
+import AcquisitionProtocol from '@/components/home/AcquisitionProtocol';
+import VerificationSection from '@/components/home/VerificationSection';
+import GlobalPresence from '@/components/home/GlobalPresence';
+import ConciergeSection from '@/components/home/ConciergeSection';
+import BrandStory from '@/components/home/BrandStory';
+import { getListings } from '@/lib/api';
+import { LuxuryListing } from '@/types';
 
 export const revalidate = 60;
 
 export default async function HomePage() {
-  const [categories, listings] = await Promise.all([
-    getCategories(),
-    getListings({ limit: 6, featuredOnly: true }),
-  ]);
+  let listings: LuxuryListing[] = [];
+  try {
+    listings = await getListings({ limit: 6, featuredOnly: true });
+  } catch (e) {
+    listings = [];
+  }
 
   return (
     <div className="flex flex-col">
       <HeroSection />
-      <StatsBar />
-      <Ticker />
-      <LiveAuctionBanner />
-      <CategoryGrid categories={categories} />
-      <FeaturedListings initialListings={listings} />
-      <MembershipPreview />
-      <HowItWorks />
-      <WhyNPGroups />
-      <AppDownload />
+      <EditorialSection />
+      <CategoryShowcase />
+      <CollectionGrid initialListings={listings} />
+      <PrivateAccessSection />
+      <OffMarketSection />
+      <MembershipSection />
+      <NetworkSection />
+      <AcquisitionProtocol />
+      <VerificationSection />
+      <GlobalPresence />
+      <ConciergeSection />
+      <BrandStory />
     </div>
   );
 }

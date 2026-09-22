@@ -1,8 +1,7 @@
 import type { Metadata } from 'next';
 import { Cormorant_Garamond, Montserrat } from 'next/font/google';
 import './globals.css';
-import Navbar from '@/components/layout/Navbar';
-import Footer from '@/components/layout/Footer';
+import LuxuryShell from '@/components/layout/LuxuryShell';
 
 const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
@@ -19,9 +18,9 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: 'NP GROUPS | Global Luxury Legacy Platform',
-  description: "The world's most exclusive luxury marketplace. Extraordinary physical assets, private jets, superyachts, sovereign islands, supercars, fine horology and high jewellery.",
-  keywords: ['luxury marketplace', 'private jets', 'superyachts', 'private islands', 'patek philippe', 'ferrari', 'haute horlogerie', 'np groups'],
+  title: 'NP GROUPS | International Private Luxury Network',
+  description: 'An international private luxury network for exceptional assets, businesses, services, experiences and private opportunities.',
+  keywords: ['private luxury network', 'private aviation', 'superyachts', 'private islands', 'patek philippe', 'ferrari', 'haute horlogerie', 'np groups', 'off-market assets'],
 };
 
 export default function RootLayout({
@@ -31,10 +30,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${cormorant.variable} ${montserrat.variable} scroll-smooth`}>
-      <body className="bg-white text-[#082015] font-sans antialiased min-h-screen flex flex-col selection:bg-[#C9A84C] selection:text-white">
-        <Navbar />
-        <main className="flex-grow">{children}</main>
-        <Footer />
+      <body className="bg-[#FCFBF7] text-[#080B09] font-sans antialiased min-h-screen selection:bg-[#C6A15B] selection:text-white">
+        <LuxuryShell>
+          {children}
+        </LuxuryShell>
       </body>
     </html>
   );

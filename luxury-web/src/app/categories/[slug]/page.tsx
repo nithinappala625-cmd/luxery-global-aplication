@@ -1,6 +1,8 @@
 import { notFound } from 'next/navigation';
 import { getCategoryBySlug, getListings } from '@/lib/api';
-import { ShieldCheck, MapPin, ArrowUpRight, ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ShieldCheck } from 'lucide-react';
+import LuxuryAssetCard, { LuxuryAsset } from '@/components/home/LuxuryAssetCard';
+import Link from 'next/link';
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -12,54 +14,85 @@ export default async function CategoryPage({ params }: Props) {
   const { slug } = await params;
   const category = await getCategoryBySlug(slug);
 
-  if (!category) {
+  if (!category && slug !== 'all') {
     notFound();
   }
 
-  const listings = await getListings({ categorySlug: slug });
+  const listings = await getListings({ categorySlug: slug === 'all' ? undefined : slug });
 
-  const formatPrice = (price: number, currency: string) => {
-    if (currency === 'INR') {
-      const cr = (price / 10000000).toFixed(1);
-      return `₹${cr} Cr`;
-    }
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: currency,
-      maximumFractionDigits: 0,
-    }).format(price);
-  };
+  const mappedAssets: LuxuryAsset[] = (listings || []).map((item) => {
+    const rawImg = item.images?.[0];
+    const imgUrl =
+      typeof rawImg === 'string'
+        ? rawImg
+        : rawImg?.original_url ||
+          rawImg?.optimized_url ||
+          'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?q=80&w=1200&auto=format&fit=crop';
+
+    const specText = item.specifications?.[0]
+      ? `${item.specifications[0].spec_key}: ${item.specifications[0].spec_value}`
+      : '';
+
+    return {
+      id: item.id,
+      title: item.title,
+      subtitle: item.description?.slice(0, 100),
+      category: item.category_name || category?.name || 'Curated Lot',
+      location: item.location ? `${item.location.city}, ${item.location.country}` : 'Monaco / Geneva',
+      year: item.year ? String(item.year) : '',
+      specs: specText,
+      priceFormatted: item.price ? `€${Number(item.price).toLocaleString()}` : 'PRICE ON REQUEST',
+      isPoa: !item.price || item.price === 0,
+      statusBadge: item.is_featured ? 'FEATURED LOT' : 'PRIVATE SALE',
+      imageUrl: imgUrl,
+      verified: item.status === 'verified',
+    };
+  });
+
+  const categoryTitle = category?.name || (slug === 'all' ? 'All Acquisitions' : 'Curated Domain');
 
   return (
-    <div className="pt-32 pb-24 bg-white min-h-screen text-[#082015]">
-      <div className="max-w-7xl mx-auto px-6">
-        {/* Breadcrumb / Back */}
-        <a
-          href="/#categories"
-          className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-[#7A8F83] hover:text-[#082015] mb-8 transition-colors font-semibold"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span>Back to All Verticals</span>
-        </a>
+    <div className="bg-[#FCFBF7] text-[#080B09] min-h-screen pt-28 pb-32">
+      <div className="max-w-7xl mx-auto px-6 lg:px-12">
+        {/* Breadcrumb Back */}
+        <div className="py-6 border-b border-[#D8D3C8] mb-8">
+          <Link
+            href="/#categories"
+            className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.25em] text-[#080B09]/70 hover:text-[#061C16] font-medium transition-colors"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>RETURN TO CURATED DOMAINS</span>
+          </Link>
+        </div>
 
-        {/* Category Header Banner with Deep Black-Green Anchor */}
-        <div className="relative rounded-2xl overflow-hidden bg-[#051810] text-white p-8 sm:p-14 mb-12 shadow-xl">
+        {/* Editorial Sector Header Banner */}
+        <div className="relative bg-[#061C16] text-[#FCFBF7] p-8 sm:p-14 mb-12 border border-[#C6A15B]/20 overflow-hidden shadow-xl">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-[#C6A15B]/10 rounded-full blur-3xl pointer-events-none" />
+
           <div className="relative z-10 max-w-3xl space-y-4">
-            <span className="text-xs font-mono uppercase tracking-[0.3em] text-[#E8D48A] font-semibold block">
-              Vertical 0{category.sort_order} &middot; Institutional Catalog
-            </span>
-            <h1 className="font-serif text-4xl sm:text-6xl text-white font-light">
-              {category.name}
-            </h1>
-            <p className="text-base sm:text-lg text-white/80 font-serif italic" dangerouslySetInnerHTML={{ __html: category.tagline || '' }} />
+            <div className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] text-[#C6A15B]">
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span>SOVEREIGN ASSET PORTFOLIO</span>
+            </div>
 
-            {/* Subcategories / Asset Types Pills */}
-            {category.asset_types && (
+            <h1 className="font-serif text-4xl sm:text-6xl font-light text-white tracking-tight">
+              {categoryTitle}
+            </h1>
+
+            {category?.tagline && (
+              <p
+                className="text-base text-[#D8D3C8]/85 font-light leading-relaxed max-w-2xl"
+                dangerouslySetInnerHTML={{ __html: category.tagline }}
+              />
+            )}
+
+            {/* Asset Types Filter Strip */}
+            {category?.asset_types && (
               <div className="pt-4 flex flex-wrap gap-2">
                 {category.asset_types.map((type) => (
                   <span
                     key={type}
-                    className="px-3 py-1 rounded text-xs bg-white/10 border border-white/20 text-white font-medium"
+                    className="px-3 py-1 bg-[#080B09]/80 border border-[#C6A15B]/30 text-[9px] uppercase tracking-[0.2em] text-[#D8D3C8]"
                   >
                     {type}
                   </span>
@@ -69,118 +102,29 @@ export default async function CategoryPage({ params }: Props) {
           </div>
         </div>
 
-        {/* Filter / Action Bar */}
-        <div className="p-4 rounded-xl bg-[#FAFAF8] border border-[#E5EAE7] mb-10 flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <span className="text-xs uppercase tracking-widest text-[#082015] font-bold">
-              Modes:
-            </span>
-            {['ALL', 'BUY', 'SELL', 'RENT', 'CHARTER', 'BOOK'].map((mode) => (
-              <button
-                key={mode}
-                className="px-3.5 py-1.5 rounded text-[11px] tracking-wider uppercase font-semibold bg-white border border-[#E5EAE7] text-[#082015] hover:border-[#082015] transition-colors"
-              >
-                {mode}
-              </button>
+        {/* Listings Catalogue Grid */}
+        {mappedAssets.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {mappedAssets.map((asset) => (
+              <LuxuryAssetCard key={asset.id} asset={asset} />
             ))}
-          </div>
-
-          <div className="text-xs text-[#7A8F83] font-medium">
-            Showing <span className="text-[#082015] font-bold">{listings.length}</span> Verified Assets
-          </div>
-        </div>
-
-        {/* Listings Grid with White Cards */}
-        {listings.length === 0 ? (
-          <div className="py-24 text-center rounded-2xl bg-[#FAFAF8] border border-[#E5EAE7] p-12">
-            <p className="font-serif text-3xl text-[#082015] mb-2 font-medium">No Public Listings Cataloged</p>
-            <p className="text-sm text-[#4A5E53] max-w-md mx-auto mb-8 font-light">
-              Assets in this vertical are currently transacting through private treaty and off-market confidential deal rooms.
-            </p>
-            <a
-              href="/membership"
-              className="inline-block px-7 py-3.5 rounded bg-[#051810] text-white text-xs font-bold uppercase tracking-widest hover:bg-[#0F3826] transition-all shadow"
-            >
-              Request Private Dossier Access
-            </a>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {listings.map((item) => (
-              <div
-                key={item.id}
-                className="group rounded-xl bg-white border border-[#E5EAE7] hover:border-[#082015] overflow-hidden flex flex-col justify-between transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-1"
+          <div className="p-16 border border-[#D8D3C8] text-center bg-white space-y-4">
+            <h3 className="font-serif text-2xl text-[#061C16] font-light">
+              Current Lots Under Bilateral Reservation
+            </h3>
+            <p className="text-xs text-[#080B09]/60 max-w-md mx-auto leading-relaxed">
+              New lots in this domain are held in private off-market reserves. Contact the private office to receive the confidential prospectus under NDA.
+            </p>
+            <div className="pt-2">
+              <Link
+                href="/membership"
+                className="inline-block px-6 py-3 bg-[#061C16] text-[#FCFBF7] text-[10px] uppercase tracking-[0.25em] font-medium"
               >
-                <div className="relative aspect-[16/10] overflow-hidden bg-[#F5F5F2]">
-                  <img
-                    src={item.images[0]?.original_url || category.banner_url || 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?q=80&w=1200'}
-                    alt={item.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                  <div className="absolute top-3 left-3 flex items-center gap-2">
-                    <span className="px-2.5 py-1 rounded text-[9px] font-bold tracking-widest uppercase bg-[#051810] text-white">
-                      {category.name}
-                    </span>
-                    <span className="px-2.5 py-1 rounded text-[9px] font-semibold tracking-wider uppercase bg-white/95 text-[#082015] flex items-center gap-1 shadow-sm backdrop-blur-sm">
-                      <ShieldCheck className="w-3 h-3 text-[#C9A84C]" />
-                      <span>Verified</span>
-                    </span>
-                  </div>
-                  {item.location && (
-                    <div className="absolute bottom-3 left-3 flex items-center gap-1.5 text-xs text-white font-medium drop-shadow">
-                      <MapPin className="w-3.5 h-3.5 text-[#E8D48A]" />
-                      <span>{item.location.city}, {item.location.country}</span>
-                    </div>
-                  )}
-                </div>
-
-                <div className="p-7 flex-grow flex flex-col justify-between">
-                  <div>
-                    <h3 className="font-serif text-2xl text-[#082015] font-semibold group-hover:text-[#0F3826] transition-colors line-clamp-1">
-                      {item.title}
-                    </h3>
-                    <p className="text-xs text-[#4A5E53] mt-2 font-light line-clamp-2 leading-relaxed">
-                      {item.description}
-                    </p>
-
-                    {item.specifications && item.specifications.length > 0 && (
-                      <div className="mt-5 pt-4 border-t border-[#E5EAE7] grid grid-cols-2 gap-3 text-xs">
-                        {item.specifications.slice(0, 2).map((s) => (
-                          <div key={s.spec_key}>
-                            <span className="text-[9px] uppercase tracking-wider text-[#7A8F83] block font-semibold">
-                              {s.spec_key}
-                            </span>
-                            <span className="text-[#082015] font-medium text-xs truncate block mt-0.5">
-                              {s.spec_value}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="mt-6 pt-5 border-t border-[#E5EAE7] flex items-center justify-between">
-                    <div>
-                      <span className="text-[9px] uppercase tracking-widest text-[#7A8F83] block font-semibold">
-                        Valuation
-                      </span>
-                      <span className="font-serif text-2xl sm:text-3xl text-[#082015] font-semibold">
-                        {formatPrice(item.price, item.currency)}
-                      </span>
-                    </div>
-
-                    <a
-                      href={`/listings/${item.id}`}
-                      className="px-5 py-2.5 rounded text-[11px] font-bold tracking-widest uppercase bg-[#051810] text-white hover:bg-[#0F3826] hover:text-[#E8D48A] transition-all flex items-center gap-1.5 shadow"
-                    >
-                      <span>Acquire</span>
-                      <ArrowUpRight className="w-3.5 h-3.5 text-[#C9A84C]" />
-                    </a>
-                  </div>
-                </div>
-              </div>
-            ))}
+                REQUEST PRIVATE DOSSIER
+              </Link>
+            </div>
           </div>
         )}
       </div>

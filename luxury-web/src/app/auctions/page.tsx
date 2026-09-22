@@ -1,5 +1,6 @@
 import { getAuctions } from '@/lib/api';
-import { Gavel, MapPin, ArrowRight } from 'lucide-react';
+import { Gavel, MapPin, ArrowRight, ShieldCheck, Clock } from 'lucide-react';
+import Link from 'next/link';
 
 export const revalidate = 60;
 
@@ -7,117 +8,123 @@ export default async function AuctionsPage() {
   const auctions = await getAuctions();
 
   return (
-    <div className="pt-32 pb-24 bg-white min-h-screen text-[#082015]">
-      <div className="max-w-7xl mx-auto px-6">
-        {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-20 space-y-4">
-          <div className="inline-flex items-center gap-2 text-[10px] tracking-[0.3em] uppercase text-[#A07830] font-bold">
-            <Gavel className="w-3.5 h-3.5 text-[#C9A84C]" />
-            <span>Curated Auction Rooms</span>
+    <div className="bg-[#FCFBF7] text-[#080B09] min-h-screen pt-28 pb-32">
+      <div className="max-w-7xl mx-auto px-6 lg:px-12">
+        {/* Header Section */}
+        <div className="text-center max-w-3xl mx-auto py-12 space-y-4">
+          <div className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] text-[#9D7B3E] font-medium">
+            <span className="w-1.5 h-1.5 bg-[#C6A15B] rotate-45" />
+            <span>CURATED TIMED TENDERS</span>
           </div>
-          <h1 className="font-serif text-4xl sm:text-6xl font-light text-[#082015] tracking-tight">
-            Live & Upcoming Auctions
+
+          <h1 className="font-serif text-4xl sm:text-6xl font-light text-[#061C16] tracking-tight">
+            TENDERS &amp; PRIVATE LOTS
           </h1>
-          <p className="text-sm sm:text-base text-[#4A5E53] font-light leading-relaxed">
-            Direct bidding partnerships with Christie's, Sotheby's, RM Sotheby's, and Phillips. Secure your paddle and consign rare horology, classic cars, fine art, and royal provenance jewellery.
+
+          <p className="font-serif text-xl sm:text-2xl text-[#061C16] font-light italic">
+            Direct Private Treaty Placements &amp; Timed Consignments.
+          </p>
+
+          <p className="text-xs sm:text-sm text-[#080B09]/70 font-light leading-relaxed max-w-xl mx-auto pt-2">
+            Discreet timed tenders, sealed bids, and specialist private treaty placements across verified horology, classic competition racecars, sovereign estates, and blue-chip art.
           </p>
         </div>
 
         {/* Auctions Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-20">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pt-8 mb-20">
           {auctions.map((auc) => (
             <div
               key={auc.id}
-              className="rounded-2xl overflow-hidden bg-white border border-[#E5EAE7] hover:border-[#082015] flex flex-col justify-between shadow-sm hover:shadow-xl transition-all"
+              className="group bg-white border border-[#D8D3C8] hover:border-[#061C16] flex flex-col justify-between transition-all duration-500 hover:shadow-xl overflow-hidden"
             >
-              <div className="relative aspect-[16/9] overflow-hidden bg-[#F5F5F2]">
-                <img
-                  src={auc.banner_url}
-                  alt={auc.title}
-                  className="w-full h-full object-cover"
+              {/* Image banner */}
+              <div className="relative aspect-[16/9] overflow-hidden bg-[#061C16]">
+                <div
+                  className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 group-hover:scale-105"
+                  style={{ backgroundImage: `url('${auc.banner_url}')` }}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#061C16]/90 via-transparent to-black/30" />
 
-                <div className="absolute top-4 left-4 flex items-center gap-2">
+                {/* Status Badges */}
+                <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
                   <span
-                    className={`px-3 py-1 rounded text-[10px] font-bold tracking-widest uppercase ${
+                    className={`px-3 py-1 text-[9px] uppercase tracking-[0.25em] font-medium border backdrop-blur-sm ${
                       auc.status === 'live'
-                        ? 'bg-red-600 text-white animate-pulse'
-                        : 'bg-[#051810] text-white'
+                        ? 'bg-amber-950/80 border-[#C6A15B] text-[#C6A15B]'
+                        : 'bg-[#061C16]/90 border-white/20 text-white'
                     }`}
                   >
-                    {auc.status === 'live' ? 'Live Now' : 'Upcoming'}
+                    {auc.status === 'live' ? 'LIVE TIMED TENDER' : 'SCHEDULED SALON'}
                   </span>
-                  <span className="px-2.5 py-1 rounded text-[10px] bg-white/95 text-[#082015] font-bold shadow-sm backdrop-blur-sm">
-                    {auc.total_lots_count} Lots Cataloged
+
+                  <span className="px-2.5 py-1 bg-black/60 border border-white/20 text-white text-[9px] uppercase tracking-[0.2em]">
+                    {auc.total_lots_count} Cataloged Lots
                   </span>
                 </div>
 
-                <div className="absolute bottom-4 left-4 flex items-center gap-1.5 text-xs text-white font-medium">
-                  <MapPin className="w-4 h-4 text-[#E8D48A]" />
-                  <span>{auc.location}</span>
+                <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-white text-xs font-light">
+                  <div className="flex items-center gap-1.5 text-[11px] uppercase tracking-[0.2em] text-[#C6A15B]">
+                    <MapPin className="w-3.5 h-3.5" />
+                    <span>{auc.location}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-[10px] text-white/80 uppercase tracking-widest font-mono">
+                    <Clock className="w-3.5 h-3.5 text-[#C6A15B]" />
+                    <span>Sealed Protocol</span>
+                  </div>
                 </div>
               </div>
 
-              <div className="p-8 space-y-6 flex-grow flex flex-col justify-between">
-                <div>
-                  <span className="text-[10px] font-bold tracking-widest uppercase text-[#A07830] block mb-1">
-                    {auc.auction_house_name} &middot; {auc.category_name}
-                  </span>
-                  <h3 className="font-serif text-2xl sm:text-3xl text-[#082015] font-semibold">
+              {/* Information Panel */}
+              <div className="p-8 flex-grow flex flex-col justify-between space-y-6">
+                <div className="space-y-3">
+                  <div className="text-[10px] uppercase tracking-[0.2em] text-[#9D7B3E] font-medium">
+                    {auc.auction_house_name || 'Independent Specialist Salon'}
+                  </div>
+                  <h3 className="font-serif text-2xl sm:text-3xl font-light text-[#061C16] group-hover:text-[#9D7B3E] transition-colors leading-snug">
                     {auc.title}
                   </h3>
-
-                  <div className="mt-6 p-5 rounded-xl bg-[#FAFAF8] border border-[#E5EAE7] space-y-1">
-                    <span className="text-[9px] uppercase tracking-widest text-[#7A8F83] block font-bold">
-                      Featured Headlining Lot
-                    </span>
-                    <p className="text-sm text-[#082015] font-serif font-bold">
-                      {auc.featured_lot_title}
-                    </p>
-                    <p className="text-xs text-[#082015] font-medium">
-                      {auc.featured_lot_estimate}
-                    </p>
-                  </div>
+                  <p className="text-xs text-[#080B09]/70 font-light leading-relaxed">
+                    Lead Lot: {auc.featured_lot_title} &middot; Estimate: {auc.featured_lot_estimate}
+                  </p>
                 </div>
 
-                <div className="pt-5 border-t border-[#E5EAE7] flex items-center justify-between gap-4">
-                  <div>
-                    <span className="text-[9px] uppercase tracking-widest text-[#7A8F83] block font-semibold">
-                      Lead Current Bid
-                    </span>
-                    <span className="font-serif text-2xl sm:text-3xl text-[#082015] font-bold">
-                      {auc.currency} {auc.current_bid ? auc.current_bid.toLocaleString() : 'Est. Upon Request'}
-                    </span>
+                <div className="pt-6 border-t border-[#D8D3C8] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+                  <div className="text-[10px] text-[#080B09]/60 uppercase tracking-[0.2em]">
+                    Fiduciary Guarantee &middot; Provenance Assured
                   </div>
 
-                  <button className="px-6 py-3 rounded-lg text-xs font-bold tracking-widest uppercase bg-[#051810] text-white hover:bg-[#0F3826] transition-all flex items-center gap-2 shadow">
-                    <span>Register Paddle</span>
-                    <ArrowRight className="w-4 h-4 text-[#E8D48A]" />
-                  </button>
+                  <Link
+                    href="/membership"
+                    className="px-6 py-3 bg-[#061C16] text-[#FCFBF7] text-[10px] uppercase tracking-[0.2em] font-medium hover:bg-[#C6A15B] hover:text-[#061C16] transition-all text-center"
+                  >
+                    REQUEST BIDDER CREDENTIALS
+                  </Link>
                 </div>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Consignment Banner with Deep Black-Green Anchor */}
-        <div className="rounded-2xl bg-[#051810] text-white p-8 sm:p-14 flex flex-col md:flex-row items-center justify-between gap-8 shadow-2xl">
-          <div className="space-y-3 max-w-xl">
-            <span className="text-[10px] uppercase tracking-[0.25em] text-[#E8D48A] font-bold block">
-              Consignor Salons
+        {/* Consignment Banner */}
+        <div className="bg-[#061C16] text-[#FCFBF7] border border-[#C6A15B]/20 p-8 sm:p-12 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="space-y-2 text-center md:text-left">
+            <span className="text-[10px] uppercase tracking-[0.25em] text-[#C6A15B]">
+              PRIVATE TREATY CONSIGNMENTS
             </span>
-            <h3 className="font-serif text-3xl sm:text-4xl text-white font-light">
-              Submit an Exceptional Asset for Next Season
+            <h3 className="font-serif text-2xl font-light text-white">
+              Consign Assets for Upcoming International Tenders
             </h3>
-            <p className="text-xs sm:text-sm text-white/80 font-light leading-relaxed">
-              Consign with confidence. Our senior specialists in Geneva, London, and Monaco provide complimentary valuation and worldwide auction placement.
+            <p className="text-xs text-[#D8D3C8]/70 font-light max-w-xl">
+              We coordinate confidential private treaties and catalog insertions in London, Geneva, Monaco, and Dubai.
             </p>
           </div>
 
-          <button className="px-8 py-4 rounded-lg bg-gradient-to-r from-[#C9A84C] via-[#E8D48A] to-[#A07830] text-[#051810] text-xs font-bold uppercase tracking-widest hover:shadow-[0_0_25px_rgba(201,168,76,0.5)] transition-all whitespace-nowrap">
-            Request Valuation
-          </button>
+          <Link
+            href="/membership"
+            className="px-8 py-3.5 bg-[#FCFBF7] text-[#061C16] text-[10px] uppercase tracking-[0.25em] font-semibold hover:bg-[#C6A15B] transition-all whitespace-nowrap"
+          >
+            SUBMIT CONSIGNMENT BRIEF
+          </Link>
         </div>
       </div>
     </div>

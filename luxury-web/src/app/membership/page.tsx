@@ -1,187 +1,228 @@
-import { getMembershipPlans } from '@/lib/api';
-import { Crown, Star, Shield, Check, ArrowRight, Lock } from 'lucide-react';
+'use client';
 
-export const revalidate = 300;
+import { useState } from 'react';
+import { useLuxuryUI } from '@/components/layout/LuxuryShell';
+import { ShieldCheck, Check, ArrowRight, Lock, FileCheck2 } from 'lucide-react';
 
-export default async function MembershipPage() {
-  const plans = await getMembershipPlans();
+const tiers = [
+  {
+    name: 'FOUNDATION',
+    tagline: 'Accredited Collector & Direct Buyer',
+    scope: 'Primary catalog access & verified bilateral direct inquiries.',
+    privileges: [
+      'Access to verified public inventory across all 8 domains',
+      'Direct bilateral message routing to certified dealers',
+      'Curated quarterly acquisitions digest & auction previews',
+      'Priority access to physical viewings in London & Geneva',
+    ],
+    vetting: 'Proof of principal identity & primary address verification.',
+  },
+  {
+    name: 'PREMIER',
+    tagline: 'Multi-Sector Discretionary Portfolio',
+    scope: 'Priority allocation & assigned acquisition officer.',
+    privileges: [
+      'All Foundation privileges',
+      'Assigned personal Acquisition Desk Officer',
+      'Early pre-catalogue viewings (72-hour window)',
+      'Confidential off-market inquiry privileges under standard NDA',
+      'Invitations to private salon dinners in Monaco, Dubai & London',
+    ],
+    vetting: 'Commercial or personal bank reference attestation.',
+  },
+  {
+    name: 'ELITE',
+    tagline: 'Cross-Border Syndicate & Off-Market Tier',
+    scope: 'Full off-market catalogue & aviation charter desk.',
+    privileges: [
+      'All Premier privileges',
+      'Unrestricted access to the classified Off-Market Directory',
+      'Dedicated bespoke Aviation & Superyacht charter concierge',
+      'Cross-border asset transfer advisory & tax neutrality structuring',
+      'Bespoke search mandate execution across 42 jurisdictions',
+    ],
+    vetting: 'Accredited investor or beneficial owner verification.',
+  },
+  {
+    name: 'ULTRA',
+    tagline: 'Single Family Office & Sovereign Mandate',
+    scope: 'Direct buy-side execution & fiduciary settlement.',
+    privileges: [
+      'All Elite privileges',
+      'Custom multi-currency Swiss & UK escrow facilities',
+      'Co-investment rights in sovereign real estate & private equity syndicates',
+      'Dedicated international legal liaison for title & registry transfer',
+      'Executive physical asset security & transport protocol',
+    ],
+    vetting: 'Institutional fiduciary audit or family office credentialing.',
+  },
+  {
+    name: 'LEGACY',
+    tagline: 'Institutional Patrimony & Generational Advisory',
+    scope: 'Bespoke board advisory & multi-generational stewardship.',
+    privileges: [
+      'All Ultra privileges',
+      'Direct advisory access to NP GROUPS International Board',
+      'Multi-generational collection cataloguing & museum placement desk',
+      'Bespoke private treaty placement for estate liquidation',
+      'Diplomatic and sovereign territory acquisition assistance',
+    ],
+    vetting: 'By invitation and unanimous committee evaluation only.',
+  },
+];
+
+export default function MembershipPage() {
+  const { openEnquiry } = useLuxuryUI();
+  const [selectedTier, setSelectedTier] = useState('PREMIER');
 
   return (
-    <div className="pt-32 pb-24 bg-white min-h-screen text-[#082015]">
-      <div className="max-w-7xl mx-auto px-6">
-        {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-20 space-y-4">
-          <div className="inline-flex items-center gap-2 text-[10px] tracking-[0.3em] uppercase text-[#A07830] font-bold">
-            <Crown className="w-3.5 h-3.5 text-[#C9A84C]" />
-            <span>Private Client Network</span>
+    <div className="bg-[#FCFBF7] text-[#080B09] min-h-screen pt-28 pb-32">
+      <div className="max-w-7xl mx-auto px-6 lg:px-12">
+        {/* Header Section */}
+        <div className="text-center max-w-3xl mx-auto py-12 space-y-4">
+          <div className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] text-[#9D7B3E] font-medium">
+            <span className="w-1.5 h-1.5 bg-[#C6A15B] rotate-45" />
+            <span>ADMISSIONS DOSSIER</span>
           </div>
-          <h1 className="font-serif text-4xl sm:text-6xl font-light text-[#082015] tracking-tight">
-            Elite Membership Privileges
+
+          <h1 className="font-serif text-4xl sm:text-6xl font-light text-[#061C16] tracking-tight">
+            THE PRIVATE CIRCLE
           </h1>
-          <p className="text-sm sm:text-base text-[#4A5E53] font-light leading-relaxed">
-            By invitation and curatorial review only. Direct access to off-market bilateral deal rooms, private treaty sales, and bespoke lifestyle management.
+
+          <p className="font-serif text-xl sm:text-2xl text-[#061C16] font-light italic">
+            &ldquo;Access is considered, not assumed.&rdquo;
+          </p>
+
+          <p className="text-xs sm:text-sm text-[#080B09]/70 font-light leading-relaxed max-w-xl mx-auto pt-2">
+            The Private Circle is an international assembly of verified asset owners, single family offices, certified operators, and collectors. All applications undergo bilateral compliance review.
           </p>
         </div>
 
-        {/* 3 Tier Cards */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch mb-24">
-          {plans.map((plan) => (
+        {/* 5 Vertical Membership Cards Grid */}
+        <div id="tiers" className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 pt-8 mb-24">
+          {tiers.map((tier) => (
             <div
-              key={plan.id}
-              className={`relative rounded-2xl flex flex-col justify-between p-8 sm:p-10 transition-all duration-300 ${
-                plan.is_popular
-                  ? 'bg-[#051810] text-white border-2 border-[#C9A84C] shadow-2xl lg:-translate-y-4'
-                  : 'bg-[#FAFAF8] text-[#082015] border border-[#E5EAE7] hover:border-[#082015] shadow-sm'
+              key={tier.name}
+              className={`group relative bg-white border p-6 flex flex-col justify-between transition-all duration-500 hover:shadow-xl ${
+                selectedTier === tier.name
+                  ? 'border-[#061C16] shadow-md ring-1 ring-[#061C16]'
+                  : 'border-[#D8D3C8] hover:border-[#C6A15B]'
               }`}
             >
-              {plan.is_popular && (
-                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-gradient-to-r from-[#C9A84C] to-[#A07830] text-[#051810] text-[10px] font-bold tracking-[0.25em] uppercase shadow-lg">
-                  Most Requested Tier
-                </div>
-              )}
-
-              <div>
-                <div className="flex items-center justify-between gap-4 mb-3">
-                  <h3 className={`font-serif text-3xl font-semibold ${plan.is_popular ? 'text-white' : 'text-[#082015]'}`}>
-                    {plan.name}
+              <div className="space-y-4">
+                <div>
+                  <span className="text-[10px] uppercase tracking-[0.25em] text-[#C6A15B] font-semibold block">
+                    TIER
+                  </span>
+                  <h3 className="font-serif text-2xl font-light text-[#061C16] tracking-wide mt-1">
+                    {tier.name}
                   </h3>
-                  {plan.tier === 'platinum' ? (
-                    <Crown className="w-7 h-7 text-[#C9A84C]" />
-                  ) : plan.tier === 'gold' ? (
-                    <Star className="w-7 h-7 text-[#E8D48A]" />
-                  ) : (
-                    <Shield className="w-7 h-7 text-[#0F3826]" />
-                  )}
+                  <p className="text-[11px] text-[#9D7B3E] font-light mt-1 italic">
+                    {tier.tagline}
+                  </p>
                 </div>
 
-                <p className={`text-[10px] uppercase tracking-[0.2em] font-bold mb-6 ${plan.is_popular ? 'text-[#E8D48A]' : 'text-[#A07830]'}`}>
-                  {plan.tagline}
-                </p>
-
-                <div className={`mb-8 pb-6 border-b ${plan.is_popular ? 'border-white/10' : 'border-[#E5EAE7]'}`}>
-                  <div className="font-serif text-4xl sm:text-5xl font-light">
-                    ₹{(plan.price_annual / 1000).toLocaleString('en-IN')}k
-                    <span className={`text-xs font-sans font-normal ml-2 ${plan.is_popular ? 'text-white/60' : 'text-[#7A8F83]'}`}>
-                      / annum
-                    </span>
-                  </div>
+                <div className="pt-3 border-t border-[#D8D3C8]/60">
+                  <p className="text-xs text-[#080B09]/80 font-medium leading-snug">
+                    {tier.scope}
+                  </p>
                 </div>
 
-                {/* Features List */}
-                <div className="space-y-4 mb-10">
-                  {plan.features.map((feat) => (
-                    <div key={feat} className="flex items-start gap-3 text-xs leading-relaxed">
-                      <div className={`w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
-                        plan.is_popular ? 'bg-[#0F3826] text-[#E8D48A]' : 'bg-[#051810] text-white'
-                      }`}>
-                        <Check className="w-2.5 h-2.5" />
-                      </div>
-                      <span className={`font-light ${plan.is_popular ? 'text-white/90' : 'text-[#4A5E53]'}`}>{feat}</span>
-                    </div>
-                  ))}
+                <div className="pt-3 space-y-2.5">
+                  <span className="text-[9px] uppercase tracking-[0.2em] text-[#080B09]/40 font-medium block">
+                    Privileges
+                  </span>
+                  <ul className="space-y-2 text-xs text-[#080B09]/70 font-light">
+                    {tier.privileges.map((item, i) => (
+                      <li key={i} className="flex items-start gap-2 leading-tight">
+                        <Check className="w-3 h-3 text-[#C6A15B] shrink-0 mt-0.5" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </div>
 
-              <button
-                className={`w-full py-4 rounded-lg text-xs font-bold tracking-[0.2em] uppercase text-center transition-all flex items-center justify-center gap-2 ${
-                  plan.is_popular
-                    ? 'bg-gradient-to-r from-[#C9A84C] via-[#E8D48A] to-[#A07830] text-[#051810] hover:shadow-[0_0_25px_rgba(201,168,76,0.5)]'
-                    : 'bg-[#051810] text-white hover:bg-[#0F3826]'
-                }`}
-              >
-                <span>Request Membership Dossier</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
+              <div className="pt-6 mt-6 border-t border-[#D8D3C8]/60 space-y-3">
+                <button
+                  onClick={() => {
+                    setSelectedTier(tier.name);
+                    openEnquiry({
+                      title: `Application: ${tier.name} Circle`,
+                      subtitle: `Submit credentials for ${tier.name} tier admission. Bilateral compliance review.`,
+                      defaultVertical: 'Private Opportunities',
+                    });
+                  }}
+                  className="w-full py-3 bg-[#061C16] text-[#FCFBF7] text-[10px] uppercase tracking-[0.25em] font-medium hover:bg-[#C6A15B] hover:text-[#061C16] transition-all"
+                >
+                  APPLY FOR ACCESS
+                </button>
+                <div className="text-[9px] text-[#080B09]/50 text-center uppercase tracking-[0.15em]">
+                  {tier.vetting}
+                </div>
+              </div>
             </div>
           ))}
         </div>
 
-        {/* Private Application Section */}
-        <div className="max-w-3xl mx-auto rounded-2xl bg-[#FAFAF8] border border-[#E5EAE7] p-8 sm:p-14 shadow-lg">
-          <div className="text-center space-y-2 mb-10">
-            <span className="text-[10px] uppercase tracking-[0.25em] text-[#A07830] font-bold block">
-              Confidential Application
-            </span>
-            <h2 className="font-serif text-3xl sm:text-4xl text-[#082015] font-semibold">
-              Apply for NP GROUPS Privé Status
-            </h2>
-            <p className="text-xs text-[#7A8F83]">
-              Our Membership Vetting Committee reviews credentials within 24 hours.
-            </p>
-          </div>
+        {/* Admissions Protocol Guide */}
+        <div id="apply" className="bg-[#061C16] text-[#FCFBF7] border border-[#C6A15B]/20 p-8 sm:p-14 shadow-2xl">
+          <div className="max-w-4xl mx-auto space-y-8">
+            <div className="space-y-2">
+              <span className="text-[10px] uppercase tracking-[0.3em] text-[#C6A15B]">
+                CONFIDENTIAL APPLICATION PROTOCOL
+              </span>
+              <h2 className="font-serif text-3xl sm:text-4xl font-light text-white">
+                How Applications Are Evaluated
+              </h2>
+            </div>
 
-          <form className="space-y-5">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <div>
-                <label className="text-[10px] uppercase tracking-wider text-[#082015] font-bold block mb-1.5">
-                  Full Legal Name
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. Lord Alexander Sterling"
-                  className="w-full px-4 py-3.5 rounded-lg bg-white border border-[#E5EAE7] text-sm text-[#082015] focus:outline-none focus:border-[#082015] shadow-sm"
-                />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-4 border-t border-[#C6A15B]/20 text-xs text-[#D8D3C8]/80 font-light leading-relaxed">
+              <div className="space-y-2">
+                <span className="text-[#C6A15B] font-mono block">STAGE 01</span>
+                <h4 className="font-serif text-lg text-white font-normal">Preliminary Submission</h4>
+                <p>
+                  Submit your principal dossier including legal entity name, jurisdiction of tax residency, and asset categories of primary interest.
+                </p>
               </div>
-              <div>
-                <label className="text-[10px] uppercase tracking-wider text-[#082015] font-bold block mb-1.5">
-                  Primary Jurisdiction / City
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. London / Monaco / Dubai"
-                  className="w-full px-4 py-3.5 rounded-lg bg-white border border-[#E5EAE7] text-sm text-[#082015] focus:outline-none focus:border-[#082015] shadow-sm"
-                />
+
+              <div className="space-y-2">
+                <span className="text-[#C6A15B] font-mono block">STAGE 02</span>
+                <h4 className="font-serif text-lg text-white font-normal">Compliance Review</h4>
+                <p>
+                  Our Geneva compliance desk conducts independent KYC/AML and beneficial ownership confirmation under international banking protocols.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <span className="text-[#C6A15B] font-mono block">STAGE 03</span>
+                <h4 className="font-serif text-lg text-white font-normal">Desk Activation</h4>
+                <p>
+                  Upon admission, you are assigned a dedicated Acquisition Desk Officer and issued encrypted credentials for bilateral communications.
+                </p>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <div>
-                <label className="text-[10px] uppercase tracking-wider text-[#082015] font-bold block mb-1.5">
-                  Private Email
-                </label>
-                <input
-                  type="email"
-                  placeholder="principal@familyoffice.com"
-                  className="w-full px-4 py-3.5 rounded-lg bg-white border border-[#E5EAE7] text-sm text-[#082015] focus:outline-none focus:border-[#082015] shadow-sm"
-                />
+            <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-6 border-t border-white/10">
+              <div className="flex items-center gap-2 text-xs text-[#D8D3C8]/60">
+                <FileCheck2 className="w-4 h-4 text-[#C6A15B]" />
+                <span>Zero Public Indexation &middot; Bilateral NDA Encrypted</span>
               </div>
-              <div>
-                <label className="text-[10px] uppercase tracking-wider text-[#082015] font-bold block mb-1.5">
-                  Encrypted Phone / WhatsApp
-                </label>
-                <input
-                  type="text"
-                  placeholder="+44 7911 123456"
-                  className="w-full px-4 py-3.5 rounded-lg bg-white border border-[#E5EAE7] text-sm text-[#082015] focus:outline-none focus:border-[#082015] shadow-sm"
-                />
-              </div>
-            </div>
 
-            <div>
-              <label className="text-[10px] uppercase tracking-wider text-[#082015] font-bold block mb-1.5">
-                Primary Verticals of Interest
-              </label>
-              <select className="w-full px-4 py-3.5 rounded-lg bg-white border border-[#E5EAE7] text-sm text-[#082015] focus:outline-none focus:border-[#082015] shadow-sm">
-                <option>Aviation & Private Jets</option>
-                <option>Marine & Superyachts</option>
-                <option>Sovereign Private Islands</option>
-                <option>Haute Horlogerie & Rare Timepieces</option>
-                <option>Rare Gemstones & Jewellery</option>
-                <option>Hypercars & Historic Concours</option>
-                <option>All 11 Verticals (Institutional / Family Office)</option>
-              </select>
-            </div>
-
-            <div className="pt-4">
               <button
-                type="button"
-                className="w-full py-4 rounded-lg text-xs font-bold tracking-[0.2em] uppercase bg-[#051810] text-white hover:bg-[#0F3826] transition-all flex items-center justify-center gap-2 shadow-lg"
+                onClick={() =>
+                  openEnquiry({
+                    title: 'Private Circle Application',
+                    subtitle: 'Direct submission to the admissions committee.',
+                    defaultVertical: 'Private Opportunities',
+                  })
+                }
+                className="px-8 py-3.5 bg-[#FCFBF7] text-[#061C16] text-[10px] uppercase tracking-[0.25em] font-semibold hover:bg-[#C6A15B] transition-all"
               >
-                <Lock className="w-4 h-4 text-[#E8D48A]" />
-                <span>Submit Confidential Application</span>
+                SUBMIT APPLICATION DOSSIER
               </button>
             </div>
-          </form>
+          </div>
         </div>
       </div>
     </div>
