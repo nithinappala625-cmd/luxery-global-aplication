@@ -13,12 +13,12 @@ export default function Ticker() {
   ];
 
   return (
-    <div className="bg-[#0A3320] border-y border-[#1E7A47]/30 py-2.5 overflow-hidden">
+    <div className="bg-[#051810] border-y border-[#C9A84C]/25 py-3 overflow-hidden shadow-inner">
       <div className="flex animate-ticker whitespace-nowrap">
         {/* First set */}
         <div className="flex items-center gap-10 px-6">
           {items.map((item, idx) => (
-            <div key={`a-${idx}`} className="flex items-center gap-3 text-xs tracking-wider uppercase text-[#D4D8D2]">
+            <div key={`a-${idx}`} className="flex items-center gap-3 text-xs tracking-wider uppercase text-white/90 font-medium">
               <span className="text-[#C9A84C]">✦</span>
               <span>{item}</span>
             </div>
@@ -27,7 +27,7 @@ export default function Ticker() {
         {/* Second set for infinite seamless loop */}
         <div className="flex items-center gap-10 px-6">
           {items.map((item, idx) => (
-            <div key={`b-${idx}`} className="flex items-center gap-3 text-xs tracking-wider uppercase text-[#D4D8D2]">
+            <div key={`b-${idx}`} className="flex items-center gap-3 text-xs tracking-wider uppercase text-white/90 font-medium">
               <span className="text-[#C9A84C]">✦</span>
               <span>{item}</span>
             </div>

@@ -8,18 +8,18 @@ export default function StatsBar() {
   ];
 
   return (
-    <div id="stats" className="bg-[#071F12] border-y border-[#1E7A47]/30 py-8">
+    <div id="stats" className="bg-[#FAFAF8] border-y border-[#E5EAE7] py-10">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-6 divide-y md:divide-y-0 md:divide-x divide-[#1E7A47]/30 text-center">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-8 divide-y md:divide-y-0 md:divide-x divide-[#E5EAE7] text-center">
           {stats.map((stat, idx) => (
             <div key={stat.label} className={`pt-4 md:pt-0 ${idx > 0 ? 'md:px-4' : 'md:pr-4'}`}>
-              <div className="font-serif text-3xl sm:text-4xl text-[#C9A84C] font-normal tracking-tight">
+              <div className="font-serif text-3xl sm:text-5xl text-[#082015] font-light tracking-tight">
                 {stat.value}
               </div>
-              <div className="text-[11px] uppercase tracking-[0.2em] text-white font-semibold mt-1">
+              <div className="text-[11px] uppercase tracking-[0.2em] text-[#082015] font-bold mt-1.5">
                 {stat.label}
               </div>
-              <div className="text-[10px] text-[#8CA090] tracking-wider mt-0.5">
+              <div className="text-[10px] text-[#7A8F83] tracking-wider mt-0.5 font-medium">
                 {stat.sub}
               </div>
             </div>

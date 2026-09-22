@@ -35,16 +35,16 @@ export default function WhyNPGroups() {
   ];
 
   return (
-    <section id="why" className="py-24 bg-[#071F12] border-t border-[#1E7A47]/30">
+    <section id="why" className="py-28 bg-white border-t border-[#E5EAE7]">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-          <div className="inline-flex items-center gap-2 text-[10px] tracking-[0.3em] uppercase text-[#C9A84C] font-semibold">
+        <div className="text-center max-w-3xl mx-auto mb-20 space-y-4">
+          <div className="inline-flex items-center gap-2 text-[10px] tracking-[0.3em] uppercase text-[#A07830] font-bold">
             <span>The Trust Standard</span>
           </div>
-          <h2 className="font-serif text-3xl sm:text-5xl font-light text-white tracking-wide">
+          <h2 className="font-serif text-4xl sm:text-6xl font-light text-[#082015] tracking-tight">
             The NP GROUPS Distinction
           </h2>
-          <p className="text-sm text-[#8CA090] font-light leading-relaxed">
+          <p className="text-sm sm:text-base text-[#4A5E53] font-light leading-relaxed">
             Why sovereign wealth managers, private family offices, and discerning connoisseurs select our platform.
           </p>
         </div>
@@ -55,15 +55,15 @@ export default function WhyNPGroups() {
             return (
               <div
                 key={p.title}
-                className="rounded-lg bg-[#0A3320]/50 border border-[#1E7A47]/30 p-8 hover:border-[#C9A84C]/50 hover:bg-[#0F4A2C]/70 transition-all group"
+                className="rounded-xl bg-[#FAFAF8] border border-[#E5EAE7] p-8 hover:border-[#082015] hover:bg-white transition-all shadow-sm hover:shadow-xl group"
               >
-                <div className="w-12 h-12 rounded bg-[#04150D] border border-[#1E7A47]/40 flex items-center justify-center text-[#C9A84C] mb-6 group-hover:border-[#C9A84C]/50 transition-colors">
+                <div className="w-13 h-13 rounded-lg bg-[#051810] flex items-center justify-center text-[#E8D48A] mb-6 group-hover:bg-[#0F3826] transition-colors shadow">
                   <Icon className="w-6 h-6" />
                 </div>
-                <h3 className="font-serif text-xl text-white font-medium mb-3">
+                <h3 className="font-serif text-2xl text-[#082015] font-semibold mb-3">
                   {p.title}
                 </h3>
-                <p className="text-xs text-[#8CA090] font-light leading-relaxed">
+                <p className="text-xs sm:text-sm text-[#4A5E53] font-light leading-relaxed">
                   {p.desc}
                 </p>
               </div>

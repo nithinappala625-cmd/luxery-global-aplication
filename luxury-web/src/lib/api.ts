@@ -2,7 +2,7 @@ import { supabase } from './supabase';
 import { ALL_CATEGORIES, FEATURED_LISTINGS, LIVE_AUCTIONS, MEMBERSHIP_PLANS } from './constants';
 import { LuxuryCategory, LuxuryListing, LuxuryAuction, MembershipPlan } from '@/types';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api/v1';
 
 export async function getCategories(): Promise<LuxuryCategory[]> {
   try {
@@ -132,7 +132,18 @@ export async function getMembershipPlans(): Promise<MembershipPlan[]> {
     const res = await fetch(`${API_BASE}/memberships/plans`, { next: { revalidate: 300 } });
     if (res.ok) {
       const json = await res.json();
-      if (json.data && json.data.length > 0) return json.data;
+      if (json.data && json.data.length > 0) {
+        return json.data.map((p: any) => ({
+          id: p.slug || p.id,
+          name: p.name,
+          tier: (p.slug === 'black' ? 'platinum' : p.slug === 'prive' ? 'gold' : 'silver'),
+          tagline: p.badge || p.tagline || '',
+          price_annual: p.priceAnnual || p.price_annual || 0,
+          currency: p.currency || 'INR',
+          features: p.perks || p.features || [],
+          is_popular: p.isMostPopular || p.is_popular || false,
+        }));
+      }
     }
   } catch {}
 

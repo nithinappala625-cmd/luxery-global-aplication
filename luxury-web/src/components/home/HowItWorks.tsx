@@ -35,16 +35,16 @@ export default function HowItWorks() {
   ];
 
   return (
-    <section id="process" className="py-24 bg-[#04150D] border-t border-[#1E7A47]/30">
+    <section id="process" className="py-28 bg-[#FAFAF8] border-t border-[#E5EAE7]">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-          <div className="inline-flex items-center gap-2 text-[10px] tracking-[0.3em] uppercase text-[#C9A84C] font-semibold">
+        <div className="text-center max-w-3xl mx-auto mb-20 space-y-4">
+          <div className="inline-flex items-center gap-2 text-[10px] tracking-[0.3em] uppercase text-[#A07830] font-bold">
             <span>The Acquisition Protocol</span>
           </div>
-          <h2 className="font-serif text-3xl sm:text-5xl font-light text-white tracking-wide">
+          <h2 className="font-serif text-4xl sm:text-6xl font-light text-[#082015] tracking-tight">
             How NP GROUPS Operates
           </h2>
-          <p className="text-sm text-[#8CA090] font-light leading-relaxed">
+          <p className="text-sm sm:text-base text-[#4A5E53] font-light leading-relaxed">
             Institutional deal-making made frictionless for ultra-high-net-worth principals.
           </p>
         </div>
@@ -55,21 +55,21 @@ export default function HowItWorks() {
             return (
               <div
                 key={step.num}
-                className="relative rounded-lg bg-[#0A3320]/40 border border-[#1E7A47]/30 p-6 flex flex-col justify-between hover:border-[#C9A84C]/40 hover:bg-[#0F4A2C]/60 transition-all"
+                className="relative rounded-xl bg-white border border-[#E5EAE7] p-7 flex flex-col justify-between hover:border-[#082015] transition-all shadow-sm hover:shadow-lg group"
               >
                 <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="font-serif text-3xl text-[#C9A84C] font-light">
+                  <div className="flex items-center justify-between mb-5">
+                    <span className="font-serif text-4xl text-[#082015] font-light">
                       {step.num}
                     </span>
-                    <div className="w-9 h-9 rounded bg-[#04150D]/80 border border-[#1E7A47]/40 flex items-center justify-center text-[#C9A84C]">
-                      <Icon className="w-4 h-4" />
+                    <div className="w-10 h-10 rounded-lg bg-[#051810] flex items-center justify-center text-[#E8D48A] group-hover:bg-[#0F3826] transition-colors shadow">
+                      <Icon className="w-5 h-5" />
                     </div>
                   </div>
-                  <h3 className="font-serif text-lg text-white font-medium mb-2">
+                  <h3 className="font-serif text-xl text-[#082015] font-semibold mb-2.5">
                     {step.title}
                   </h3>
-                  <p className="text-xs text-[#8CA090] font-light leading-relaxed">
+                  <p className="text-xs text-[#4A5E53] font-light leading-relaxed">
                     {step.desc}
                   </p>
                 </div>

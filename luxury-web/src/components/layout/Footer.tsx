@@ -41,7 +41,7 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="bg-[#04150D] border-t border-[#1E7A47]/30 pt-20 pb-10 text-[#D4D8D2]">
+    <footer className="bg-[#051810] border-t border-[#C9A84C]/25 pt-20 pb-10 text-white/90">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 pb-16 border-b border-white/10">
           {/* Brand & Global Hubs */}
@@ -50,11 +50,11 @@ export default function Footer() {
               <span className="font-serif text-3xl font-semibold tracking-wider text-white">
                 NP GROUPS
               </span>
-              <p className="text-xs uppercase tracking-[0.3em] text-[#C9A84C] mt-1">
+              <p className="text-xs uppercase tracking-[0.3em] text-[#C9A84C] mt-1 font-semibold">
                 Global Luxury Legacy Platform
               </p>
             </div>
-            <p className="text-sm text-[#8CA090] max-w-sm leading-relaxed font-light">
+            <p className="text-sm text-white/70 max-w-sm leading-relaxed font-light">
               The world's premier marketplace and deal platform for extraordinary physical assets & sovereign experiences. Serving royal families, ultra-high-net-worth collectors, and family offices worldwide.
             </p>
 
@@ -67,11 +67,11 @@ export default function Footer() {
                 {globalHubs.map((hub) => (
                   <div
                     key={hub.city}
-                    className="px-3 py-1.5 rounded bg-[#071F12] border border-[#1E7A47]/30 text-xs flex items-center gap-1.5 text-white/90"
+                    className="px-3 py-1.5 rounded bg-black/40 border border-white/10 text-xs flex items-center gap-1.5 text-white/90"
                   >
                     <span>{hub.flag}</span>
                     <span className="font-medium">{hub.city}</span>
-                    <span className="text-[10px] text-[#8CA090]">({hub.address})</span>
+                    <span className="text-[10px] text-white/60">({hub.address})</span>
                   </div>
                 ))}
               </div>
@@ -86,7 +86,7 @@ export default function Footer() {
             <ul className="space-y-2 text-xs">
               {categories.map((c) => (
                 <li key={c.name}>
-                  <a href={c.href} className="text-[#8CA090] hover:text-[#C9A84C] transition-colors">
+                  <a href={c.href} className="text-white/70 hover:text-[#C9A84C] transition-colors">
                     {c.name}
                   </a>
                 </li>
@@ -102,7 +102,7 @@ export default function Footer() {
             <ul className="space-y-2 text-xs">
               {platform.map((p) => (
                 <li key={p.name}>
-                  <a href={p.href} className="text-[#8CA090] hover:text-[#C9A84C] transition-colors">
+                  <a href={p.href} className="text-white/70 hover:text-[#C9A84C] transition-colors">
                     {p.name}
                   </a>
                 </li>
@@ -118,7 +118,7 @@ export default function Footer() {
             <ul className="space-y-2 text-xs">
               {legal.map((l) => (
                 <li key={l.name}>
-                  <a href={l.href} className="text-[#8CA090] hover:text-[#C9A84C] transition-colors">
+                  <a href={l.href} className="text-white/70 hover:text-[#C9A84C] transition-colors">
                     {l.name}
                   </a>
                 </li>
@@ -128,18 +128,18 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#8CA090]">
+        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/60">
           <p>
             &copy; {new Date().getFullYear()} NP GROUPS Pvt Ltd &middot; Global Luxury Legacy Platform &middot; All Rights Reserved.
           </p>
           <div className="flex items-center gap-4">
-            <span className="px-2.5 py-1 rounded bg-[#071F12] border border-[#1E7A47]/30 text-[10px] uppercase tracking-wider text-[#C9A84C]">
+            <span className="px-2.5 py-1 rounded bg-black/40 border border-white/10 text-[10px] uppercase tracking-wider text-[#C9A84C]">
               ISO 27001 Certified
             </span>
-            <span className="px-2.5 py-1 rounded bg-[#071F12] border border-[#1E7A47]/30 text-[10px] uppercase tracking-wider text-[#C9A84C]">
+            <span className="px-2.5 py-1 rounded bg-black/40 border border-white/10 text-[10px] uppercase tracking-wider text-[#C9A84C]">
               AML / CFT Compliant
             </span>
-            <span className="px-2.5 py-1 rounded bg-[#071F12] border border-[#1E7A47]/30 text-[10px] uppercase tracking-wider text-[#C9A84C]">
+            <span className="px-2.5 py-1 rounded bg-black/40 border border-white/10 text-[10px] uppercase tracking-wider text-[#C9A84C]">
               Swiss Escrow Guard
             </span>
           </div>

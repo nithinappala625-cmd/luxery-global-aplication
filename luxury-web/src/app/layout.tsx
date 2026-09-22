@@ -20,7 +20,7 @@ const montserrat = Montserrat({
 
 export const metadata: Metadata = {
   title: 'NP GROUPS | Global Luxury Legacy Platform',
-  description: "The world's most exclusive luxury marketplace. Extraordinary assets, private jets, superyachts, sovereign islands, supercars, fine horology and high jewellery.",
+  description: "The world's most exclusive luxury marketplace. Extraordinary physical assets, private jets, superyachts, sovereign islands, supercars, fine horology and high jewellery.",
   keywords: ['luxury marketplace', 'private jets', 'superyachts', 'private islands', 'patek philippe', 'ferrari', 'haute horlogerie', 'np groups'],
 };
 
@@ -31,7 +31,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${cormorant.variable} ${montserrat.variable} scroll-smooth`}>
-      <body className="bg-[#04150D] text-[#D4D8D2] font-sans antialiased min-h-screen flex flex-col selection:bg-[#C9A84C] selection:text-[#04150D]">
+      <body className="bg-white text-[#082015] font-sans antialiased min-h-screen flex flex-col selection:bg-[#C9A84C] selection:text-white">
         <Navbar />
         <main className="flex-grow">{children}</main>
         <Footer />
