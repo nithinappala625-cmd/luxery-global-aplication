@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { Anchor, Users, Compass, Shield, ArrowRight, MapPin, Sparkles } from 'lucide-react';
+import { Ship, Calendar, MapPin, Users, Anchor, Compass, Shield, ArrowRight, Sparkles, Droplets, Waves, Globe } from 'lucide-react';
 import MarineCharterModal from '@/components/marine/MarineCharterModal';
 import { useLuxuryUI } from '@/components/layout/LuxuryShell';
+import { useCountry } from '@/lib/countryContext';
 import Link from 'next/link';
 
 interface YachtModel {
@@ -13,7 +14,7 @@ interface YachtModel {
   typeLabel: string;
   tagline: string;
   builder: string;
-  loa: string; // Length overall
+  loa: string;
   beam: string;
   draft: string;
   engines: string;
@@ -22,8 +23,8 @@ interface YachtModel {
   crew: number;
   range: string;
   speed: string;
-  askingPrice: string;
-  charterRatePerDay: string;
+  usdPrice: number;
+  usdCharterDaily: number;
   allowedEvents: string[];
   imageUrl: string;
   ownerOrBroker: string;
@@ -47,8 +48,8 @@ const marineFleet: YachtModel[] = [
     crew: 22,
     range: '5,000 Nautical Miles',
     speed: '18.5 Knots Max / 14 Knots Cruise',
-    askingPrice: '₹850 Cr (€94,000,000)',
-    charterRatePerDay: '₹45 Lakhs / day ($54,000)',
+    usdPrice: 105000000,
+    usdCharterDaily: 58000,
     allowedEvents: ['High-Profile Corporate Summits', 'Monaco Grand Prix VIP Berthing', 'Transoceanic Expeditions'],
     imageUrl: 'https://images.unsplash.com/photo-1569263979104-865ab7cd8d17?q=80&w=1200&auto=format&fit=crop',
     ownerOrBroker: 'Aurelia Delacroix · Monaco Marine Syndicate',
@@ -59,7 +60,7 @@ const marineFleet: YachtModel[] = [
     name: 'Sunseeker 131 Tri-Deck "Aura of Goa"',
     category: 'super',
     typeLabel: '40-Metre Tri-Deck Superyacht',
-    tagline: 'Perfect for private sunset celebrations, destination weddings, and coastal cruising in Goa & Mumbai Harbour.',
+    tagline: 'Perfect for private sunset celebrations, destination ocean weddings, and coastal cruising in Goa, Mumbai, or the French Riviera.',
     builder: 'Sunseeker International (UK)',
     loa: '40.05 Metres (131 ft)',
     beam: '8.09 Metres',
@@ -70,12 +71,12 @@ const marineFleet: YachtModel[] = [
     crew: 8,
     range: '1,500 Nautical Miles',
     speed: '25 Knots Max / 18 Knots Cruise',
-    askingPrice: '₹185 Cr (€20,500,000)',
-    charterRatePerDay: '₹18.5 Lakhs / day (Goa Charter)',
+    usdPrice: 22500000,
+    usdCharterDaily: 24000,
     allowedEvents: ['Private Sunset Yacht Parties & DJ Sets', 'Weddings & Pre-Wedding Shoots', 'VIP Anniversary Celebrations'],
     imageUrl: 'https://images.unsplash.com/photo-1540946485063-a40da27545f8?q=80&w=1200&auto=format&fit=crop',
     ownerOrBroker: 'Sameer Singhal · Goa Superyachts',
-    location: 'Goa (Mandovi) / Mumbai Harbour',
+    location: 'Goa (Mandovi) / Mumbai Harbour / Monaco',
   },
   {
     id: 'benetti-fb277',
@@ -93,8 +94,8 @@ const marineFleet: YachtModel[] = [
     crew: 29,
     range: '6,500 Nautical Miles',
     speed: '18 Knots Max',
-    askingPrice: '₹1,200 Cr (€135,000,000)',
-    charterRatePerDay: '₹65 Lakhs / day',
+    usdPrice: 145000000,
+    usdCharterDaily: 82000,
     allowedEvents: ['International Bilateral State Summits', 'Film Festival Gala Receptions', 'Private Island Expeditions'],
     imageUrl: 'https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?q=80&w=1200&auto=format&fit=crop',
     ownerOrBroker: 'Aurelia Delacroix · Monaco Marine Syndicate',
@@ -116,12 +117,12 @@ const marineFleet: YachtModel[] = [
     crew: 4,
     range: 'Transoceanic Sailing Capability',
     speed: '12 Knots under Sail / 10 Knots Engine',
-    askingPrice: '₹55 Cr (€6,100,000)',
-    charterRatePerDay: '₹6.5 Lakhs / day',
+    usdPrice: 6800000,
+    usdCharterDaily: 8500,
     allowedEvents: ['Family Receptions', 'Intimate Cocktail Evenings', 'Coral Island Snorkelling'],
     imageUrl: 'https://images.unsplash.com/photo-1605281317010-fe5ffe798166?q=80&w=1200&auto=format&fit=crop',
     ownerOrBroker: 'Sameer Singhal · Goa Superyachts',
-    location: 'Goa / Lakshadweep / Maldives',
+    location: 'Goa / Lakshadweep / Maldives / Greek Isles',
   },
   {
     id: 'damen-seaxplorer',
@@ -139,36 +140,39 @@ const marineFleet: YachtModel[] = [
     crew: 18,
     range: '6,000 Nautical Miles',
     speed: '15 Knots',
-    askingPrice: '₹420 Cr (€46,500,000)',
-    charterRatePerDay: '₹32 Lakhs / day',
+    usdPrice: 52000000,
+    usdCharterDaily: 42000,
     allowedEvents: ['Arctic / Antarctic Exploration', 'Scientific Research Expeditions', 'Deep Sea Submersible Missions'],
     imageUrl: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=1200&auto=format&fit=crop',
     ownerOrBroker: 'Polaris Maritime Desk',
-    location: 'North Sea / Mediterranean',
+    location: 'North Sea / Mediterranean / Norwegian Fjords',
   },
 ];
 
 const marineEventHighlights = [
   {
     title: 'Sunset Yacht Parties & Celebrations',
-    location: 'Goa Coastal Waters / Mumbai Harbour / Monaco',
+    location: 'Monaco / Goa Coastal Waters / Dubai Marina / Miami',
     description: 'Flybridge cocktail decks, professional DJ setups, live sushi and oyster bars with licensed marine security.',
     capacity: 'Up to 40 Guests',
     vessel: 'Sunseeker 131 or Azimut Grande',
+    usdEstimate: 24000,
   },
   {
     title: 'Weddings & Pre-Wedding Galas at Sea',
-    location: 'Goa Mandovi River & Arabian Sea / French Riviera',
+    location: 'French Riviera / Goa Mandovi & Arabian Sea / Amalfi Coast',
     description: 'Ceremonial vows against the open ocean sunset, floral archways, champagne fountains and tender guest shuttles.',
     capacity: 'Up to 50 Guests',
     vessel: '40m - 50m Tri-Deck Superyacht',
+    usdEstimate: 35000,
   },
   {
     title: 'Offshore Corporate Summits & Board Retreats',
-    location: 'Monaco / Dubai Marina / Goa Coast',
+    location: 'Monaco Port Hercule / Dubai / London Thames / Cannes',
     description: 'Satellite encrypted teleconferencing, private executive dining room, and absolute privacy from media or interference.',
     capacity: '12 - 20 Principals',
     vessel: 'Oceanco 73m or Benetti 90m Giga',
+    usdEstimate: 65000,
   },
   {
     title: 'Grand Prix & Film Festival VIP Berths',
@@ -176,6 +180,7 @@ const marineEventHighlights = [
     description: 'Guaranteed prime quay berthage with trackside or red-carpet views, executive hostess crew, and private yacht tender transfers.',
     capacity: 'VIP Passes included',
     vessel: 'Exclusive Berth Allocation',
+    usdEstimate: 75000,
   },
 ];
 
@@ -188,6 +193,7 @@ export default function MarinePage() {
   const [selectedPortForModal, setSelectedPortForModal] = useState<string | undefined>(undefined);
 
   const { openEnquiry } = useLuxuryUI();
+  const { country, formatPrice } = useCountry();
 
   const filteredFleet = marineFleet.filter((yacht) => {
     if (selectedCategory === 'all') return true;
@@ -201,179 +207,166 @@ export default function MarinePage() {
     setCharterModalOpen(true);
   };
 
-  const handleBookVessel = (vessel: YachtModel) => {
-    setSelectedVesselForModal(`${vessel.name} (${vessel.loa})`);
-    setSelectedEventTypeForModal(vessel.allowedEvents[0]);
-    setSelectedPortForModal(vessel.location);
+  const handleBookYacht = (yacht: YachtModel) => {
+    setSelectedVesselForModal(yacht.name);
+    setSelectedEventTypeForModal('Private Custom Yacht Charter');
+    setSelectedPortForModal(yacht.location);
     setCharterModalOpen(true);
   };
 
   return (
     <div className="bg-[#FCFBF7] text-[#080B09] min-h-screen pt-28 pb-32">
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
-        {/* Navigation Breadcrumb */}
-        <div className="py-6 border-b border-[#D8D3C8] mb-10 flex items-center justify-between text-xs">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 text-[#080B09]/70 hover:text-[#061C16] uppercase tracking-[0.25em] font-medium transition-colors"
-          >
-            <span>&larr; BACK TO NP GROUPS NETWORK</span>
-          </Link>
+
+        {/* Global Maritime Desk Awareness Bar */}
+        <div className="mb-6 p-4 rounded-xl bg-[#061C16] border border-[#C6A15B]/40 text-white flex flex-wrap items-center justify-between gap-4 shadow-lg">
           <div className="flex items-center gap-3">
-            <span className="text-[10px] uppercase tracking-[0.2em] text-[#9D7B3E] font-medium">
-              MYBA MEMBER &middot; LLOYD&apos;S REGISTER CLASS CERTIFIED
-            </span>
+            <span className="text-2xl">{country.flag}</span>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] uppercase tracking-[0.25em] text-[#C6A15B] font-bold">
+                  Active Maritime Syndicate Desk
+                </span>
+                <span className="px-2 py-0.5 rounded bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 text-[9px] font-mono uppercase">
+                  MYBA Compliant
+                </span>
+              </div>
+              <p className="text-xs sm:text-sm font-serif font-bold text-white mt-0.5">
+                {country.name} · Coastal Ports &amp; Yacht Harbours
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="text-right hidden sm:block">
+              <span className="text-[9px] uppercase tracking-wider text-[#F6F3EA]/60 block font-mono">
+                Currency &amp; Escrow
+              </span>
+              <span className="text-xs font-mono font-bold text-[#E8D48A]">
+                1 USD = {country.usdRate} {country.currency}
+              </span>
+            </div>
+            <Link
+              href="/portal"
+              className="px-3.5 py-1.5 rounded bg-[#C6A15B] text-[#061C16] text-[10px] font-bold uppercase tracking-widest hover:bg-[#E0C17E] transition-all"
+            >
+              Broker Portal
+            </Link>
           </div>
         </div>
 
-        {/* Marine Banner */}
-        <div className="relative bg-[#061C16] text-[#FCFBF7] p-8 sm:p-14 mb-12 border border-[#C6A15B]/20 overflow-hidden shadow-2xl">
-          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#C6A15B]/10 rounded-full blur-[140px] pointer-events-none" />
-
-          <div className="relative z-10 max-w-3xl space-y-4">
-            <div className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] text-[#C6A15B] font-medium">
-              <Anchor className="w-3.5 h-3.5" />
-              <span>SOVEREIGN MARITIME DESK</span>
-            </div>
-
-            <h1 className="font-serif text-4xl sm:text-6xl font-light text-white tracking-tight leading-[1.08]">
-              Mega Yachts, Superyacht Charters &amp; Private Parties
-            </h1>
-
-            <p className="text-sm sm:text-base text-[#D8D3C8]/85 font-light leading-relaxed max-w-2xl">
-              From private sunset celebrations in Goa &amp; Mumbai Harbour to Mediterranean megayacht berths in Monaco, weddings at sea, and polar explorer vessels.
-            </p>
-
-            <div className="pt-4 flex flex-wrap gap-4 items-center">
-              <button
-                onClick={() => {
-                  setSelectedVesselForModal(undefined);
-                  setSelectedEventTypeForModal(undefined);
-                  setCharterModalOpen(true);
-                }}
-                className="px-8 py-3.5 bg-[#FCFBF7] text-[#061C16] text-[10px] uppercase tracking-[0.25em] font-semibold hover:bg-[#C6A15B] hover:text-[#061C16] transition-all shadow-md"
-              >
-                BOOK YACHT CHARTER OR EVENT
-              </button>
-              <Link
-                href="/portal"
-                className="px-8 py-3.5 border border-[#C6A15B]/60 text-white text-[10px] uppercase tracking-[0.25em] font-medium hover:bg-[#C6A15B]/20 transition-all"
-              >
-                YACHT OWNER &amp; BROKER PORTAL
-              </Link>
-            </div>
+        {/* Header Section */}
+        <div className="text-center max-w-4xl mx-auto py-8 sm:py-12 space-y-4">
+          <div className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.3em] text-[#7A5410] font-extrabold bg-[#F5EEDB] px-3.5 py-1 rounded-full border border-[#C6A15B]/30">
+            <Ship className="w-3.5 h-3.5 text-[#7A5410]" />
+            <span>GLOBAL SUPERYACHT SYNDICATE</span>
           </div>
+
+          <h1 className="font-serif text-4xl sm:text-6xl lg:text-7xl font-bold text-[#061C16] tracking-tight leading-none drop-shadow-sm">
+            MARINE &amp; SUPERYACHTS
+          </h1>
+
+          <p className="font-serif text-xl sm:text-2xl text-[#143327] font-semibold italic">
+            Mega Yacht Charters, Sunset Celebrations, Ocean Weddings, and Certified Vessel Acquisitions.
+          </p>
+
+          <p className="text-xs sm:text-sm text-[#1A2E24] font-medium leading-relaxed max-w-2xl mx-auto pt-2">
+            Discreet charter brokerage under MYBA standard agreements, shipyard new-build allocations, and direct ownership transfers across Monaco, the French Riviera, Dubai Marina, and the Indian Ocean.
+          </p>
         </div>
 
-        {/* Tab & Subcategory Switcher */}
-        <div className="flex items-center justify-between border-b border-[#D8D3C8] pb-6 mb-8 gap-4 flex-wrap">
-          <div className="flex items-center gap-2 sm:gap-4">
+        {/* Mode Selector Tabs (Charter vs Sales) */}
+        <div className="flex items-center justify-between border-b border-[#D0C9BA] pb-6 mb-8 gap-4 flex-wrap">
+          <div className="flex items-center gap-3">
             <button
               onClick={() => setActiveTab('charter')}
-              className={`px-6 py-3 text-[11px] uppercase tracking-[0.25em] font-semibold transition-all ${
+              className={`px-6 py-3.5 text-xs uppercase tracking-[0.25em] font-extrabold transition-all rounded-lg shadow-sm ${
                 activeTab === 'charter'
-                  ? 'bg-[#061C16] text-[#FCFBF7] border border-[#061C16]'
-                  : 'bg-transparent text-[#080B09]/70 border border-[#D8D3C8] hover:border-[#061C16]'
+                  ? 'bg-[#061C16] text-[#F3E2B8] border border-[#061C16]'
+                  : 'bg-white text-[#061C16] border border-[#D0C9BA] hover:border-[#061C16]'
               }`}
             >
-              1. CHARTER &amp; PRIVATE PARTIES
+              1. YACHT CHARTER &amp; CELEBRATIONS
             </button>
             <button
               onClick={() => setActiveTab('sales')}
-              className={`px-6 py-3 text-[11px] uppercase tracking-[0.25em] font-semibold transition-all ${
+              className={`px-6 py-3.5 text-xs uppercase tracking-[0.25em] font-extrabold transition-all rounded-lg shadow-sm ${
                 activeTab === 'sales'
-                  ? 'bg-[#061C16] text-[#FCFBF7] border border-[#061C16]'
-                  : 'bg-transparent text-[#080B09]/70 border border-[#D8D3C8] hover:border-[#061C16]'
+                  ? 'bg-[#061C16] text-[#F3E2B8] border border-[#061C16]'
+                  : 'bg-white text-[#061C16] border border-[#D0C9BA] hover:border-[#061C16]'
               }`}
             >
               2. VESSEL SALES &amp; SYNDICATES
             </button>
           </div>
 
-          <div className="flex items-center gap-2 text-xs">
-            <button
-              onClick={() => setSelectedCategory('all')}
-              className={`px-3 py-1.5 text-[10px] uppercase tracking-[0.2em] font-medium transition-colors ${
-                selectedCategory === 'all' ? 'text-[#061C16] font-bold border-b border-[#061C16]' : 'text-[#080B09]/60'
-              }`}
-            >
-              All Vessels
-            </button>
-            <button
-              onClick={() => setSelectedCategory('mega')}
-              className={`px-3 py-1.5 text-[10px] uppercase tracking-[0.2em] font-medium transition-colors ${
-                selectedCategory === 'mega' ? 'text-[#061C16] font-bold border-b border-[#061C16]' : 'text-[#080B09]/60'
-              }`}
-            >
-              Mega Yachts (60m+)
-            </button>
-            <button
-              onClick={() => setSelectedCategory('super')}
-              className={`px-3 py-1.5 text-[10px] uppercase tracking-[0.2em] font-medium transition-colors ${
-                selectedCategory === 'super' ? 'text-[#061C16] font-bold border-b border-[#061C16]' : 'text-[#080B09]/60'
-              }`}
-            >
-              Superyachts
-            </button>
-            <button
-              onClick={() => setSelectedCategory('catamaran')}
-              className={`px-3 py-1.5 text-[10px] uppercase tracking-[0.2em] font-medium transition-colors ${
-                selectedCategory === 'catamaran' ? 'text-[#061C16] font-bold border-b border-[#061C16]' : 'text-[#080B09]/60'
-              }`}
-            >
-              Catamarans
-            </button>
-            <button
-              onClick={() => setSelectedCategory('explorer')}
-              className={`px-3 py-1.5 text-[10px] uppercase tracking-[0.2em] font-medium transition-colors ${
-                selectedCategory === 'explorer' ? 'text-[#061C16] font-bold border-b border-[#061C16]' : 'text-[#080B09]/60'
-              }`}
-            >
-              Explorer
-            </button>
+          {/* Subcategories Filter */}
+          <div className="flex items-center gap-1.5 bg-white p-1 rounded-lg border border-[#D0C9BA]">
+            {(['all', 'mega', 'super', 'catamaran', 'explorer'] as const).map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`px-3 py-1.5 text-[10px] uppercase tracking-[0.2em] font-bold rounded transition-colors ${
+                  selectedCategory === cat
+                    ? 'bg-[#061C16] text-[#F3E2B8]'
+                    : 'text-[#4A5E53] hover:text-[#061C16]'
+                }`}
+              >
+                {cat === 'all' ? 'All Vessels' : cat === 'mega' ? 'Mega Yachts' : cat === 'super' ? 'Superyachts' : cat === 'catamaran' ? 'Catamarans' : 'Explorers'}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Event Charter Strip */}
+        {/* Tab 1: Marine Events Strip */}
         {activeTab === 'charter' && (
           <div className="mb-16 space-y-6">
-            <div className="space-y-1">
-              <span className="text-[10px] uppercase tracking-[0.25em] text-[#9D7B3E] font-medium">
-                CURATED CELEBRATIONS AT SEA
-              </span>
-              <h3 className="font-serif text-2xl font-light text-[#061C16]">
-                Superyacht Parties, Weddings &amp; Offshore Summits
-              </h3>
+            <div className="flex items-end justify-between">
+              <div>
+                <span className="text-[10px] uppercase tracking-[0.25em] text-[#7A5410] font-extrabold bg-[#F5EEDB] px-2.5 py-0.5 rounded border border-[#C6A15B]/30 block w-fit mb-1">
+                  CELEBRATIONS &amp; BESPOKE EXPERIENCES
+                </span>
+                <h3 className="font-serif text-2xl sm:text-3xl font-bold text-[#061C16]">
+                  Curated Private Charters &amp; Ocean Galas
+                </h3>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {marineEventHighlights.map((evt, i) => (
                 <div
                   key={i}
-                  className="bg-white border border-[#D8D3C8] p-6 flex flex-col justify-between space-y-4 hover:border-[#061C16] transition-all hover:shadow-lg"
+                  className="bg-white border-2 border-[#D8D3C8] rounded-xl p-6 flex flex-col justify-between space-y-4 hover:border-[#061C16] transition-all hover:shadow-xl group"
                 >
                   <div className="space-y-2">
-                    <span className="text-[9px] uppercase tracking-[0.2em] text-[#C6A15B] font-medium block">
+                    <span className="text-[10px] uppercase tracking-[0.2em] text-[#7A5410] font-mono font-bold block bg-[#F9F8F5] px-2 py-0.5 rounded w-fit border border-[#D8D3C8]">
                       {evt.capacity}
                     </span>
-                    <h4 className="font-serif text-lg font-light text-[#061C16]">
+                    <h4 className="font-serif text-lg font-bold text-[#061C16] group-hover:text-[#0A3324] leading-snug">
                       {evt.title}
                     </h4>
-                    <p className="text-xs text-[#080B09]/70 font-light leading-relaxed">
+                    <p className="text-xs text-[#203127] font-medium leading-relaxed">
                       {evt.description}
                     </p>
-                    <div className="text-[10px] text-[#9D7B3E] font-medium pt-1">
-                      {evt.location}
+                    <div className="text-[10px] text-[#7A5410] font-bold pt-1">
+                      Location: {evt.location}
                     </div>
                   </div>
 
-                  <div className="pt-4 border-t border-[#D8D3C8]/60 flex items-center justify-between">
-                    <span className="text-[9px] uppercase tracking-widest text-[#080B09]/50 block">{evt.vessel}</span>
+                  <div className="pt-4 border-t border-[#D8D3C8] flex items-center justify-between">
+                    <div>
+                      <span className="text-[9px] uppercase tracking-wider text-[#4D6055] font-bold block">
+                        EST. CHARTER
+                      </span>
+                      <span className="font-serif font-extrabold text-base text-[#061C16]">
+                        {formatPrice(evt.usdEstimate)}
+                      </span>
+                    </div>
                     <button
                       onClick={() => handleBookEvent(evt)}
-                      className="px-3 py-1.5 bg-[#061C16] text-[#FCFBF7] text-[9px] uppercase tracking-widest font-semibold hover:bg-[#C6A15B] hover:text-[#061C16] transition-all"
+                      className="px-3.5 py-2 bg-[#061C16] text-[#F3E2B8] text-[10px] uppercase tracking-widest font-bold hover:bg-[#0D382A] hover:text-white transition-all rounded"
                     >
-                      BOOK EVENT
+                      BOOK
                     </button>
                   </div>
                 </div>
@@ -382,14 +375,14 @@ export default function MarinePage() {
           </div>
         )}
 
-        {/* Yacht Fleet Grid */}
+        {/* Yacht Fleet Grid with Punchy High-Contrast Typography */}
         <div className="space-y-6">
           <div className="flex items-center justify-between">
-            <h3 className="font-serif text-2xl sm:text-3xl font-light text-[#061C16]">
+            <h3 className="font-serif text-2xl sm:text-3xl font-bold text-[#061C16]">
               {activeTab === 'charter' ? 'Available Yachts for Charter &amp; Private Parties' : 'Vessels Available for Acquisition'}
             </h3>
-            <span className="text-xs text-[#080B09]/60 font-light">
-              {filteredFleet.length} Verified Vessels Listed
+            <span className="text-xs text-[#3C4E44] font-bold bg-[#EFECE4] px-3 py-1 rounded-full">
+              {filteredFleet.length} Verified Vessels
             </span>
           </div>
 
@@ -397,73 +390,81 @@ export default function MarinePage() {
             {filteredFleet.map((yacht) => (
               <div
                 key={yacht.id}
-                className="bg-white border border-[#D8D3C8] hover:border-[#061C16] transition-all duration-500 hover:shadow-2xl overflow-hidden flex flex-col justify-between"
+                className="bg-white border-2 border-[#D8D3C8] hover:border-[#061C16] rounded-2xl transition-all duration-300 hover:shadow-2xl overflow-hidden flex flex-col justify-between"
               >
                 {/* Image Stage with Badges */}
                 <div className="relative aspect-[16/10] overflow-hidden bg-[#061C16]">
                   <div
-                    className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 hover:scale-105"
+                    className="absolute inset-0 bg-cover bg-center transition-transform duration-700 hover:scale-105"
                     style={{ backgroundImage: `url('${yacht.imageUrl}')` }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#061C16]/95 via-transparent to-black/30" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#04130D]/95 via-transparent to-black/30" />
 
                   <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
-                    <span className="px-3 py-1 bg-[#061C16]/90 border border-[#C6A15B]/30 text-[#C6A15B] text-[9px] uppercase tracking-[0.2em] backdrop-blur-sm">
+                    <span className="px-3 py-1 bg-[#061C16]/95 border border-[#C6A15B] text-[#E8D48A] text-[10px] font-bold uppercase tracking-[0.2em] rounded backdrop-blur-sm shadow">
                       {yacht.typeLabel}
                     </span>
-                    <span className="px-2.5 py-1 bg-black/60 border border-white/20 text-white text-[9px] uppercase tracking-widest font-mono">
+                    <span className="px-2.5 py-1 bg-black/80 border border-white/20 text-white text-[10px] font-mono font-bold uppercase tracking-wider rounded">
                       LOA: {yacht.loa}
                     </span>
                   </div>
 
-                  <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-white text-xs font-light">
-                    <div className="flex items-center gap-1.5">
-                      <Users className="w-3.5 h-3.5 text-[#C6A15B]" />
+                  <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-white text-xs font-semibold">
+                    <div className="flex items-center gap-1.5 drop-shadow">
+                      <Users className="w-4 h-4 text-[#E8D48A]" />
                       <span>{yacht.guests} Guests &middot; {yacht.crew} Crew</span>
                     </div>
-                    <div className="flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-[#C6A15B]" />
+                    <div className="flex items-center gap-1.5 drop-shadow">
+                      <MapPin className="w-4 h-4 text-[#E8D48A]" />
                       <span>{yacht.location}</span>
                     </div>
                   </div>
                 </div>
 
-                {/* Details Area */}
-                <div className="p-8 space-y-6 flex-grow flex flex-col justify-between">
+                {/* Details Area with Rich High-Contrast Typography */}
+                <div className="p-7 sm:p-8 space-y-6 flex-grow flex flex-col justify-between">
                   <div className="space-y-4">
                     <div>
-                      <span className="text-[10px] uppercase tracking-[0.2em] text-[#9D7B3E] font-medium block">
+                      <span className="text-[10px] uppercase tracking-[0.25em] text-[#7A5410] font-extrabold bg-[#F5EEDB] px-3 py-1 rounded inline-block border border-[#C6A15B]/30 mb-2">
                         BROKER / OWNER: {yacht.ownerOrBroker}
                       </span>
-                      <h4 className="font-serif text-2xl font-light text-[#061C16] leading-snug mt-1">
+                      <h4 className="font-serif text-2xl sm:text-[1.85rem] font-bold text-[#061C16] leading-snug tracking-tight">
                         {yacht.name}
                       </h4>
-                      <p className="text-xs text-[#080B09]/75 font-light leading-relaxed mt-2">
+                      <p className="text-[13px] sm:text-sm text-[#1F2C24] font-medium leading-relaxed mt-2">
                         {yacht.tagline}
                       </p>
                     </div>
 
-                    <div className="bg-[#FCFBF7] border border-[#D8D3C8] p-4 text-xs space-y-2">
-                      <div className="grid grid-cols-2 gap-2">
+                    <div className="bg-[#F9F8F5] border border-[#D0C9BA] rounded-xl p-4 sm:p-5 text-xs space-y-3 shadow-sm">
+                      <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <span className="text-[9px] uppercase tracking-widest text-[#080B09]/50 block">BUILDER &amp; YEAR:</span>
-                          <span className="font-medium text-[#061C16] text-[11px]">{yacht.builder}</span>
+                          <span className="text-[9px] uppercase tracking-wider text-[#4D6055] font-bold block mb-0.5">
+                            BUILDER &amp; SPECIFICATIONS:
+                          </span>
+                          <span className="font-bold text-[#061C16] text-xs sm:text-[13px] leading-tight block">
+                            {yacht.builder} ({yacht.loa})
+                          </span>
                         </div>
                         <div>
-                          <span className="text-[9px] uppercase tracking-widest text-[#080B09]/50 block">ENGINES:</span>
-                          <span className="font-medium text-[#061C16] text-[11px]">{yacht.engines}</span>
+                          <span className="text-[9px] uppercase tracking-wider text-[#4D6055] font-bold block mb-0.5">
+                            POWERPLANT / SPEED:
+                          </span>
+                          <span className="font-bold text-[#061C16] text-xs sm:text-[13px] leading-tight block">
+                            {yacht.engines} &middot; {yacht.speed}
+                          </span>
                         </div>
                       </div>
 
-                      <div className="pt-2 border-t border-[#D8D3C8]/60">
-                        <span className="text-[9px] uppercase tracking-widest text-[#080B09]/50 block mb-1">
+                      <div className="pt-3 border-t border-[#D0C9BA]">
+                        <span className="text-[9px] uppercase tracking-wider text-[#4D6055] font-bold block mb-1.5">
                           RECOMMENDED CELEBRATIONS &amp; ITINERARIES:
                         </span>
                         <div className="flex flex-wrap gap-1.5">
                           {yacht.allowedEvents.map((evt, idx) => (
                             <span
                               key={idx}
-                              className="px-2 py-0.5 bg-white border border-[#D8D3C8] text-[9px] text-[#061C16]"
+                              className="px-2.5 py-1 bg-white border border-[#D0C9BA] text-[10px] font-bold text-[#061C16] rounded shadow-xs"
                             >
                               &bull; {evt}
                             </span>
@@ -474,70 +475,58 @@ export default function MarinePage() {
                   </div>
 
                   {/* Actions & Price Bar */}
-                  <div className="pt-6 border-t border-[#D8D3C8] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+                  <div className="pt-6 border-t border-[#D0C9BA] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
                     <div>
-                      <span className="text-[9px] uppercase tracking-widest text-[#080B09]/50 block">
-                        {activeTab === 'charter' ? 'DAILY CHARTER RATE' : 'VALUATION FOR SALE'}
+                      <span className="text-[10px] uppercase tracking-wider text-[#4D6055] font-bold block mb-0.5">
+                        {activeTab === 'charter' ? 'DAILY CHARTER VALUATION' : 'VALUATION FOR SALE'}
                       </span>
-                      <span className="font-serif text-xl font-medium text-[#061C16]">
-                        {activeTab === 'charter' ? yacht.charterRatePerDay : yacht.askingPrice}
-                      </span>
+                      <div className="flex items-baseline gap-2">
+                        <span className="font-serif text-2xl sm:text-3xl font-extrabold text-[#061C16] tracking-tight">
+                          {activeTab === 'charter'
+                            ? `${formatPrice(yacht.usdCharterDaily)} / day`
+                            : formatPrice(yacht.usdPrice)}
+                        </span>
+                        <span className="text-[10px] text-[#7A5410] font-mono font-bold bg-[#F5EEDB] px-2 py-0.5 rounded border border-[#C6A15B]/30">
+                          {country.currency}
+                        </span>
+                      </div>
                     </div>
 
                     <div className="flex items-center gap-3">
                       {activeTab === 'charter' ? (
                         <button
-                          onClick={() => handleBookVessel(yacht)}
-                          className="px-6 py-3 bg-[#061C16] text-[#FCFBF7] text-[10px] uppercase tracking-[0.2em] font-semibold hover:bg-[#C6A15B] hover:text-[#061C16] transition-all shadow-md"
+                          onClick={() => handleBookYacht(yacht)}
+                          className="px-6 py-3.5 bg-[#061C16] hover:bg-[#0D382A] text-[#F3E2B8] hover:text-white text-[11px] uppercase tracking-[0.2em] font-bold transition-all shadow-md hover:shadow-xl hover:-translate-y-0.5 rounded border border-[#C6A15B]/40"
                         >
-                          BOOK YACHT CHARTER
+                          BOOK CHARTER CRUISE
                         </button>
                       ) : (
                         <button
                           onClick={() =>
                             openEnquiry({
-                              title: `Vessel Acquisition: ${yacht.name}`,
-                              subtitle: 'Request Lloyd\'s survey documentation, GA drawings, and bilateral purchase contract.',
+                              title: `Vessel Acquisition Prospectus: ${yacht.name}`,
+                              subtitle: `Valuation: ${formatPrice(yacht.usdPrice)}. Full naval architecture blueprints, survey reports, and transfer escrow documentation.`,
                               assetTitle: yacht.name,
-                              defaultVertical: 'Marine',
+                              defaultVertical: 'Marine & Superyachts',
                             })
                           }
-                          className="px-6 py-3 bg-[#061C16] text-[#FCFBF7] text-[10px] uppercase tracking-[0.2em] font-semibold hover:bg-[#C6A15B] hover:text-[#061C16] transition-all shadow-md"
+                          className="px-6 py-3.5 bg-[#061C16] hover:bg-[#0D382A] text-[#F3E2B8] hover:text-white text-[11px] uppercase tracking-[0.2em] font-bold transition-all shadow-md hover:shadow-xl hover:-translate-y-0.5 rounded border border-[#C6A15B]/40"
                         >
                           REQUEST PROSPECTUS
                         </button>
                       )}
                     </div>
                   </div>
+
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Yacht Owner Consignment Strip */}
-        <div className="mt-20 p-8 sm:p-12 bg-[#061C16] text-[#FCFBF7] border border-[#C6A15B]/20 flex flex-col md:flex-row items-center justify-between gap-8">
-          <div className="space-y-2 text-center md:text-left">
-            <span className="text-[10px] uppercase tracking-[0.3em] text-[#C6A15B] block">
-              YACHT OWNERS &amp; CAPTAINS
-            </span>
-            <h3 className="font-serif text-2xl font-light text-white">
-              List Your Vessel for Charter or Private Sale
-            </h3>
-            <p className="text-xs text-[#D8D3C8]/70 font-light max-w-xl">
-              Monetize empty berths, list for private parties in Goa, Cannes or Monaco, and receive direct pre-screened client charter mandates with zero commission leakage.
-            </p>
-          </div>
-
-          <Link
-            href="/portal"
-            className="px-8 py-3.5 bg-[#FCFBF7] text-[#061C16] text-[10px] uppercase tracking-[0.25em] font-semibold hover:bg-[#C6A15B] transition-all whitespace-nowrap"
-          >
-            ENTER YACHT BROKER PORTAL
-          </Link>
-        </div>
       </div>
 
+      {/* Live Yacht Charter Modal */}
       <MarineCharterModal
         isOpen={charterModalOpen}
         onClose={() => setCharterModalOpen(false)}

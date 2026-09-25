@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { Watch, Search, ShieldCheck, UserCheck, Check, ArrowRight, SlidersHorizontal, ArrowUpDown } from 'lucide-react';
+import { Watch, Search, ShieldCheck, UserCheck, Check, ArrowRight, SlidersHorizontal, ArrowUpDown, Globe } from 'lucide-react';
 import { useLuxuryUI } from '@/components/layout/LuxuryShell';
+import { useCountry } from '@/lib/countryContext';
 import Link from 'next/link';
 
 interface WatchItem {
@@ -11,8 +12,7 @@ interface WatchItem {
   model: string;
   reference: string;
   tagline: string;
-  price: number;
-  priceFormatted: string;
+  usdPrice: number;
   year: string;
   caseMaterial: string;
   caseDiameter: string;
@@ -35,9 +35,8 @@ const watchInventory: WatchItem[] = [
     brand: 'Patek Philippe',
     model: 'Grandmaster Chime 6300G-010',
     reference: 'Ref. 6300G',
-    tagline: 'The most complicated wrist watch in regular production. 20 complications, reversible white gold case.',
-    price: 325000000,
-    priceFormatted: '₹32.5 Cr ($3,900,000)',
+    tagline: 'The most complicated wristwatch in regular production. 20 complications, reversible white gold case.',
+    usdPrice: 3900000,
     year: '2023',
     caseMaterial: '18K White Gold Hand-Guilloché',
     caseDiameter: '47.7 mm',
@@ -48,7 +47,7 @@ const watchInventory: WatchItem[] = [
     boxAndPapers: true,
     warranty: 'Factory Sealed Double Boxed & Certificate of Origin',
     imageUrl: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=800&auto=format&fit=crop',
-    sellerName: 'Laurent Mercier &middot; Independent Horology Broker',
+    sellerName: 'Laurent Mercier · Independent Horology Broker',
     sellerType: 'independent_broker',
     sellerLocation: 'Geneva / Zurich',
     sellerRating: 5.0,
@@ -59,8 +58,7 @@ const watchInventory: WatchItem[] = [
     model: 'Cosmograph Daytona Platinum Ice Blue Dial',
     reference: 'Ref. 116506-0002',
     tagline: 'Solid 950 Platinum with iconic ice blue sunray dial and chestnut brown Cerachrom bezel.',
-    price: 9500000,
-    priceFormatted: '₹95 Lakhs ($115,000)',
+    usdPrice: 115000,
     year: '2024',
     caseMaterial: '950 Platinum',
     caseDiameter: '40 mm',
@@ -71,9 +69,9 @@ const watchInventory: WatchItem[] = [
     boxAndPapers: true,
     warranty: '5-Year International Rolex Factory Warranty',
     imageUrl: 'https://images.unsplash.com/photo-1547996160-81dfa63595aa?q=80&w=800&auto=format&fit=crop',
-    sellerName: 'Vikram K. &middot; Private Vault Collector',
+    sellerName: 'Vikram K. · Private Vault Collector',
     sellerType: 'private_collector',
-    sellerLocation: 'Mumbai &middot; Bandra Kurla',
+    sellerLocation: 'Mumbai · Bandra Kurla',
     sellerRating: 4.96,
   },
   {
@@ -81,9 +79,8 @@ const watchInventory: WatchItem[] = [
     brand: 'Audemars Piguet',
     model: 'Royal Oak "Jumbo" Extra-Thin 18K Yellow Gold',
     reference: 'Ref. 16202BA.OO.1240BA.01',
-    tagline: '50th Anniversary tribute in solid 18K yellow gold with smoke yellow-gold Petite Tapisserie dial.',
-    price: 8800000,
-    priceFormatted: '₹88 Lakhs ($106,000)',
+    tagline: '50th Anniversary tribute in solid 18K yellow gold with smoked yellow-gold Petite Tapisserie dial.',
+    usdPrice: 106000,
     year: '2023',
     caseMaterial: '18K Yellow Gold',
     caseDiameter: '39 mm',
@@ -94,7 +91,7 @@ const watchInventory: WatchItem[] = [
     boxAndPapers: true,
     warranty: 'Audemars Piguet Extended 5-Year Warranty',
     imageUrl: 'https://images.unsplash.com/photo-1523170335258-f5ed11844a49?q=80&w=800&auto=format&fit=crop',
-    sellerName: 'Philippe Laurent &middot; Independent Watch Consignor',
+    sellerName: 'Philippe Laurent · Independent Watch Consignor',
     sellerType: 'independent_broker',
     sellerLocation: 'Monaco / London',
     sellerRating: 4.98,
@@ -105,8 +102,7 @@ const watchInventory: WatchItem[] = [
     model: 'RM 11-03 Flyback Chronograph Titanium',
     reference: 'Ref. RM 11-03 Ti',
     tagline: 'Ergonomic tonneau architecture with variable-geometry skeletonized rotor and countdown timer.',
-    price: 24500000,
-    priceFormatted: '₹2.45 Cr ($295,000)',
+    usdPrice: 295000,
     year: '2022',
     caseMaterial: 'Grade 5 Titanium',
     caseDiameter: '44.5 x 49.9 mm',
@@ -127,9 +123,8 @@ const watchInventory: WatchItem[] = [
     brand: 'Patek Philippe',
     model: 'Nautilus 5711/1R-001 Rose Gold Chocolate Dial',
     reference: 'Ref. 5711/1R',
-    tagline: 'The ultimate luxury sports icon. Discontinued reference with high investment appreciation.',
-    price: 13500000,
-    priceFormatted: '₹1.35 Cr ($162,000)',
+    tagline: 'The ultimate luxury sports icon. Discontinued reference with strong international secondary liquidity.',
+    usdPrice: 162000,
     year: '2021',
     caseMaterial: '18K Rose Gold',
     caseDiameter: '40 mm',
@@ -140,7 +135,7 @@ const watchInventory: WatchItem[] = [
     boxAndPapers: true,
     warranty: 'Complete Original Set, Patek Certificate of Origin',
     imageUrl: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=800&auto=format&fit=crop',
-    sellerName: 'Kunal Zaveri &middot; Private Collector',
+    sellerName: 'Kunal Zaveri · Private Collector',
     sellerType: 'private_collector',
     sellerLocation: 'Mumbai / Antwerp',
     sellerRating: 4.97,
@@ -151,8 +146,7 @@ const watchInventory: WatchItem[] = [
     model: 'Overseas Tourbillon Ultra-Thin Blue Lacquer',
     reference: 'Ref. 6000V/110A-B544',
     tagline: 'Maltese cross tourbillon cage at 6 o\'clock with peripheral rotor and quick-change interchangeable straps.',
-    price: 11800000,
-    priceFormatted: '₹1.18 Cr ($142,000)',
+    usdPrice: 142000,
     year: '2023',
     caseMaterial: 'Stainless Steel',
     caseDiameter: '42.5 mm',
@@ -163,7 +157,7 @@ const watchInventory: WatchItem[] = [
     boxAndPapers: true,
     warranty: 'Vacheron Constantin 8-Year Passport Warranty',
     imageUrl: 'https://images.unsplash.com/photo-1434056886845-dac89ffe9b56?q=80&w=800&auto=format&fit=crop',
-    sellerName: 'Laurent Mercier &middot; Independent Horology Broker',
+    sellerName: 'Laurent Mercier · Independent Horology Broker',
     sellerType: 'independent_broker',
     sellerLocation: 'Geneva / Paris',
     sellerRating: 5.0,
@@ -175,117 +169,132 @@ export default function WatchesPage() {
   const [selectedBrand, setSelectedBrand] = useState('All');
   const [sortBy, setSortBy] = useState<'featured' | 'price-asc' | 'price-desc'>('featured');
   const { openEnquiry } = useLuxuryUI();
+  const { country, formatPrice } = useCountry();
 
   const brands = ['All', 'Patek Philippe', 'Rolex', 'Audemars Piguet', 'Richard Mille', 'Vacheron Constantin'];
 
   const filteredWatches = watchInventory
     .filter((w) => {
-      const matchBrand = selectedBrand === 'All' || w.brand === selectedBrand;
-      const matchSearch =
+      const matchesBrand = selectedBrand === 'All' || w.brand === selectedBrand;
+      const matchesSearch =
         w.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        w.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
         w.reference.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        w.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
         w.sellerName.toLowerCase().includes(searchTerm.toLowerCase());
-      return matchBrand && matchSearch;
+      return matchesBrand && matchesSearch;
     })
     .sort((a, b) => {
-      if (sortBy === 'price-asc') return a.price - b.price;
-      if (sortBy === 'price-desc') return b.price - a.price;
+      if (sortBy === 'price-asc') return a.usdPrice - b.usdPrice;
+      if (sortBy === 'price-desc') return b.usdPrice - a.usdPrice;
       return 0;
     });
 
   return (
     <div className="bg-[#FCFBF7] text-[#080B09] min-h-screen pt-28 pb-32">
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
-        {/* Navigation Breadcrumb */}
-        <div className="py-6 border-b border-[#D8D3C8] mb-10 flex items-center justify-between text-xs">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 text-[#080B09]/70 hover:text-[#061C16] uppercase tracking-[0.25em] font-medium transition-colors"
-          >
-            <span>&larr; BACK TO NP GROUPS NETWORK</span>
-          </Link>
+
+        {/* Global Awareness Bar */}
+        <div className="mb-6 p-4 rounded-xl bg-[#061C16] border border-[#C6A15B]/40 text-white flex flex-wrap items-center justify-between gap-4 shadow-lg">
           <div className="flex items-center gap-3">
-            <span className="text-[10px] uppercase tracking-[0.2em] text-[#9D7B3E] font-medium">
-              STRICTLY FOR SALE &middot; ZERO RENTAL &middot; SWISS VAULT CUSTODY
-            </span>
+            <span className="text-2xl">{country.flag}</span>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] uppercase tracking-[0.25em] text-[#C6A15B] font-bold">
+                  Sovereign Horology Desk
+                </span>
+                <span className="px-2 py-0.5 rounded bg-amber-950/80 border border-amber-500/40 text-amber-300 text-[9px] font-mono uppercase font-bold">
+                  STRICTLY SALES ONLY &middot; ZERO RENTAL
+                </span>
+              </div>
+              <p className="text-xs sm:text-sm font-serif font-bold text-white mt-0.5">
+                {country.name} · Curated Vault Deliveries in {country.currency}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="text-right hidden sm:block">
+              <span className="text-[9px] uppercase tracking-wider text-[#F6F3EA]/60 block font-mono">
+                Currency Conversion
+              </span>
+              <span className="text-xs font-mono font-bold text-[#E8D48A]">
+                1 USD = {country.usdRate} {country.currency}
+              </span>
+            </div>
+            <Link
+              href="/portal"
+              className="px-3.5 py-1.5 rounded bg-[#C6A15B] text-[#061C16] text-[10px] font-bold uppercase tracking-widest hover:bg-[#E0C17E] transition-all"
+            >
+              Broker Portal
+            </Link>
           </div>
         </div>
 
-        {/* Watches Header */}
-        <div className="relative bg-[#061C16] text-[#FCFBF7] p-8 sm:p-14 mb-12 border border-[#C6A15B]/20 overflow-hidden shadow-2xl">
-          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#C6A15B]/10 rounded-full blur-[140px] pointer-events-none" />
-
-          <div className="relative z-10 max-w-3xl space-y-4">
-            <div className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] text-[#C6A15B] font-medium">
-              <Watch className="w-3.5 h-3.5" />
-              <span>HAUTE HORLOGERIE &amp; GRAND COMPLICATIONS</span>
-            </div>
-
-            <h1 className="font-serif text-4xl sm:text-6xl font-light text-white tracking-tight leading-[1.08]">
-              Luxury Timepieces &middot; Sales Only
-            </h1>
-
-            <p className="text-sm sm:text-base text-[#D8D3C8]/85 font-light leading-relaxed max-w-2xl">
-              Authentic luxury timepieces from verified independent horology brokers and private collectors worldwide. Every timepiece is physically inspected and backed by complete provenance papers.
-            </p>
-
-            <div className="pt-2 flex items-center gap-3 text-xs text-[#C6A15B]">
-              <ShieldCheck className="w-4 h-4" />
-              <span>Independent Broker &amp; Private Collector Verified Inventory &middot; Escrow Protection Guaranteed</span>
-            </div>
+        {/* Header Section */}
+        <div className="text-center max-w-4xl mx-auto py-8 sm:py-12 space-y-4">
+          <div className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.3em] text-[#7A5410] font-extrabold bg-[#F5EEDB] px-3.5 py-1 rounded-full border border-[#C6A15B]/30">
+            <Watch className="w-3.5 h-3.5 text-[#7A5410]" />
+            <span>CERTIFIED HAUTE HOROLOGY SALON</span>
           </div>
+
+          <h1 className="font-serif text-4xl sm:text-6xl lg:text-7xl font-bold text-[#061C16] tracking-tight leading-none drop-shadow-sm">
+            HAUTE HOROLOGY &amp; TIMEPIECES
+          </h1>
+
+          <p className="font-serif text-xl sm:text-2xl text-[#143327] font-semibold italic">
+            Physical Vault In-Stock Timepieces, Independent Master Watchmakers, and Bilateral Private Treaty.
+          </p>
+
+          <p className="text-xs sm:text-sm text-[#1A2E24] font-medium leading-relaxed max-w-2xl mx-auto pt-2">
+            Every timepiece inspected by independent Swiss horologists, delivered with factory extract of archives, original presentation cases, and guaranteed authentic provenance.
+          </p>
         </div>
 
-        {/* E-Commerce Search & Filter Bar (Flipkart / Amazon style layout with luxury aesthetic) */}
-        <div className="bg-white border border-[#D8D3C8] p-6 mb-10 shadow-sm space-y-5">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            {/* Search Input */}
-            <div className="relative w-full md:w-96">
-              <Search className="w-4 h-4 absolute left-3.5 top-3.5 text-[#9D7B3E]" />
+        {/* Search, Filter & Sorter Toolbar */}
+        <div className="bg-white border-2 border-[#D8D3C8] rounded-xl p-4 sm:p-6 mb-10 space-y-4 shadow-sm">
+          <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+            {/* Search input */}
+            <div className="relative flex-grow max-w-md">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#7A5410]" />
               <input
                 type="text"
+                placeholder="Search reference, brand, complication, or broker name..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search reference, model, or broker name..."
-                className="w-full pl-10 pr-4 py-2.5 bg-[#FCFBF7] border border-[#D8D3C8] text-xs focus:outline-none focus:border-[#061C16]"
+                className="w-full pl-10 pr-4 py-2.5 bg-[#FAF9F5] border border-[#D0C9BA] rounded-lg text-xs text-[#061C16] placeholder-[#7A8F83] focus:border-[#061C16] outline-none font-medium"
               />
             </div>
 
-            {/* Price Sort & Counter */}
-            <div className="flex items-center justify-between w-full md:w-auto gap-4">
-              <span className="text-xs text-[#080B09]/60 font-light">
-                Showing <strong>{filteredWatches.length}</strong> authenticated timepieces
+            {/* Price sort */}
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] uppercase tracking-wider text-[#4D6055] font-bold whitespace-nowrap">
+                SORT VALUATION:
               </span>
-
-              <div className="flex items-center gap-2">
-                <ArrowUpDown className="w-3.5 h-3.5 text-[#9D7B3E]" />
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as any)}
-                  className="px-3 py-2 bg-[#FCFBF7] border border-[#D8D3C8] text-xs focus:outline-none focus:border-[#061C16]"
-                >
-                  <option value="featured">Sort by: Curated Featured</option>
-                  <option value="price-desc">Price: High to Low</option>
-                  <option value="price-asc">Price: Low to High</option>
-                </select>
-              </div>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as any)}
+                className="px-3 py-2 bg-[#FAF9F5] border border-[#D0C9BA] rounded-lg text-xs text-[#061C16] font-bold outline-none"
+              >
+                <option value="featured">Featured Curations</option>
+                <option value="price-desc">Price: High to Low</option>
+                <option value="price-asc">Price: Low to High</option>
+              </select>
             </div>
           </div>
 
-          {/* Brand Pills Filter Strip */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 border-t border-[#D8D3C8]/60 pt-4">
-            <span className="text-[10px] uppercase tracking-widest text-[#080B09]/50 font-medium mr-2 whitespace-nowrap">
-              Manufacture:
+          {/* Brand pills */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none pt-2 border-t border-[#D8D3C8]">
+            <span className="text-[10px] uppercase tracking-wider text-[#4D6055] font-bold mr-1 whitespace-nowrap">
+              BRANDS:
             </span>
             {brands.map((b) => (
               <button
                 key={b}
                 onClick={() => setSelectedBrand(b)}
-                className={`px-4 py-1.5 text-[11px] uppercase tracking-wider font-medium whitespace-nowrap transition-all ${
+                className={`px-4 py-1.5 text-[11px] uppercase tracking-wider font-bold whitespace-nowrap transition-all rounded ${
                   selectedBrand === b
-                    ? 'bg-[#061C16] text-[#FCFBF7]'
-                    : 'bg-[#FCFBF7] text-[#080B09]/70 border border-[#D8D3C8] hover:border-[#061C16]'
+                    ? 'bg-[#061C16] text-[#F3E2B8]'
+                    : 'bg-[#FAF9F5] text-[#061C16] border border-[#D0C9BA] hover:border-[#061C16]'
                 }`}
               >
                 {b}
@@ -299,62 +308,62 @@ export default function WatchesPage() {
           {filteredWatches.map((watch) => (
             <div
               key={watch.id}
-              className="group bg-white border border-[#D8D3C8] hover:border-[#061C16] transition-all duration-500 hover:shadow-xl flex flex-col justify-between overflow-hidden"
+              className="group bg-white border-2 border-[#D8D3C8] hover:border-[#061C16] rounded-2xl transition-all duration-300 hover:shadow-2xl flex flex-col justify-between overflow-hidden"
             >
               <div>
                 {/* Watch Image Banner */}
                 <div className="relative aspect-square overflow-hidden bg-[#061C16]">
                   <div
-                    className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 group-hover:scale-105"
+                    className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
                     style={{ backgroundImage: `url('${watch.imageUrl}')` }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#061C16]/80 via-transparent to-black/20" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#04130D]/80 via-transparent to-black/20" />
 
                   {/* Top Badges */}
                   <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
-                    <span className="px-2.5 py-1 bg-[#061C16]/90 border border-[#C6A15B]/30 text-[#C6A15B] text-[9px] uppercase tracking-[0.2em] backdrop-blur-sm">
+                    <span className="px-2.5 py-1 bg-[#061C16]/95 border border-[#C6A15B] text-[#E8D48A] text-[9px] font-bold uppercase tracking-[0.2em] rounded backdrop-blur-sm shadow">
                       {watch.condition}
                     </span>
-                    <span className="px-2.5 py-1 bg-black/60 border border-white/20 text-white text-[9px] uppercase tracking-widest font-mono">
+                    <span className="px-2.5 py-1 bg-black/80 border border-white/20 text-white text-[9px] uppercase tracking-widest font-mono font-bold rounded">
                       {watch.reference}
                     </span>
                   </div>
 
-                  <div className="absolute bottom-3 left-4 right-4 text-white text-[10px] tracking-widest uppercase flex items-center justify-between">
+                  <div className="absolute bottom-3 left-4 right-4 text-white text-[10px] tracking-widest uppercase font-bold flex items-center justify-between drop-shadow">
                     <span>{watch.caseMaterial}</span>
                     <span>{watch.caseDiameter}</span>
                   </div>
                 </div>
 
-                {/* Card Content Area */}
+                {/* Card Content Area with High-Contrast Typography */}
                 <div className="p-6 space-y-4">
                   {/* Seller / Independent Broker Card */}
-                  <div className="p-2.5 bg-[#FCFBF7] border border-[#D8D3C8]/70 flex items-center justify-between text-[10px]">
+                  <div className="p-3 bg-[#F9F8F5] border border-[#D0C9BA] rounded-lg flex items-center justify-between text-[11px]">
                     <div className="flex items-center gap-1.5 text-[#061C16]">
-                      <UserCheck className="w-3.5 h-3.5 text-[#9D7B3E]" />
-                      <span className="font-semibold">{watch.sellerName}</span>
+                      <UserCheck className="w-4 h-4 text-[#7A5410]" />
+                      <span className="font-bold">{watch.sellerName}</span>
                     </div>
-                    <span className="text-[#9D7B3E] font-medium">{watch.sellerLocation}</span>
+                    <span className="text-[#7A5410] font-bold">{watch.sellerLocation}</span>
                   </div>
 
                   <div>
-                    <span className="text-[10px] uppercase tracking-[0.25em] text-[#9D7B3E] font-semibold block">
+                    <span className="text-[11px] uppercase tracking-[0.25em] text-[#7A5410] font-extrabold block">
                       {watch.brand}
                     </span>
-                    <h3 className="font-serif text-xl font-light text-[#061C16] leading-snug mt-0.5">
+                    <h3 className="font-serif text-xl sm:text-2xl font-bold text-[#061C16] leading-snug mt-1">
                       {watch.model}
                     </h3>
-                    <p className="text-xs text-[#080B09]/70 font-light leading-relaxed mt-1.5 line-clamp-2">
+                    <p className="text-[13px] text-[#1F2C24] font-medium leading-relaxed mt-2 line-clamp-2">
                       {watch.tagline}
                     </p>
                   </div>
 
                   {/* Complications Chips */}
-                  <div className="flex flex-wrap gap-1">
+                  <div className="flex flex-wrap gap-1.5 pt-1">
                     {watch.complications.slice(0, 3).map((comp, i) => (
                       <span
                         key={i}
-                        className="px-2 py-0.5 bg-[#FCFBF7] border border-[#D8D3C8] text-[9px] text-[#080B09]/80"
+                        className="px-2.5 py-1 bg-[#FAF9F5] border border-[#D0C9BA] text-[10px] font-bold text-[#061C16] rounded"
                       >
                         {comp}
                       </span>
@@ -364,14 +373,23 @@ export default function WatchesPage() {
               </div>
 
               {/* Price & Buy Action Bar */}
-              <div className="p-6 pt-0 border-t border-[#D8D3C8]/60 mt-4">
+              <div className="p-6 pt-0 border-t border-[#D8D3C8] mt-4">
                 <div className="pt-4 flex items-center justify-between mb-4">
                   <div>
-                    <span className="text-[8px] uppercase tracking-widest text-[#080B09]/50 block">SALE PRICE</span>
-                    <span className="font-serif text-xl font-semibold text-[#061C16]">{watch.priceFormatted}</span>
+                    <span className="text-[10px] uppercase tracking-wider text-[#4D6055] font-bold block mb-0.5">
+                      SALE VALUATION
+                    </span>
+                    <div className="flex items-baseline gap-2">
+                      <span className="font-serif text-2xl font-extrabold text-[#061C16] tracking-tight">
+                        {formatPrice(watch.usdPrice)}
+                      </span>
+                      <span className="text-[9px] text-[#7A5410] font-mono font-bold bg-[#F5EEDB] px-1.5 py-0.5 rounded border border-[#C6A15B]/30">
+                        {country.currency}
+                      </span>
+                    </div>
                   </div>
-                  <span className="text-[10px] text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5">
-                    In Stock &middot; Ready for Transit
+                  <span className="text-[10px] text-emerald-800 bg-emerald-100 border border-emerald-300 px-2.5 py-1 rounded font-bold">
+                    Vault Certified
                   </span>
                 </div>
 
@@ -379,50 +397,36 @@ export default function WatchesPage() {
                   <button
                     onClick={() =>
                       openEnquiry({
-                        title: `Purchase Acquisition: ${watch.brand} ${watch.model}`,
-                        subtitle: `Connect with consignor ${watch.sellerName}. Immediate Swiss/Geneva vault escrow release.`,
+                        title: `Acquisition Order: ${watch.brand} ${watch.model}`,
+                        subtitle: `Reference ${watch.reference}. Valuation: ${formatPrice(watch.usdPrice)}. Ready for private vault dispatch or insured transit.`,
                         assetTitle: `${watch.brand} ${watch.model} (${watch.reference})`,
-                        defaultVertical: 'Jewellery & Horology',
+                        defaultVertical: 'Luxury Watches',
                       })
                     }
-                    className="w-full py-2.5 bg-[#061C16] text-[#FCFBF7] text-[10px] uppercase tracking-[0.2em] font-semibold hover:bg-[#C6A15B] hover:text-[#061C16] transition-all text-center"
+                    className="py-3 bg-[#061C16] hover:bg-[#0D382A] text-[#F3E2B8] hover:text-white text-[11px] font-bold uppercase tracking-wider text-center rounded transition-all shadow"
                   >
-                    INQUIRE TO BUY
+                    BUY NOW
                   </button>
-                  <Link
-                    href={`/listings/${watch.id}`}
-                    className="w-full py-2.5 border border-[#D8D3C8] text-[#080B09] text-[10px] uppercase tracking-[0.2em] font-medium hover:border-[#061C16] transition-all text-center flex items-center justify-center gap-1"
+
+                  <button
+                    onClick={() =>
+                      openEnquiry({
+                        title: `Consignor Direct Message: ${watch.sellerName}`,
+                        subtitle: `Inquiring about ${watch.brand} ${watch.model} (${watch.reference}) located in ${watch.sellerLocation}.`,
+                        assetTitle: `${watch.brand} ${watch.model}`,
+                        defaultVertical: 'Luxury Watches',
+                      })
+                    }
+                    className="py-3 bg-white hover:bg-[#FAF9F5] border border-[#061C16] text-[#061C16] text-[11px] font-bold uppercase tracking-wider text-center rounded transition-all"
                   >
-                    <span>SPEC SHEET</span>
-                    <ArrowRight className="w-3 h-3" />
-                  </Link>
+                    CONTACT BROKER
+                  </button>
                 </div>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Independent Watch Broker Onboarding Callout */}
-        <div className="mt-20 p-8 sm:p-12 bg-[#061C16] text-[#FCFBF7] border border-[#C6A15B]/20 flex flex-col md:flex-row items-center justify-between gap-8">
-          <div className="space-y-2 text-center md:text-left">
-            <span className="text-[10px] uppercase tracking-[0.3em] text-[#C6A15B] block">
-              INDEPENDENT WATCH BROKERS &amp; PRIVATE COLLECTORS
-            </span>
-            <h3 className="font-serif text-2xl font-light text-white">
-              List Your Timepieces for Global Bilateral Sale
-            </h3>
-            <p className="text-xs text-[#D8D3C8]/70 font-light max-w-xl">
-              Individual brokers and private collectors can list timepieces directly on NP GROUPS without company incorporation. Direct client escrow and zero marketplace listing fees.
-            </p>
-          </div>
-
-          <Link
-            href="/portal"
-            className="px-8 py-3.5 bg-[#FCFBF7] text-[#061C16] text-[10px] uppercase tracking-[0.25em] font-semibold hover:bg-[#C6A15B] transition-all whitespace-nowrap"
-          >
-            LIST TIMEPIECE AS BROKER
-          </Link>
-        </div>
       </div>
     </div>
   );

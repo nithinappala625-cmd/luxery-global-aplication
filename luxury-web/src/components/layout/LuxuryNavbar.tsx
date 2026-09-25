@@ -1,7 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Menu, X, Search, Shield, ArrowUpRight } from 'lucide-react';
+import { Menu, X, Search, Shield, ArrowUpRight, Globe } from 'lucide-react';
+import { useCountry } from '@/lib/countryContext';
+import CountrySwitcherModal from '@/components/layout/CountrySwitcherModal';
 
 interface LuxuryNavbarProps {
   onOpenSearch?: () => void;
@@ -11,6 +13,8 @@ interface LuxuryNavbarProps {
 export default function LuxuryNavbar({ onOpenSearch, onOpenEnquiry }: LuxuryNavbarProps) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+  const [countryModalOpen, setCountryModalOpen] = useState(false);
+  const { country } = useCountry();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -65,8 +69,19 @@ export default function LuxuryNavbar({ onOpenSearch, onOpenEnquiry }: LuxuryNavb
           ))}
         </nav>
 
-        {/* Right Side: Search, Portal, Membership, Primary CTA */}
-        <div className="hidden lg:flex items-center gap-5">
+        {/* Right Side: Country Selector, Search, Portal, Primary CTA */}
+        <div className="hidden lg:flex items-center gap-4">
+          {/* Sovereign Country / Currency Switcher */}
+          <button
+            onClick={() => setCountryModalOpen(true)}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#08241C] border border-[#C6A15B]/50 hover:border-[#C6A15B] text-white text-[11px] font-semibold transition-all hover:bg-[#0C3328] shadow-sm group"
+            title="Switch Global Jurisdiction & Currency"
+          >
+            <span className="text-sm">{country.flag}</span>
+            <span className="font-mono text-xs text-[#E8D48A]">{country.currency}</span>
+            <span className="text-[9px] text-[#C6A15B] opacity-70 group-hover:opacity-100">▼</span>
+          </button>
+
           <button
             onClick={onOpenSearch}
             className="flex items-center gap-1.5 text-[11px] uppercase tracking-[0.2em] font-medium text-[#F6F3EA]/80 hover:text-[#C6A15B] transition-colors py-1"
@@ -92,8 +107,17 @@ export default function LuxuryNavbar({ onOpenSearch, onOpenEnquiry }: LuxuryNavb
           </button>
         </div>
 
-        {/* Mobile Hamburger */}
-        <div className="flex items-center gap-4 lg:hidden">
+        {/* Mobile Hamburger & Mobile Country Switcher */}
+        <div className="flex items-center gap-3 lg:hidden">
+          <button
+            onClick={() => setCountryModalOpen(true)}
+            className="flex items-center gap-1 px-2.5 py-1 rounded bg-[#08241C] border border-[#C6A15B]/40 text-xs text-[#E8D48A]"
+            title="Change Country"
+          >
+            <span>{country.flag}</span>
+            <span className="font-mono text-[10px] font-bold">{country.currency}</span>
+          </button>
+
           <button
             onClick={onOpenSearch}
             className="p-1.5 text-[#F6F3EA] hover:text-[#C6A15B] transition-colors"
@@ -163,6 +187,12 @@ export default function LuxuryNavbar({ onOpenSearch, onOpenEnquiry }: LuxuryNavb
           </nav>
         </div>
       )}
+
+      {/* Sovereign Jurisdiction & Currency Switcher Modal */}
+      <CountrySwitcherModal
+        isOpen={countryModalOpen}
+        onClose={() => setCountryModalOpen(false)}
+      />
     </header>
   );
 }

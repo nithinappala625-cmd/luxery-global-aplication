@@ -21,18 +21,46 @@ body {
 }
 
 .font-serif {
-  font-family: var(--font-cormorant), Georgia, serif;
+  font-family: var(--font-playfair), var(--font-cormorant), Georgia, serif;
+}
+
+.font-crest {
+  font-family: var(--font-cinzel), serif;
 }
 
 .font-sans {
   font-family: var(--font-montserrat), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
+/* High-contrast luxury typography helpers */
+.luxury-heading {
+  font-family: var(--font-playfair), Georgia, serif;
+  font-weight: 700;
+  color: #061C16;
+  letter-spacing: -0.015em;
+  line-height: 1.15;
+}
+
+.luxury-subheading {
+  color: #1A2E24;
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+.luxury-label {
+  font-family: var(--font-montserrat), sans-serif;
+  color: #785312;
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
 /* Luxury Editorial Typography utilities */
 .editorial-title {
-  font-family: var(--font-cormorant), Georgia, serif;
-  font-weight: 300;
-  letter-spacing: -0.01em;
+  font-family: var(--font-playfair), var(--font-cormorant), Georgia, serif;
+  font-weight: 700;
+  letter-spacing: -0.015em;
   line-height: 1.08;
 }
 

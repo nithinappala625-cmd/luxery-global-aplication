@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { Gem, Search, ShieldCheck, UserCheck, ArrowRight, ArrowUpDown, Award, CheckCircle2 } from 'lucide-react';
+import { Gem, Search, ShieldCheck, UserCheck, Check, ArrowRight, Shield, Award, Sparkles, ArrowUpDown, Globe } from 'lucide-react';
 import { useLuxuryUI } from '@/components/layout/LuxuryShell';
+import { useCountry } from '@/lib/countryContext';
 import Link from 'next/link';
 
 interface DiamondItem {
@@ -16,13 +17,12 @@ interface DiamondItem {
   cutGrade: string;
   polishAndSymmetry: string;
   fluorescence: string;
-  labCertificate: string; // e.g. GIA 2185940021
-  priceFormatted: string;
-  priceRaw: number;
+  labCertificate: string;
+  usdPrice: number;
   tagline: string;
   imageUrl: string;
   brokerName: string;
-  brokerType: 'independent_diamond_broker' | 'sightholder' | 'private_vault';
+  brokerType: 'sightholder' | 'independent_diamond_broker' | 'vault_custodian';
   brokerLocation: string;
   vaultCustody: string;
 }
@@ -40,14 +40,13 @@ const diamondsInventory: DiamondItem[] = [
     polishAndSymmetry: 'Excellent / Excellent',
     fluorescence: 'None (Inert)',
     labCertificate: 'GIA #2215894101 Monograph Report',
-    priceFormatted: '₹38.5 Cr ($4,600,000)',
-    priceRaw: 385000000,
+    usdPrice: 4600000,
     tagline: 'The rarest 0.01% of all gem-quality diamonds. Type IIa chemical purity with complete optical transparency.',
     imageUrl: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?q=80&w=800&auto=format&fit=crop',
-    brokerName: 'Hiren Jhaveri & Sons &middot; Bharat Diamond Bourse',
+    brokerName: 'Hiren Jhaveri & Sons · Bharat Diamond Bourse',
     brokerType: 'sightholder',
-    brokerLocation: 'Mumbai &middot; BKC / Antwerp',
-    vaultCustody: 'Malca-Amit Vault, Mumbai Free Trade Zone',
+    brokerLocation: 'Mumbai · BKC / Antwerp',
+    vaultCustody: 'Malca-Amit Vault, Free Trade Zone',
   },
   {
     id: 'pink-panther-15ct',
@@ -61,11 +60,10 @@ const diamondsInventory: DiamondItem[] = [
     polishAndSymmetry: 'Excellent / Very Good',
     fluorescence: 'Faint Blue',
     labCertificate: 'GIA #6193402880 Coloured Diamond Dossier',
-    priceFormatted: '₹145 Cr ($17,400,000)',
-    priceRaw: 1450000000,
+    usdPrice: 17400000,
     tagline: 'Museum-calibre colored diamond of historic proportions. Unmodified color saturation with zero secondary modifiers.',
     imageUrl: 'https://images.unsplash.com/photo-1568944729458-ce2bf7768e44?q=80&w=800&auto=format&fit=crop',
-    brokerName: 'Philippe Laurent &middot; Independent Diamond Broker',
+    brokerName: 'Philippe Laurent · Independent Diamond Broker',
     brokerType: 'independent_diamond_broker',
     brokerLocation: 'Geneva / London',
     vaultCustody: 'Geneva Freeport Secure Vault Room',
@@ -82,11 +80,10 @@ const diamondsInventory: DiamondItem[] = [
     polishAndSymmetry: 'Excellent',
     fluorescence: 'None',
     labCertificate: 'SSEF & Gübelin Gemmological Reports (No Heat)',
-    priceFormatted: '₹48 Cr ($5,800,000)',
-    priceRaw: 480000000,
+    usdPrice: 5800000,
     tagline: 'Historical old-mine Kashmir origin. Exhibiting the legendary velvety cornflower blue with dual Swiss laboratory origin certs.',
     imageUrl: 'https://images.unsplash.com/photo-1602751584552-8ba73aad10e1?q=80&w=800&auto=format&fit=crop',
-    brokerName: 'Laurent Mercier &middot; Fine Gemstones Specialist',
+    brokerName: 'Laurent Mercier · Fine Gemstones Specialist',
     brokerType: 'independent_diamond_broker',
     brokerLocation: 'Zurich / Mumbai',
     vaultCustody: 'Zurich Cantonal Bank Depository',
@@ -98,217 +95,185 @@ const diamondsInventory: DiamondItem[] = [
     shape: 'Radiant Cut',
     carat: '22.45 ct',
     colorGrade: 'Fancy Vivid Yellow (Canary)',
-    clarityGrade: 'IF (Internally Flawless)',
-    cutGrade: 'Excellent',
+    clarityGrade: 'VVS2',
+    cutGrade: 'Radiant Brilliant',
     polishAndSymmetry: 'Excellent / Excellent',
     fluorescence: 'None',
-    labCertificate: 'GIA #5201193309 Special Letter',
-    priceFormatted: '₹32 Cr ($3,850,000)',
-    priceRaw: 320000000,
-    tagline: 'Electric canary saturation with internally flawless clarity. Sourced from the historical Kimberley deposits.',
+    labCertificate: 'GIA #5182901452 Dossier',
+    usdPrice: 5100000,
+    tagline: 'Electrifying pure canary yellow saturation. Exceptional dispersion and brilliance in oversized carat weight.',
     imageUrl: 'https://images.unsplash.com/photo-1612891936954-09a2c7dd53d2?q=80&w=800&auto=format&fit=crop',
-    brokerName: 'Hiren Jhaveri & Sons &middot; Bharat Diamond Bourse',
+    brokerName: 'Hiren Jhaveri & Sons · Bharat Diamond Bourse',
     brokerType: 'sightholder',
-    brokerLocation: 'Mumbai &middot; BKC',
-    vaultCustody: 'BDB Central Vault Room, Bandra Kurla',
+    brokerLocation: 'Mumbai / Dubai',
+    vaultCustody: 'Brink’s Global Vault, Dubai Multi Commodities Centre (DMCC)',
   },
   {
-    id: 'pamp-suisse-gold-1kg',
-    title: 'PAMP Suisse 1kg Cast Gold Bar 999.9 Fine (10x Lot)',
+    id: 'pamp-gold-1kg',
+    title: '1 Kilogram PAMP Suisse 999.9 Fine Gold Bullion Bar',
     category: 'gold_bullion',
-    shape: 'Cast Bar',
-    carat: '10 Kilograms Total (321.5 Troy Oz)',
-    colorGrade: '999.9 Pure Gold (24 Karat)',
+    shape: 'Cast Bar in Sealed Assay Blister',
+    carat: '1,000 Grams (32.15 Troy Oz)',
+    colorGrade: '24 Karat (999.9 Purity)',
     clarityGrade: 'LBMA Good Delivery Standard',
-    cutGrade: 'Assayed with Individual Serial Stamps',
-    polishAndSymmetry: 'Standard Mint Finish',
+    cutGrade: 'PAMP Suisse Lady Fortuna Monogram',
+    polishAndSymmetry: 'Mirror Assay Finish',
     fluorescence: 'None',
-    labCertificate: 'PAMP Suisse Essayeur Fondeur Certificate',
-    priceFormatted: '₹7.6 Cr ($915,000)',
-    priceRaw: 76000000,
-    tagline: 'Ten individual LBMA-certified 1kg gold bullion bars in tamper-evident Veriscan packaging.',
+    labCertificate: 'Swiss Federal Assay Office Certificate & Individual Serial Number',
+    usdPrice: 90000,
+    tagline: 'Direct sovereign wealth hedge. Certified LBMA Good Delivery physical bar stored in allocated high-security vault facilities.',
     imageUrl: 'https://images.unsplash.com/photo-1610375461246-83df859d849d?q=80&w=800&auto=format&fit=crop',
-    brokerName: 'Swiss Bullion Custody Ltd &middot; Private Vault',
-    brokerType: 'private_vault',
-    brokerLocation: 'Zurich / Dubai',
-    vaultCustody: 'Loomis International Secure Freeport Vault',
+    brokerName: 'Swiss Bullion Depository Escrow Desk',
+    brokerType: 'vault_custodian',
+    brokerLocation: 'Zurich / Singapore',
+    vaultCustody: 'Le Freeport Singapore / Zurich Cantonal Vault',
   },
   {
-    id: 'burmese-ruby-52ct',
-    title: '5.20 Carat Pigeon\'s Blood Burmese Ruby (Mogok)',
+    id: 'colombian-emerald-12ct',
+    title: '12.40 Carat Muzo Colombian Emerald (Insignificant Oil)',
     category: 'rare_gem',
-    shape: 'Oval Brilliant',
-    carat: '5.20 ct',
-    colorGrade: 'Pigeon\'s Blood Red (No Heat)',
-    clarityGrade: 'VS1 Transparency',
-    cutGrade: 'Traditional Master Facet',
-    polishAndSymmetry: 'Very Good',
-    fluorescence: 'Strong Red UV Reaction',
-    labCertificate: 'GRS Platinum Award Report #GRS2021-098841',
-    priceFormatted: '₹26.5 Cr ($3,180,000)',
-    priceRaw: 265000000,
-    tagline: 'Untreated Mogok provenance displaying saturated chromium glow. Free of any thermal or chemical enhancement.',
+    shape: 'Classic Emerald Cut',
+    carat: '12.40 ct',
+    colorGrade: 'Vivid Deep Green ("Verde Muzo")',
+    clarityGrade: 'Exceptional Transparency',
+    cutGrade: 'Step Cut Octagon',
+    polishAndSymmetry: 'Very Good / Excellent',
+    fluorescence: 'Inert',
+    labCertificate: 'Gübelin Gemmological Report #21040082',
+    usdPrice: 3800000,
+    tagline: 'From the famed historic Muzo mines of Colombia. Highly saturated green with only minor cedarwood oil indication.',
     imageUrl: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=800&auto=format&fit=crop',
-    brokerName: 'Kunal Zaveri &middot; Private Gemstone Collector',
+    brokerName: 'Philippe Laurent · Independent Broker',
     brokerType: 'independent_diamond_broker',
-    brokerLocation: 'Mumbai / Geneva',
-    vaultCustody: 'Geneva Freeport',
+    brokerLocation: 'Geneva / Bogota',
+    vaultCustody: 'Geneva Freeport Secure Vault Room',
   },
 ];
 
 export default function JewelleryPage() {
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<'all' | 'natural_diamond' | 'fancy_colored' | 'rare_gem' | 'gold_bullion'>('all');
   const [sortBy, setSortBy] = useState<'featured' | 'price-desc' | 'price-asc'>('featured');
   const { openEnquiry } = useLuxuryUI();
+  const { country, formatPrice } = useCountry();
 
   const filteredItems = diamondsInventory
-    .filter((item) => {
-      const matchCat = selectedCategory === 'all' || item.category === selectedCategory;
-      const matchSearch =
-        item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.brokerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.shape.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.labCertificate.toLowerCase().includes(searchTerm.toLowerCase());
-      return matchCat && matchSearch;
+    .filter((d) => {
+      if (selectedCategory === 'all') return true;
+      return d.category === selectedCategory;
     })
     .sort((a, b) => {
-      if (sortBy === 'price-desc') return b.priceRaw - a.priceRaw;
-      if (sortBy === 'price-asc') return a.priceRaw - b.priceRaw;
+      if (sortBy === 'price-asc') return a.usdPrice - b.usdPrice;
+      if (sortBy === 'price-desc') return b.usdPrice - a.usdPrice;
       return 0;
     });
 
   return (
     <div className="bg-[#FCFBF7] text-[#080B09] min-h-screen pt-28 pb-32">
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
-        {/* Navigation Breadcrumb */}
-        <div className="py-6 border-b border-[#D8D3C8] mb-10 flex items-center justify-between text-xs">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 text-[#080B09]/70 hover:text-[#061C16] uppercase tracking-[0.25em] font-medium transition-colors"
-          >
-            <span>&larr; BACK TO NP GROUPS NETWORK</span>
-          </Link>
+
+        {/* Global Awareness Bar */}
+        <div className="mb-6 p-4 rounded-xl bg-[#061C16] border border-[#C6A15B]/40 text-white flex flex-wrap items-center justify-between gap-4 shadow-lg">
           <div className="flex items-center gap-3">
-            <span className="text-[10px] uppercase tracking-[0.2em] text-[#9D7B3E] font-medium">
-              STRICTLY FOR SALE &middot; ZERO RENTAL &middot; GIA CERTIFIED NATURAL DIAMONDS ONLY
-            </span>
-          </div>
-        </div>
-
-        {/* Diamond Header Banner */}
-        <div className="relative bg-[#061C16] text-[#FCFBF7] p-8 sm:p-14 mb-12 border border-[#C6A15B]/20 overflow-hidden shadow-2xl">
-          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#C6A15B]/10 rounded-full blur-[140px] pointer-events-none" />
-
-          <div className="relative z-10 max-w-3xl space-y-4">
-            <div className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] text-[#C6A15B] font-medium">
-              <Gem className="w-3.5 h-3.5" />
-              <span>NATURAL DIAMONDS &amp; HAUTE JOAILLERIE</span>
-            </div>
-
-            <h1 className="font-serif text-4xl sm:text-6xl font-light text-white tracking-tight leading-[1.08]">
-              Natural Diamonds &middot; Sales Only
-            </h1>
-
-            <p className="text-sm sm:text-base text-[#D8D3C8]/85 font-light leading-relaxed max-w-2xl">
-              Type IIa D-Flawless diamonds, rare fancy colored pink and yellow diamonds, and investment bullion directly from certified diamond brokers and sightholders.
-            </p>
-
-            <div className="pt-2 flex items-center gap-3 text-xs text-[#C6A15B]">
-              <Award className="w-4 h-4" />
-              <span>Independent Diamond Broker Profiles &middot; GIA Verification &middot; Vault Fiduciary Escrow</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Search & Filter Bar */}
-        <div className="bg-white border border-[#D8D3C8] p-6 mb-10 shadow-sm space-y-5">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="relative w-full md:w-96">
-              <Search className="w-4 h-4 absolute left-3.5 top-3.5 text-[#9D7B3E]" />
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search GIA cert #, shape, color, or broker name..."
-                className="w-full pl-10 pr-4 py-2.5 bg-[#FCFBF7] border border-[#D8D3C8] text-xs focus:outline-none focus:border-[#061C16]"
-              />
-            </div>
-
-            <div className="flex items-center justify-between w-full md:w-auto gap-4">
-              <span className="text-xs text-[#080B09]/60 font-light">
-                Showing <strong>{filteredItems.length}</strong> certified diamond lots
-              </span>
-
+            <span className="text-2xl">{country.flag}</span>
+            <div>
               <div className="flex items-center gap-2">
-                <ArrowUpDown className="w-3.5 h-3.5 text-[#9D7B3E]" />
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as any)}
-                  className="px-3 py-2 bg-[#FCFBF7] border border-[#D8D3C8] text-xs focus:outline-none focus:border-[#061C16]"
-                >
-                  <option value="featured">Sort by: Curated Featured</option>
-                  <option value="price-desc">Price: High to Low</option>
-                  <option value="price-asc">Price: Low to High</option>
-                </select>
+                <span className="text-[10px] uppercase tracking-[0.25em] text-[#C6A15B] font-bold">
+                  Sovereign Gemological Desk
+                </span>
+                <span className="px-2 py-0.5 rounded bg-amber-950/80 border border-amber-500/40 text-amber-300 text-[9px] font-mono uppercase font-bold">
+                  STRICTLY SALES ONLY &middot; ZERO RENTAL
+                </span>
               </div>
+              <p className="text-xs sm:text-sm font-serif font-bold text-white mt-0.5">
+                {country.name} · GIA Certified Vault Deliveries in {country.currency}
+              </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 border-t border-[#D8D3C8]/60 pt-4">
-            <span className="text-[10px] uppercase tracking-widest text-[#080B09]/50 font-medium mr-2 whitespace-nowrap">
-              Diamond Category:
+          <div className="flex items-center gap-3">
+            <div className="text-right hidden sm:block">
+              <span className="text-[9px] uppercase tracking-wider text-[#F6F3EA]/60 block font-mono">
+                Currency &amp; Gold Escrow
+              </span>
+              <span className="text-xs font-mono font-bold text-[#E8D48A]">
+                1 USD = {country.usdRate} {country.currency}
+              </span>
+            </div>
+            <Link
+              href="/portal"
+              className="px-3.5 py-1.5 rounded bg-[#C6A15B] text-[#061C16] text-[10px] font-bold uppercase tracking-widest hover:bg-[#E0C17E] transition-all"
+            >
+              Broker Portal
+            </Link>
+          </div>
+        </div>
+
+        {/* Header Section with Rich High-Contrast Typography */}
+        <div className="text-center max-w-4xl mx-auto py-8 sm:py-12 space-y-4">
+          <div className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.3em] text-[#7A5410] font-extrabold bg-[#F5EEDB] px-3.5 py-1 rounded-full border border-[#C6A15B]/30">
+            <Gem className="w-3.5 h-3.5 text-[#7A5410]" />
+            <span>NATURAL CERTIFIED DIAMONDS &amp; GOLD BULLION</span>
+          </div>
+
+          <h1 className="font-serif text-4xl sm:text-6xl lg:text-7xl font-bold text-[#061C16] tracking-tight leading-none drop-shadow-sm">
+            FINE JEWELS &amp; GEMS
+          </h1>
+
+          <p className="font-serif text-xl sm:text-2xl text-[#143327] font-semibold italic">
+            GIA Monograph Certified Diamonds, Historic Unheated Gems, and 24K Physical Bullion.
+          </p>
+
+          <p className="text-xs sm:text-sm text-[#1A2E24] font-medium leading-relaxed max-w-2xl mx-auto pt-2">
+            Direct bilateral access to Bharat Diamond Bourse sightholders, Geneva freeport vaults, and Cantonal Swiss bullion depositories. All stones authenticated under GIA, Gübelin, and SSEF monographs.
+          </p>
+        </div>
+
+        {/* Category Filter & Sorter */}
+        <div className="bg-white border-2 border-[#D8D3C8] rounded-xl p-4 sm:p-6 mb-10 space-y-4 shadow-sm">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+            <span className="text-xs font-bold text-[#061C16]">
+              Showing <strong>{filteredItems.length}</strong> certified sovereign lots
             </span>
-            <button
-              onClick={() => setSelectedCategory('all')}
-              className={`px-4 py-1.5 text-[11px] uppercase tracking-wider font-medium whitespace-nowrap transition-all ${
-                selectedCategory === 'all'
-                  ? 'bg-[#061C16] text-[#FCFBF7]'
-                  : 'bg-[#FCFBF7] text-[#080B09]/70 border border-[#D8D3C8] hover:border-[#061C16]'
-              }`}
-            >
-              All Diamonds &amp; Gems
-            </button>
-            <button
-              onClick={() => setSelectedCategory('natural_diamond')}
-              className={`px-4 py-1.5 text-[11px] uppercase tracking-wider font-medium whitespace-nowrap transition-all ${
-                selectedCategory === 'natural_diamond'
-                  ? 'bg-[#061C16] text-[#FCFBF7]'
-                  : 'bg-[#FCFBF7] text-[#080B09]/70 border border-[#D8D3C8] hover:border-[#061C16]'
-              }`}
-            >
-              Natural White Diamonds (D-FL)
-            </button>
-            <button
-              onClick={() => setSelectedCategory('fancy_colored')}
-              className={`px-4 py-1.5 text-[11px] uppercase tracking-wider font-medium whitespace-nowrap transition-all ${
-                selectedCategory === 'fancy_colored'
-                  ? 'bg-[#061C16] text-[#FCFBF7]'
-                  : 'bg-[#FCFBF7] text-[#080B09]/70 border border-[#D8D3C8] hover:border-[#061C16]'
-              }`}
-            >
-              Fancy Vivid Diamonds
-            </button>
-            <button
-              onClick={() => setSelectedCategory('rare_gem')}
-              className={`px-4 py-1.5 text-[11px] uppercase tracking-wider font-medium whitespace-nowrap transition-all ${
-                selectedCategory === 'rare_gem'
-                  ? 'bg-[#061C16] text-[#FCFBF7]'
-                  : 'bg-[#FCFBF7] text-[#080B09]/70 border border-[#D8D3C8] hover:border-[#061C16]'
-              }`}
-            >
-              Rare Gemstones (Kashmir / Burma)
-            </button>
-            <button
-              onClick={() => setSelectedCategory('gold_bullion')}
-              className={`px-4 py-1.5 text-[11px] uppercase tracking-wider font-medium whitespace-nowrap transition-all ${
-                selectedCategory === 'gold_bullion'
-                  ? 'bg-[#061C16] text-[#FCFBF7]'
-                  : 'bg-[#FCFBF7] text-[#080B09]/70 border border-[#D8D3C8] hover:border-[#061C16]'
-              }`}
-            >
-              24K Pure Gold Bullion
-            </button>
+
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] uppercase tracking-wider text-[#4D6055] font-bold whitespace-nowrap">
+                SORT VALUATION:
+              </span>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as any)}
+                className="px-3 py-2 bg-[#FAF9F5] border border-[#D0C9BA] rounded-lg text-xs text-[#061C16] font-bold outline-none"
+              >
+                <option value="featured">Featured Curations</option>
+                <option value="price-desc">Price: High to Low</option>
+                <option value="price-asc">Price: Low to High</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 border-t border-[#D8D3C8] pt-3 scrollbar-none">
+            <span className="text-[10px] uppercase tracking-wider text-[#4D6055] font-bold mr-1 whitespace-nowrap">
+              CLASSIFICATION:
+            </span>
+            {[
+              { id: 'all', label: 'All Diamonds & Gems' },
+              { id: 'natural_diamond', label: 'Natural White (D-FL)' },
+              { id: 'fancy_colored', label: 'Fancy Vivid Colors' },
+              { id: 'rare_gem', label: 'Rare Gems (Kashmir/Muzo)' },
+              { id: 'gold_bullion', label: '24K Pure Gold Bullion' },
+            ].map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => setSelectedCategory(cat.id as any)}
+                className={`px-4 py-1.5 text-[11px] uppercase tracking-wider font-bold whitespace-nowrap transition-all rounded ${
+                  selectedCategory === cat.id
+                    ? 'bg-[#061C16] text-[#F3E2B8]'
+                    : 'bg-[#FAF9F5] text-[#061C16] border border-[#D0C9BA] hover:border-[#061C16]'
+                }`}
+              >
+                {cat.label}
+              </button>
+            ))}
           </div>
         </div>
 
@@ -317,80 +282,89 @@ export default function JewelleryPage() {
           {filteredItems.map((diamond) => (
             <div
               key={diamond.id}
-              className="group bg-white border border-[#D8D3C8] hover:border-[#061C16] transition-all duration-500 hover:shadow-xl flex flex-col justify-between overflow-hidden"
+              className="group bg-white border-2 border-[#D8D3C8] hover:border-[#061C16] rounded-2xl transition-all duration-300 hover:shadow-2xl flex flex-col justify-between overflow-hidden"
             >
               <div>
                 {/* Image Banner */}
                 <div className="relative aspect-square overflow-hidden bg-[#061C16]">
                   <div
-                    className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 group-hover:scale-105"
+                    className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
                     style={{ backgroundImage: `url('${diamond.imageUrl}')` }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#061C16]/80 via-transparent to-black/20" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#04130D]/80 via-transparent to-black/20" />
 
                   {/* Top Badges */}
                   <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
-                    <span className="px-2.5 py-1 bg-[#061C16]/90 border border-[#C6A15B]/30 text-[#C6A15B] text-[9px] uppercase tracking-[0.2em] backdrop-blur-sm">
+                    <span className="px-2.5 py-1 bg-[#061C16]/95 border border-[#C6A15B] text-[#E8D48A] text-[9px] font-bold uppercase tracking-[0.2em] rounded backdrop-blur-sm shadow">
                       {diamond.shape} &middot; {diamond.carat}
                     </span>
-                    <span className="px-2.5 py-1 bg-black/60 border border-white/20 text-white text-[9px] uppercase tracking-widest font-mono">
+                    <span className="px-2.5 py-1 bg-black/80 border border-white/20 text-white text-[9px] uppercase tracking-widest font-mono font-bold rounded">
                       GIA CERTIFIED
                     </span>
                   </div>
 
-                  <div className="absolute bottom-3 left-4 right-4 text-white text-[10px] tracking-widest uppercase flex items-center justify-between">
+                  <div className="absolute bottom-3 left-4 right-4 text-white text-[10px] tracking-widest uppercase font-bold flex items-center justify-between drop-shadow">
                     <span>Color: {diamond.colorGrade.split(' ')[0]}</span>
                     <span>Clarity: {diamond.clarityGrade.split(' ')[0]}</span>
                   </div>
                 </div>
 
-                {/* Content Box */}
+                {/* Content Box with High-Contrast Typography */}
                 <div className="p-6 space-y-4">
                   {/* Broker Profile Card */}
-                  <div className="p-2.5 bg-[#FCFBF7] border border-[#D8D3C8]/70 flex items-center justify-between text-[10px]">
+                  <div className="p-3 bg-[#F9F8F5] border border-[#D0C9BA] rounded-lg flex items-center justify-between text-[11px]">
                     <div className="flex items-center gap-1.5 text-[#061C16]">
-                      <UserCheck className="w-3.5 h-3.5 text-[#9D7B3E]" />
-                      <span className="font-semibold">{diamond.brokerName}</span>
+                      <UserCheck className="w-4 h-4 text-[#7A5410]" />
+                      <span className="font-bold">{diamond.brokerName}</span>
                     </div>
-                    <span className="text-[#9D7B3E] font-medium">{diamond.brokerLocation}</span>
+                    <span className="text-[#7A5410] font-bold">{diamond.brokerLocation}</span>
                   </div>
 
                   <div>
-                    <h3 className="font-serif text-xl font-light text-[#061C16] leading-snug">
+                    <h3 className="font-serif text-xl sm:text-2xl font-bold text-[#061C16] leading-snug">
                       {diamond.title}
                     </h3>
-                    <p className="text-xs text-[#080B09]/70 font-light leading-relaxed mt-1.5 line-clamp-2">
+                    <p className="text-[13px] text-[#1F2C24] font-medium leading-relaxed mt-2 line-clamp-2">
                       {diamond.tagline}
                     </p>
                   </div>
 
                   {/* 4Cs Technical Specs Box */}
-                  <div className="bg-[#FCFBF7] border border-[#D8D3C8] p-3 text-[11px] space-y-1.5">
+                  <div className="bg-[#F9F8F5] border border-[#D0C9BA] rounded-xl p-3.5 text-xs space-y-2 shadow-xs">
                     <div className="flex justify-between">
-                      <span className="text-[#080B09]/50 uppercase tracking-widest text-[9px]">CUT &amp; POLISH:</span>
-                      <span className="font-medium text-[#061C16]">{diamond.cutGrade}</span>
+                      <span className="text-[#4D6055] font-bold uppercase tracking-wider text-[9px]">CUT &amp; POLISH:</span>
+                      <span className="font-bold text-[#061C16]">{diamond.cutGrade}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-[#080B09]/50 uppercase tracking-widest text-[9px]">CERTIFICATE:</span>
-                      <span className="font-mono text-[#061C16] text-[10px]">{diamond.labCertificate}</span>
+                      <span className="text-[#4D6055] font-bold uppercase tracking-wider text-[9px]">CERTIFICATE:</span>
+                      <span className="font-mono font-bold text-[#061C16] text-[10px]">{diamond.labCertificate}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-[#080B09]/50 uppercase tracking-widest text-[9px]">VAULT CUSTODY:</span>
-                      <span className="font-medium text-[#9D7B3E] text-[10px]">{diamond.vaultCustody}</span>
+                      <span className="text-[#4D6055] font-bold uppercase tracking-wider text-[9px]">VAULT CUSTODY:</span>
+                      <span className="font-bold text-[#7A5410] text-[10px]">{diamond.vaultCustody}</span>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Price & Buy Action */}
-              <div className="p-6 pt-0 border-t border-[#D8D3C8]/60 mt-4">
+              <div className="p-6 pt-0 border-t border-[#D8D3C8] mt-4">
                 <div className="pt-4 flex items-center justify-between mb-4">
                   <div>
-                    <span className="text-[8px] uppercase tracking-widest text-[#080B09]/50 block">ACQUISITION PRICE</span>
-                    <span className="font-serif text-xl font-semibold text-[#061C16]">{diamond.priceFormatted}</span>
+                    <span className="text-[10px] uppercase tracking-wider text-[#4D6055] font-bold block mb-0.5">
+                      ACQUISITION VALUATION
+                    </span>
+                    <div className="flex items-baseline gap-2">
+                      <span className="font-serif text-2xl font-extrabold text-[#061C16] tracking-tight">
+                        {formatPrice(diamond.usdPrice)}
+                      </span>
+                      <span className="text-[9px] text-[#7A5410] font-mono font-bold bg-[#F5EEDB] px-1.5 py-0.5 rounded border border-[#C6A15B]/30">
+                        {country.currency}
+                      </span>
+                    </div>
                   </div>
-                  <span className="text-[10px] text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5">
-                    Sealed in Tamper-Proof Vault
+                  <span className="text-[10px] text-emerald-800 bg-emerald-100 border border-emerald-300 px-2.5 py-1 rounded font-bold">
+                    Sealed in Vault
                   </span>
                 </div>
 
@@ -398,12 +372,12 @@ export default function JewelleryPage() {
                   onClick={() =>
                     openEnquiry({
                       title: `Diamond Acquisition: ${diamond.title}`,
-                      subtitle: `Direct broker transaction with ${diamond.brokerName}. Fiduciary Swiss/Mumbai vault release under escrow.`,
+                      subtitle: `Valuation: ${formatPrice(diamond.usdPrice)}. Direct sightholder transaction with ${diamond.brokerName}. Escrow transfer under Swiss/Freeport custody protocol.`,
                       assetTitle: `${diamond.title} (${diamond.labCertificate})`,
-                      defaultVertical: 'Jewellery & Horology',
+                      defaultVertical: 'Jewels & Gemstones',
                     })
                   }
-                  className="w-full py-3 bg-[#061C16] text-[#FCFBF7] text-[10px] uppercase tracking-[0.2em] font-semibold hover:bg-[#C6A15B] hover:text-[#061C16] transition-all text-center shadow-md"
+                  className="w-full py-3.5 bg-[#061C16] hover:bg-[#0D382A] text-[#F3E2B8] hover:text-white text-[11px] font-bold uppercase tracking-[0.2em] rounded transition-all shadow-md hover:shadow-xl hover:-translate-y-0.5 border border-[#C6A15B]/40"
                 >
                   INQUIRE TO PURCHASE DIAMOND
                 </button>
@@ -412,27 +386,6 @@ export default function JewelleryPage() {
           ))}
         </div>
 
-        {/* Diamond Broker Registration Banner */}
-        <div className="mt-20 p-8 sm:p-12 bg-[#061C16] text-[#FCFBF7] border border-[#C6A15B]/20 flex flex-col md:flex-row items-center justify-between gap-8">
-          <div className="space-y-2 text-center md:text-left">
-            <span className="text-[10px] uppercase tracking-[0.3em] text-[#C6A15B] block">
-              DIAMOND SIGHTHOLDERS &amp; INDEPENDENT BROKERS
-            </span>
-            <h3 className="font-serif text-2xl font-light text-white">
-              List Natural Diamonds for International Vault Placement
-            </h3>
-            <p className="text-xs text-[#D8D3C8]/70 font-light max-w-xl">
-              Connect directly with ultra-high-net-worth buyers and family offices seeking D-Flawless and rare colored diamonds. Zero rental, strictly vetted acquisition.
-            </p>
-          </div>
-
-          <Link
-            href="/portal"
-            className="px-8 py-3.5 bg-[#FCFBF7] text-[#061C16] text-[10px] uppercase tracking-[0.25em] font-semibold hover:bg-[#C6A15B] transition-all whitespace-nowrap"
-          >
-            ENTER DIAMOND BROKER PORTAL
-          </Link>
-        </div>
       </div>
     </div>
   );
