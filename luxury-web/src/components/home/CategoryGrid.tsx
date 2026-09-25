@@ -103,13 +103,31 @@ export default function CategoryGrid({ categories = ALL_CATEGORIES }: Props) {
                   <span className="text-[9px] uppercase tracking-wider text-[#082015] font-semibold px-2 py-0.5 rounded bg-white border border-[#E5EAE7]">
                     SELL
                   </span>
-                  <span className="text-[9px] uppercase tracking-wider text-[#082015] font-semibold px-2 py-0.5 rounded bg-white border border-[#E5EAE7]">
-                    RENT
-                  </span>
+                  {cat.slug !== 'watches' && cat.slug !== 'jewellery' ? (
+                    <span className="text-[9px] uppercase tracking-wider text-[#082015] font-semibold px-2 py-0.5 rounded bg-white border border-[#E5EAE7]">
+                      {cat.slug === 'aviation' || cat.slug === 'marine' ? 'CHARTER' : 'RENT'}
+                    </span>
+                  ) : (
+                    <span className="text-[9px] uppercase tracking-wider text-[#A07830] font-bold px-2 py-0.5 rounded bg-[#FAF6EE] border border-[#E8D48A]">
+                      SALES ONLY
+                    </span>
+                  )}
                 </div>
 
                 <a
-                  href={`/categories/${cat.slug}`}
+                  href={
+                    cat.slug === 'aviation'
+                      ? '/aviation'
+                      : cat.slug === 'marine'
+                      ? '/marine'
+                      : cat.slug === 'cars' || cat.slug === 'automotive'
+                      ? '/automotive'
+                      : cat.slug === 'watches'
+                      ? '/watches'
+                      : cat.slug === 'jewellery'
+                      ? '/jewellery'
+                      : `/categories/${cat.slug}`
+                  }
                   className="text-xs font-bold tracking-wider uppercase text-[#082015] group-hover:text-[#A07830] flex items-center gap-1 transition-colors"
                 >
                   <span>Explore</span>

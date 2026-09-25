@@ -21,13 +21,13 @@ export default function LuxuryNavbar({ onOpenSearch, onOpenEnquiry }: LuxuryNavb
   }, []);
 
   const navItems = [
-    { label: 'Discover', href: '/#categories' },
-    { label: 'Acquisitions', href: '/#collection' },
-    { label: 'Private Access', href: '/#private-access' },
-    { label: 'Private Sales', href: '/#off-market' },
+    { label: 'Aviation', href: '/aviation' },
+    { label: 'Marine', href: '/marine' },
+    { label: 'Automotive', href: '/automotive' },
+    { label: 'Timepieces', href: '/watches' },
+    { label: 'Fine Jewels', href: '/jewellery' },
     { label: 'Tenders', href: '/auctions' },
-    { label: 'Collections', href: '/#collection' },
-    { label: 'Concierge', href: '/#concierge' },
+    { label: 'Membership', href: '/membership' },
   ];
 
   return (
@@ -52,12 +52,12 @@ export default function LuxuryNavbar({ onOpenSearch, onOpenEnquiry }: LuxuryNavb
         </a>
 
         {/* Center Desktop Navigation - Thin, Elegant, Generous Spacing */}
-        <nav className="hidden xl:flex items-center gap-7">
+        <nav className="hidden xl:flex items-center gap-6">
           {navItems.map((item) => (
             <a
               key={item.label}
               href={item.href}
-              className="text-[11px] uppercase tracking-[0.25em] font-medium text-[#F6F3EA]/85 hover:text-[#C6A15B] transition-colors relative py-1 group"
+              className="text-[11px] uppercase tracking-[0.22em] font-medium text-[#F6F3EA]/85 hover:text-[#C6A15B] transition-colors relative py-1 group"
             >
               <span>{item.label}</span>
               <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-[#C6A15B] group-hover:w-full transition-all duration-300" />
@@ -65,36 +65,30 @@ export default function LuxuryNavbar({ onOpenSearch, onOpenEnquiry }: LuxuryNavb
           ))}
         </nav>
 
-        {/* Right Side: Search, Membership, Sign In, Primary CTA */}
-        <div className="hidden lg:flex items-center gap-6">
+        {/* Right Side: Search, Portal, Membership, Primary CTA */}
+        <div className="hidden lg:flex items-center gap-5">
           <button
             onClick={onOpenSearch}
-            className="flex items-center gap-2 text-[11px] uppercase tracking-[0.2em] font-medium text-[#F6F3EA]/80 hover:text-[#C6A15B] transition-colors py-1"
+            className="flex items-center gap-1.5 text-[11px] uppercase tracking-[0.2em] font-medium text-[#F6F3EA]/80 hover:text-[#C6A15B] transition-colors py-1"
           >
             <Search className="w-3.5 h-3.5 text-[#C6A15B]" />
             <span>Search</span>
           </button>
 
           <a
-            href="/membership"
-            className="text-[11px] uppercase tracking-[0.2em] font-medium text-[#F6F3EA]/80 hover:text-[#C6A15B] transition-colors py-1"
+            href="/portal"
+            className="px-3 py-1.5 border border-[#C6A15B]/40 hover:border-[#C6A15B] bg-[#061C16]/60 text-[10px] uppercase tracking-[0.2em] font-semibold text-[#C6A15B] hover:text-white transition-all flex items-center gap-1.5"
           >
-            Membership
+            <span className="w-1.5 h-1.5 rounded-full bg-[#C6A15B] animate-pulse" />
+            <span>Broker Portal</span>
           </a>
-
-          <button
-            onClick={onOpenEnquiry}
-            className="text-[11px] uppercase tracking-[0.2em] font-medium text-[#F6F3EA]/80 hover:text-[#C6A15B] transition-colors py-1"
-          >
-            Sign In
-          </button>
 
           {/* Primary CTA */}
           <button
             onClick={onOpenEnquiry}
-            className="px-5 py-2.5 bg-[#C6A15B] hover:bg-[#E0C17E] text-[#080B09] text-[10px] font-bold tracking-[0.22em] uppercase transition-all duration-300 shadow hover:-translate-y-0.5"
+            className="px-4 py-2 bg-[#C6A15B] hover:bg-[#E0C17E] text-[#080B09] text-[10px] font-bold tracking-[0.2em] uppercase transition-all duration-300 shadow hover:-translate-y-0.5"
           >
-            Request Private Access
+            Request Access
           </button>
         </div>
 
@@ -136,9 +130,21 @@ export default function LuxuryNavbar({ onOpenSearch, onOpenEnquiry }: LuxuryNavb
 
             <div className="pt-2 flex flex-col gap-3">
               <a
+                href="/portal"
+                onClick={() => setMobileDrawerOpen(false)}
+                className="text-xs tracking-[0.25em] uppercase text-[#C6A15B] py-2 flex items-center justify-between border-b border-[#C6A15B]/20"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-[#C6A15B] animate-pulse" />
+                  <span>Broker / Owner Portal</span>
+                </div>
+                <ArrowUpRight className="w-4 h-4 text-[#C6A15B]" />
+              </a>
+
+              <a
                 href="/membership"
                 onClick={() => setMobileDrawerOpen(false)}
-                className="text-xs tracking-[0.25em] uppercase text-[#C6A15B] py-2 flex items-center justify-between"
+                className="text-xs tracking-[0.25em] uppercase text-[#F6F3EA]/90 py-2 flex items-center justify-between"
               >
                 <span>The Private Circle (Membership)</span>
                 <ArrowUpRight className="w-4 h-4 text-[#C6A15B]" />

@@ -108,12 +108,24 @@ export default function CategoryShowcase() {
 
         {/* Asymmetrical Magazine Image Panels */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pt-12">
-          {sectors.map((sector) => (
-            <Link
-              key={sector.id}
-              href={`/categories/${sector.slug}`}
-              className={`group relative overflow-hidden bg-[#061C16] border border-[#D8D3C8] shadow-md transition-all duration-500 hover:shadow-2xl ${sector.span}`}
-            >
+          {sectors.map((sector) => {
+            const sectorHref =
+              sector.id === 'aviation'
+                ? '/aviation'
+                : sector.id === 'marine'
+                ? '/marine'
+                : sector.id === 'automotive'
+                ? '/automotive'
+                : sector.id === 'horology'
+                ? '/watches'
+                : `/categories/${sector.slug}`;
+
+            return (
+              <Link
+                key={sector.id}
+                href={sectorHref}
+                className={`group relative overflow-hidden bg-[#061C16] border border-[#D8D3C8] shadow-md transition-all duration-500 hover:shadow-2xl ${sector.span}`}
+              >
               {/* Background Image with Zoom */}
               <div
                 className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 ease-out group-hover:scale-105"
@@ -146,7 +158,8 @@ export default function CategoryShowcase() {
               {/* Subtle Gold Hairline on Hover */}
               <div className="absolute inset-0 border border-transparent group-hover:border-[#C6A15B]/40 transition-colors duration-500 pointer-events-none" />
             </Link>
-          ))}
+          );
+        })}
         </div>
       </div>
     </section>
