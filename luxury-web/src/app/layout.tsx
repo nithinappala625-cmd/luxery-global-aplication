@@ -33,9 +33,9 @@ const cinzel = Cinzel({
 });
 
 export const metadata: Metadata = {
-  title: 'NP GROUPS | International Private Luxury Network',
-  description: 'An international private luxury network for exceptional assets, businesses, services, experiences and private opportunities.',
-  keywords: ['private luxury network', 'private aviation', 'superyachts', 'private islands', 'patek philippe', 'ferrari', 'haute horlogerie', 'np groups', 'off-market assets'],
+  title: 'Royendison | Global Heritage Luxury Marketplace — Aviation Sales, Charters & Superyachts',
+  description: 'Enterprise mobility atelier for sovereign dignitaries and family offices. Aircraft sales, private charters desk, mega superyachts, and tarmac apron hypercars across London, Dubai, and New Delhi.',
+  keywords: ['royendison', 'aircraft sales', 'private aviation acquisition', 'charter desk', 'empty legs', 'superyachts', 'rolls royce apron', 'sovereign luxury'],
 };
 
 export default function RootLayout({
