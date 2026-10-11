@@ -12,7 +12,6 @@ import {
   Zap, 
   Building2, 
   CheckCircle2, 
-  Anchor,
   Compass,
   FileCheck2,
   Lock,
@@ -83,7 +82,7 @@ export default function HomePage() {
       priceINR: '₹625.8 Cr',
       hours: '195 TTAF',
       engineProgram: 'Rolls-Royce CorporateCare',
-      imageUrl: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?q=80&w=1200&auto=format&fit=crop',
+      imageUrl: '/g700_flagship.jpg',
     },
     {
       name: 'Bombardier Global 7500',
@@ -95,7 +94,7 @@ export default function HomePage() {
       priceINR: '₹570.3 Cr',
       hours: '340 TTAF',
       engineProgram: 'GE Passport OnPoint',
-      imageUrl: 'https://images.unsplash.com/photo-1569154941061-e231b4725ef1?q=80&w=1200&auto=format&fit=crop',
+      imageUrl: '/empty_leg.jpg',
     },
     {
       name: 'Hawker 900XP Executive',
@@ -308,57 +307,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 3. REQUESTED SHIP BANNER: HORIZONTAL AERIAL TOP-VIEW SHIP IN DEEP SEA WITH OVERLAY TEXT */}
-      <section className="relative w-full h-[460px] sm:h-[500px] overflow-hidden my-12 shadow-2xl border-y border-[#C6A15B]/40">
-        {/* Background image of aerial superyacht in the sea */}
-        <div
-          className="absolute inset-0 bg-cover bg-center brightness-90"
-          style={{ backgroundImage: "url('/aerial_ship_sea.jpg')" }}
-        />
-
-        {/* Subtle luxury vignette and text backing */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#041D12]/90 via-[#041D12]/60 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#041D12]/80 via-transparent to-black/30" />
-
-        {/* Overlay Content */}
-        <div className="relative z-10 max-w-[1440px] mx-auto h-full flex items-center px-6 sm:px-12">
-          <div className="max-w-2xl space-y-5 text-white">
-            
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-[#0A3A25]/90 backdrop-blur-md border border-[#C6A15B] text-[#DFC07E] text-xs font-mono font-bold tracking-[0.2em] uppercase">
-              <Anchor className="w-3.5 h-3.5 text-[#C6A15B]" />
-              <span>Runway to Anchorage · Integrated Helideck Transfers</span>
-            </div>
-
-            <h2 className="font-serif text-3xl sm:text-5xl font-bold tracking-tight text-white leading-tight">
-              Sovereign Mobility: Connecting Tarmac to Helideck
-            </h2>
-
-            <p className="text-sm sm:text-base text-stone-200 leading-relaxed font-light">
-              For principals requiring seamless transit from executive airport aprons directly to offshore mega superyacht helipads. Operating bespoke twin-turbine rotary transfers across Monaco, Dubai, the French Riviera, and the Maldivian atolls.
-            </p>
-
-            <div className="flex flex-wrap items-center gap-4 pt-2">
-              <Link
-                href="/charters"
-                className="px-6 py-3 rounded bg-gradient-to-r from-[#C6A15B] to-[#DFC07E] hover:from-[#DFC07E] hover:to-[#C6A15B] text-[#041D12] text-xs font-bold tracking-widest uppercase transition-all shadow-lg"
-              >
-                Inquire Helideck Transfer
-              </Link>
-
-              <a
-                href="https://wa.me/917981994870?text=Hello%20Royendison,%20I%20wish%20to%20arrange%20a%20yacht%20helideck%20transfer."
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-5 py-3 rounded bg-[#065E38] hover:bg-[#044B2D] border border-[#25D366]/50 text-white text-xs font-semibold tracking-wider transition-all flex items-center gap-2 shadow"
-              >
-                <PhoneCall className="w-4 h-4 text-[#25D366]" />
-                <span>WhatsApp Ops (+91 7981994870)</span>
-              </a>
-            </div>
-
-          </div>
-        </div>
-      </section>
 
       {/* 4. GLOBAL AVIATION CORRIDORS & COUNTRIES */}
       <section className="max-w-[1440px] mx-auto px-6 sm:px-10 py-16">

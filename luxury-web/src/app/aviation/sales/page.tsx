@@ -106,14 +106,14 @@ export default function AviationSalesPage() {
   };
 
   return (
-    <div className="bg-[#FAFBF8] text-[#0A1A12] min-h-screen pt-24 pb-20">
+    <div className="bg-[#FAFBF8] text-[#0A1A12] min-h-screen pb-20">
       
       {/* 1. HERO HEADER: LUXURY GREEN & CHAMPAGNE GOLD */}
-      <section className="bg-[#062B1B] text-[#FCFBF7] border-b border-[#C6A15B]/40 py-16 px-4 sm:px-8 relative overflow-hidden shadow-2xl">
+      <section className="bg-[#041D12] text-[#FCFBF7] border-b border-[#C6A15B]/30 pt-28 sm:pt-32 pb-14 px-4 sm:px-8 relative overflow-hidden shadow-2xl">
         <div className="absolute inset-0 bg-[radial-gradient(#C6A15B_1px,transparent_1px)] [background-size:24px_24px] opacity-10 pointer-events-none" />
-        <div className="max-w-[1440px] mx-auto relative z-10">
+        <div className="max-w-[1440px] mx-auto relative z-10 space-y-8">
           
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div className="space-y-3 max-w-3xl">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-[#0A3A25] border border-[#C6A15B]/50 text-[#DFC07E] text-xs font-mono font-semibold tracking-wider uppercase">
                 <Sparkles className="w-3.5 h-3.5" />
@@ -149,16 +149,16 @@ export default function AviationSalesPage() {
             </div>
           </div>
 
+          {/* 2. CINEMATIC PRODUCT STORYTELLING (GSAP + SCROLLTRIGGER) */}
+          <div className="pt-2">
+            <CinematicAircraftShowcase />
+          </div>
+
         </div>
       </section>
 
-      {/* 2. CINEMATIC PRODUCT STORYTELLING (GSAP + SCROLLTRIGGER REPLACING THREE.JS) */}
-      <section className="max-w-[1440px] mx-auto px-4 sm:px-8 -mt-6 mb-12">
-        <CinematicAircraftShowcase />
-      </section>
-
       {/* 3. INVENTORY FILTER BAR */}
-      <section className="max-w-[1440px] mx-auto px-4 sm:px-8 mb-8">
+      <section className="max-w-[1440px] mx-auto px-4 sm:px-8 py-8 mb-4">
         <div className="bg-white border border-[#062B1B]/15 rounded-xl p-5 shadow-lg flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           
           {/* Category Tabs */}

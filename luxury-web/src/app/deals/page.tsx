@@ -104,7 +104,7 @@ const LIVE_EMPTY_LEGS: EmptyLegSector[] = [
     aircraftClass: 'Heavy Jet',
     operator: 'Empire Aviation Group UAE',
     aocRating: 'GCAA UAE AOC · Wyvern Wingman Certified',
-    imageUrl: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?q=80&w=1200&auto=format&fit=crop',
+    imageUrl: '/g700_flagship.jpg',
   },
   {
     id: 'EL-04',
