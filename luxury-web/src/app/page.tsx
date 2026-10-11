@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { 
   Plane, 
@@ -10,66 +10,21 @@ import {
   Sparkles, 
   PhoneCall, 
   Zap, 
-  Building2, 
   CheckCircle2, 
-  Compass,
-  FileCheck2,
-  Lock,
-  PlusCircle
+  Calendar,
+  Gauge,
+  Tag,
+  Mail,
+  Clock,
+  Award,
+  ChevronRight
 } from 'lucide-react';
 
 export default function HomePage() {
-  const aviationCountries = [
-    {
-      country: 'United Kingdom',
-      flag: '🇬🇧',
-      city: 'London',
-      airports: 'Farnborough (EGLF) · Luton (EGGW)',
-      description: 'Primary transatlantic heavy jet hub with dedicated sovereign FBO lounges.',
-    },
-    {
-      country: 'United Arab Emirates',
-      flag: '🇦🇪',
-      city: 'Dubai',
-      airports: 'Al Maktoum VIP (OMDW) · Dubai (OMDB)',
-      description: 'Gulf aviation corridor connecting Europe, Africa, and South Asia with 24-hr slots.',
-    },
-    {
-      country: 'India',
-      flag: '🇮🇳',
-      city: 'Mumbai & New Delhi',
-      airports: 'Kalina GA (VABB) · Delhi IGI Terminal (VIDP)',
-      description: 'Subcontinent industrialist jet fleet with DGCA Part 135 air ambulance & charter dispatch.',
-    },
-    {
-      country: 'Switzerland',
-      flag: '🇨🇭',
-      city: 'Geneva & Zurich',
-      airports: 'Geneva Cointrin (LSGG) · Zurich (LSZH)',
-      description: 'Neutral private banking escrow and alpine ski resort helicopter transfers.',
-    },
-    {
-      country: 'United States',
-      flag: '🇺🇸',
-      city: 'New York & Miami',
-      airports: 'Teterboro (KTEB) · Miami Executive (KTMB)',
-      description: 'North American business aviation corridor with rapid coast-to-coast departures.',
-    },
-    {
-      country: 'Singapore',
-      flag: '🇸🇬',
-      city: 'Singapore',
-      airports: 'Seletar Business Aviation (WSSL)',
-      description: 'Pan-Asian family office flight gateway with zero slot congestion.',
-    },
-    {
-      country: 'Monaco & France',
-      flag: '🇲🇨',
-      city: 'Monaco / Côte d’Azur',
-      airports: 'Nice Côte d’Azur (LFMN) · Monaco Heliport (LNMC)',
-      description: 'Direct tarmac-to-superyacht helicopter transfers and Mediterranean charters.',
-    },
-  ];
+  const [inquiryName, setInquiryName] = useState('');
+  const [inquiryPhone, setInquiryPhone] = useState('+91 ');
+  const [inquiryMessage, setInquiryMessage] = useState('');
+  const [submitted, setSubmitted] = useState(false);
 
   const featuredAircraft = [
     {
@@ -81,19 +36,19 @@ export default function HomePage() {
       priceUSD: '$74.5M',
       priceINR: '₹625.8 Cr',
       hours: '195 TTAF',
-      engineProgram: 'Rolls-Royce CorporateCare',
+      engineProgram: 'Rolls-Royce CorporateCare Enhanced',
       imageUrl: '/g700_flagship.jpg',
     },
     {
       name: 'Bombardier Global 7500',
       registration: 'VT-BMR',
       category: 'Ultra Long Range',
-      country: 'India / Geneva',
+      country: 'India (Mumbai / Delhi)',
       flag: '🇮🇳',
       priceUSD: '$67.9M',
       priceINR: '₹570.3 Cr',
       hours: '340 TTAF',
-      engineProgram: 'GE Passport OnPoint',
+      engineProgram: 'GE Passport OnPoint Solutions',
       imageUrl: '/empty_leg.jpg',
     },
     {
@@ -105,437 +60,617 @@ export default function HomePage() {
       priceUSD: '$5.95M',
       priceINR: '₹49.9 Cr',
       hours: '2,150 TTAF',
-      engineProgram: 'Honeywell MSP Gold',
+      engineProgram: 'Honeywell MSP Gold (100% Paid)',
       imageUrl: '/hawker_jet.jpg',
     },
   ];
 
-  return (
-    <div className="bg-[#FAFBF8] text-[#0A1A12] min-h-screen">
-      
-      {/* 1. CINEMATIC HERO SECTION: PURE LUXURY AVIATION EMPIRE */}
-      <section className="relative min-h-[92vh] flex items-center bg-[#041D12] text-[#FCFBF7] overflow-hidden pt-24 pb-16 px-6 sm:px-10 border-b border-[#C6A15B]/30 shadow-2xl">
-        <div className="absolute inset-0 bg-[radial-gradient(#C6A15B_1px,transparent_1px)] [background-size:28px_28px] opacity-10 pointer-events-none" />
-        
-        {/* Subtle background jet photography */}
-        <div className="absolute inset-0 z-0 opacity-20 bg-cover bg-center mix-blend-luminosity" style={{ backgroundImage: "url('/vip_boarding.jpg')" }} />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#041D12] via-[#041D12]/90 to-transparent z-0" />
+  const numbersData = [
+    { value: '70+', label: 'AIRCRAFT MODELS', sub: 'Across Private Jets & Turboprops' },
+    { value: '5+', label: 'YEARS OF EXPERIENCE', sub: 'In Private Aviation Transactions' },
+    { value: 'UAM / RAM', label: 'ADVANCED AIR MOBILITY', sub: 'Next-Gen eVTOL & Helideck Network' },
+    { value: '₹1,200+ Cr', label: 'TRANSACTION ADVISORY', sub: 'Audited Aviation Capital Deployed' },
+  ];
 
-        <div className="max-w-[1440px] mx-auto w-full relative z-10">
+  const aviationHubs = [
+    { city: 'Mumbai', code: 'VABB', terminal: 'Kalina GA Terminal', type: 'Flagship Headquarters' },
+    { city: 'New Delhi', code: 'VIDP', terminal: 'IGI Terminal 3 Airside', type: 'Sovereign Dispatch Hub' },
+    { city: 'Bangalore', code: 'VOBL', terminal: 'Kempegowda VIP Apron', type: 'Tech & Aerotech Corridor' },
+    { city: 'Dubai', code: 'OMDW', terminal: 'Al Maktoum DWC VIP', type: 'Middle East Gateway' },
+    { city: 'London', code: 'EGLF', terminal: 'Farnborough Airport', type: 'Transatlantic Terminal' },
+    { city: 'Geneva', code: 'LSGG', terminal: 'Geneva Cointrin VIP', type: 'European Escrow Desk' },
+  ];
+
+  const handleInquirySubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const text = encodeURIComponent(
+      `👑 *PLANEDEKHO INDIA / ROYENDISON CONSULTATION REQUEST*\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+      `*Name:* ${inquiryName || 'Verified Principal'}\n` +
+      `*Phone:* ${inquiryPhone}\n` +
+      `*Message:* ${inquiryMessage || 'Requesting aircraft acquisition & consultation details.'}\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━━━━━`
+    );
+    window.open(`https://wa.me/917981994870?text=${text}`, '_blank');
+    setSubmitted(true);
+  };
+
+  return (
+    <div className="bg-[#FAFBF8] text-[#1A1A1A] font-sans antialiased selection:bg-[#C6A15B] selection:text-white">
+      
+      {/* 1. CINEMATIC HERO SECTION (PlaneDekho India Style) */}
+      <section className="relative min-h-[92vh] sm:min-h-screen flex items-center justify-center text-white overflow-hidden">
+        {/* Runway Tarmac Hero Photography */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center brightness-[0.82] scale-100 transition-transform duration-1000"
+          style={{ backgroundImage: "url('/g700_flagship.jpg')" }}
+        />
+        
+        {/* Gradient overlays for high contrast readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#041D12]/95 via-black/40 to-black/60" />
+        <div className="absolute inset-0 bg-[radial-gradient(#C6A15B_1px,transparent_1px)] [background-size:32px_32px] opacity-15 pointer-events-none" />
+
+        <div className="max-w-[1280px] mx-auto px-6 sm:px-12 w-full relative z-10 pt-28 pb-20 text-center sm:text-left">
           <div className="max-w-3xl space-y-6">
             
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded bg-[#0A3A25] border border-[#C6A15B]/50 text-[#DFC07E] text-xs font-mono font-bold tracking-[0.2em] uppercase">
+            <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-sm bg-[#041D12]/80 backdrop-blur-md border border-[#C6A15B]/60 text-[#DFC07E] text-[11px] uppercase tracking-[0.25em] font-medium">
               <Sparkles className="w-3.5 h-3.5 text-[#C6A15B]" />
-              <span>Royendison Global Heritage Aviation Marketplace</span>
+              <span>PlaneDekho India · Royendison Aviation</span>
             </div>
 
-            <h1 className="font-serif text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-[#FCFBF7] leading-[1.08]">
-              The Sovereign Aviation Marketplace
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-normal tracking-[0.08em] sm:tracking-[0.12em] uppercase leading-[1.18] text-white">
+              Redefining The Standards Of <br className="hidden sm:inline" />
+              <span className="font-semibold text-white">Private Aviation In India</span>
             </h1>
 
-            <p className="text-base sm:text-lg text-stone-200 font-light leading-relaxed max-w-2xl">
-              Facilitating private aircraft sales, audited acquisitions, and on-demand flight charters for high-net-worth principals, royal flight wings, and corporate leaders across London, Dubai, and New Delhi.
+            <p className="text-sm sm:text-base text-stone-200 font-light leading-[1.8] max-w-2xl">
+              A boutique philosophy delivering holistic aircraft transactions, bespoke fleet management, transparent DGCA title escrow, and priority access to Advanced Air Mobility.
             </p>
 
-            {/* Core Action CTAs */}
-            <div className="flex flex-wrap items-center gap-4 pt-4">
+            {/* PlaneDekho-style Minimalist Action Buttons */}
+            <div className="flex flex-wrap items-center gap-4 pt-4 justify-center sm:justify-start">
               <Link
                 href="/aviation/sales"
-                className="px-6 py-3.5 rounded bg-gradient-to-r from-[#C6A15B] to-[#DFC07E] hover:from-[#DFC07E] hover:to-[#C6A15B] text-[#041D12] text-xs font-bold tracking-[0.18em] uppercase transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+                className="inline-flex items-center gap-3 px-7 py-3.5 bg-[#C6A15B] hover:bg-[#DFC07E] text-[#041D12] text-xs font-semibold tracking-[0.2em] uppercase transition-all shadow-lg hover:-translate-y-0.5 group"
               >
-                Explore Private Sales
+                <span>Aircrafts For Sale</span>
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
               </Link>
 
               <Link
                 href="/charters"
-                className="px-6 py-3.5 rounded bg-[#0A3A25] hover:bg-[#02140B] border border-[#C6A15B] text-[#DFC07E] text-xs font-bold tracking-[0.18em] uppercase transition-all shadow hover:-translate-y-0.5"
+                className="inline-flex items-center gap-3 px-7 py-3.5 bg-black/60 hover:bg-black/90 backdrop-blur-md border border-white/40 hover:border-white text-white text-xs font-semibold tracking-[0.2em] uppercase transition-all group"
               >
-                Open Charter Desk
+                <span>What We Do</span>
+                <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
               </Link>
 
-              <Link
-                href="/deals"
-                className="px-5 py-3.5 rounded bg-amber-500/10 hover:bg-amber-500/20 border border-amber-400/50 text-amber-300 text-xs font-bold tracking-[0.15em] uppercase transition-all flex items-center gap-2"
+              <a
+                href="https://wa.me/917981994870?text=Hello%20PlaneDekho%20India,%20I%20wish%20to%20inquire%20about%20aircraft%20acquisition%20and%20charters."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-5 py-3.5 rounded-sm bg-[#065E38]/90 hover:bg-[#065E38] border border-[#25D366]/50 text-white text-xs font-semibold tracking-wider transition-all"
               >
-                <Zap className="w-4 h-4 fill-amber-400" />
-                <span>Empty Legs (-65%)</span>
-              </Link>
-            </div>
-
-            {/* Key Metrics Strip */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-8 border-t border-white/10">
-              <div>
-                <span className="text-[10px] uppercase font-mono tracking-wider text-stone-400 block">Fixed-Wing Jets</span>
-                <strong className="font-serif text-2xl font-bold text-[#DFC07E]">81 Models</strong>
-              </div>
-              <div>
-                <span className="text-[10px] uppercase font-mono tracking-wider text-stone-400 block">Rotary Helicopters</span>
-                <strong className="font-serif text-2xl font-bold text-white">40 Models</strong>
-              </div>
-              <div>
-                <span className="text-[10px] uppercase font-mono tracking-wider text-stone-400 block">Global Corridors</span>
-                <strong className="font-serif text-2xl font-bold text-[#DFC07E]">7 Hubs</strong>
-              </div>
-              <div>
-                <span className="text-[10px] uppercase font-mono tracking-wider text-stone-400 block">Escrow Standard</span>
-                <strong className="font-serif text-2xl font-bold text-white">100% Audited</strong>
-              </div>
+                <PhoneCall className="w-4 h-4 text-[#25D366]" />
+                <span>+91 7981994870</span>
+              </a>
             </div>
 
           </div>
         </div>
       </section>
 
-      {/* 2. THE TWO PRIMARY LAUNCH PILLARS: PRIVATE SALES vs CHARTER DESK */}
-      <section className="max-w-[1440px] mx-auto px-6 sm:px-10 py-20">
-        <div className="text-center max-w-2xl mx-auto mb-14 space-y-2">
-          <span className="text-xs uppercase font-mono tracking-[0.25em] text-[#065E38] font-bold">
-            Dual Operational Desks
-          </span>
-          <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#041D12]">
-            Two Pillars of Private Aviation
-          </h2>
-          <p className="text-sm text-stone-600 font-light">
-            Whether acquiring multi-million dollar long-range aircraft or chartering executive helicopters for weddings and state summits, our desks operate with uncompromising precision.
-          </p>
-        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      {/* 2. OUR VISION (PlaneDekho India 2-Column Split Layout) */}
+      <section className="w-full bg-[#1A1A1A] text-white">
+        <div className="grid grid-cols-1 lg:grid-cols-2">
           
-          {/* Pillar 1: Private Sales */}
-          <div className="bg-white border border-[#041D12]/15 rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 flex flex-col justify-between group">
-            <div>
-              <div className="relative h-72 bg-stone-900 overflow-hidden">
-                <img
-                  src="/vip_boarding.jpg"
-                  alt="Private Aircraft Sales"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#041D12] via-black/30 to-transparent" />
-                <div className="absolute top-4 left-4">
-                  <span className="px-3 py-1 rounded bg-[#041D12]/95 backdrop-blur-md border border-[#C6A15B] text-[#DFC07E] text-xs font-mono font-bold uppercase tracking-wider">
-                    Capital Acquisitions
-                  </span>
-                </div>
-                <div className="absolute bottom-4 left-6 right-6">
-                  <h3 className="font-serif text-2xl sm:text-3xl font-bold text-white">
-                    Private Sales & Title Escrow
-                  </h3>
-                </div>
-              </div>
-
-              <div className="p-8 space-y-4">
-                <p className="text-sm text-stone-600 leading-relaxed font-light">
-                  Acquire verified business jets and turbine aircraft directly from private owners and sovereign flight departments. Every transaction includes certified logbook audits, borescope engine inspections, and bilateral escrow facilities.
-                </p>
-
-                <div className="grid grid-cols-2 gap-3 text-xs pt-2">
-                  <div className="p-3 bg-[#FAFBF8] border border-stone-200 rounded-lg">
-                    <strong className="text-[#041D12] block mb-0.5">Registration Verified</strong>
-                    <span className="text-stone-500">Official FAA, DGCA & EASA tail registrations displayed.</span>
-                  </div>
-                  <div className="p-3 bg-[#FAFBF8] border border-stone-200 rounded-lg">
-                    <strong className="text-[#041D12] block mb-0.5">Sovereign Escrow</strong>
-                    <span className="text-stone-500">Multi-currency neutral settlement in USD, GBP, and EUR.</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="p-8 pt-0">
-              <Link
-                href="/aviation/sales"
-                className="w-full py-3.5 rounded bg-[#041D12] hover:bg-[#0A3A25] text-[#DFC07E] font-bold text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow"
-              >
-                <span>Inspect Sales Inventory</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-          </div>
-
-          {/* Pillar 2: Charter Desk */}
-          <div className="bg-white border border-[#041D12]/15 rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 flex flex-col justify-between group">
-            <div>
-              <div className="relative h-72 bg-stone-900 overflow-hidden">
-                <img
-                  src="/helicopter.jpg"
-                  alt="Aviation Charter Desk"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#041D12] via-black/30 to-transparent" />
-                <div className="absolute top-4 left-4">
-                  <span className="px-3 py-1 rounded bg-[#041D12]/95 backdrop-blur-md border border-[#C6A15B] text-[#DFC07E] text-xs font-mono font-bold uppercase tracking-wider">
-                    On-Demand Operations
-                  </span>
-                </div>
-                <div className="absolute bottom-4 left-6 right-6">
-                  <h3 className="font-serif text-2xl sm:text-3xl font-bold text-white">
-                    VIP Charter & Rotary Operations
-                  </h3>
-                </div>
-              </div>
-
-              <div className="p-8 space-y-4">
-                <p className="text-sm text-stone-600 leading-relaxed font-light">
-                  Switch between 81 fixed-wing executive jets and 40 VIP helicopters. Tailored flight solutions for wedding grand entries, rose-petal flower showers, high-level political campaigns, and urgent transcontinental family travel.
-                </p>
-
-                <div className="grid grid-cols-2 gap-3 text-xs pt-2">
-                  <div className="p-3 bg-[#FAFBF8] border border-stone-200 rounded-lg">
-                    <strong className="text-[#041D12] block mb-0.5">Wedding Grand Entries</strong>
-                    <span className="text-stone-500">Flower shower drops and rooftop venue helipad landings.</span>
-                  </div>
-                  <div className="p-3 bg-[#FAFBF8] border border-stone-200 rounded-lg">
-                    <strong className="text-[#041D12] block mb-0.5">Corporate Hops</strong>
-                    <span className="text-stone-500">Same-day return business itineraries with zero security delay.</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="p-8 pt-0">
-              <Link
-                href="/charters"
-                className="w-full py-3.5 rounded bg-[#041D12] hover:bg-[#0A3A25] text-[#DFC07E] font-bold text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow"
-              >
-                <span>Access Charter Desk</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-
-      {/* 4. GLOBAL AVIATION CORRIDORS & COUNTRIES */}
-      <section className="max-w-[1440px] mx-auto px-6 sm:px-10 py-16">
-        <div className="text-center max-w-2xl mx-auto mb-12 space-y-2">
-          <span className="text-xs uppercase font-mono tracking-[0.25em] text-[#065E38] font-bold">
-            Sovereign Flight Network
-          </span>
-          <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#041D12]">
-            International Aviation Corridors
-          </h2>
-          <p className="text-sm text-stone-600 font-light">
-            Seven primary general aviation hubs with expedited FBO ground handling, dedicated private terminals, and direct tarmac limousine escort.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {aviationCountries.map((hub) => (
-            <div
-              key={hub.city}
-              className="bg-white border border-[#041D12]/15 hover:border-[#041D12] p-6 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 space-y-3 group"
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-2xl">{hub.flag}</span>
-                <span className="text-[10px] uppercase font-mono tracking-wider text-emerald-800 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                  Active Airside Desk
+          {/* Left: Dark Content Panel with Vertical Accent Bar */}
+          <div className="p-8 sm:p-14 lg:p-20 flex flex-col justify-center bg-[#141414] border-b lg:border-b-0 lg:border-r border-white/10">
+            <div className="max-w-xl space-y-6">
+              
+              <div className="border-l-2 border-[#C6A15B] pl-4">
+                <span className="text-[11px] uppercase tracking-[0.3em] font-medium text-[#C6A15B] block mb-2">
+                  OUR VISION
                 </span>
+                <h2 className="text-2xl sm:text-4xl font-normal tracking-[0.1em] uppercase text-white leading-snug">
+                  Transforming Private Aviation
+                </h2>
               </div>
 
-              <div>
-                <h3 className="font-serif text-xl font-bold text-[#041D12] group-hover:text-[#065E38] transition-colors">
-                  {hub.city}
-                </h3>
-                <span className="text-xs text-stone-500 font-medium">{hub.country}</span>
-              </div>
-
-              <div className="p-2.5 bg-stone-50 rounded border border-stone-200 text-xs font-mono text-[#041D12] font-semibold">
-                {hub.airports}
-              </div>
-
-              <p className="text-xs text-stone-600 leading-relaxed font-light">
-                {hub.description}
+              <p className="text-sm sm:text-base text-stone-300 font-light leading-[1.85]">
+                At PlaneDekho India, we are transforming private aviation by providing a diverse range of aircraft, streamlined ownership processes, and expert consultation. Our mission is to simplify and innovate aircraft acquisition in India, meeting the unique needs and aspirations of every client.
               </p>
-            </div>
-          ))}
 
-          {/* Callout Card */}
-          <div className="bg-[#041D12] text-white p-6 rounded-xl border border-[#C6A15B]/40 shadow-md flex flex-col justify-between">
-            <div className="space-y-3">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-[#DFC07E]">
-                Custom Flight Routing
-              </span>
-              <h3 className="font-serif text-xl font-bold">
-                Transcontinental Flight Clearance
-              </h3>
-              <p className="text-xs text-stone-300 leading-relaxed font-light">
-                Need overflight permits across non-standard diplomatic air corridors? Our dispatch team manages full clearance under bilateral sovereign protocols.
+              <p className="text-xs sm:text-sm text-stone-400 font-light leading-[1.8] pt-2 border-t border-white/10">
+                From intercontinental long-range business jets to light turbine aircraft and rotary helideck transfers, our team delivers complete lifecycle stewardship with uncompromised discretion.
               </p>
-            </div>
 
-            <a
-              href="https://wa.me/917981994870"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-4 inline-flex items-center gap-1.5 text-xs text-[#DFC07E] font-bold uppercase tracking-wider hover:underline"
-            >
-              <span>Contact Flight Planning Desk ➔</span>
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* 5. FEATURED PRIVATE SALES AIRCRAFT PREVIEW */}
-      <section className="max-w-[1440px] mx-auto px-6 sm:px-10 py-16 border-t border-stone-200">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
-          <div>
-            <span className="text-xs uppercase font-mono tracking-[0.25em] text-[#065E38] font-bold">
-              Verified Logbooks & Titles
-            </span>
-            <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#041D12]">
-              Acquisition Inventory Highlights
-            </h2>
-          </div>
-
-          <Link
-            href="/aviation/sales"
-            className="text-xs font-bold uppercase tracking-wider text-[#041D12] hover:text-[#065E38] flex items-center gap-1.5"
-          >
-            <span>View Complete Sales Inventory</span>
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {featuredAircraft.map((plane) => (
-            <div
-              key={plane.registration}
-              className="bg-white border border-[#041D12]/15 hover:border-[#041D12] rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
-            >
-              <div>
-                <div className="relative h-48 bg-stone-900 overflow-hidden">
-                  <img
-                    src={plane.imageUrl}
-                    alt={plane.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
-                  
-                  <div className="absolute top-3 left-3">
-                    <span className="px-2.5 py-1 rounded bg-[#041D12]/95 backdrop-blur-md border border-[#C6A15B] text-white font-mono text-xs font-bold">
-                      TAIL: {plane.registration}
-                    </span>
-                  </div>
-
-                  <div className="absolute bottom-3 left-3 right-3">
-                    <h3 className="font-serif text-xl font-bold text-white group-hover:text-[#DFC07E] transition-colors">
-                      {plane.name}
-                    </h3>
-                  </div>
-                </div>
-
-                <div className="p-5 space-y-3 text-xs">
-                  <div className="flex justify-between text-stone-500">
-                    <span>Base & Country:</span>
-                    <strong className="text-[#041D12]">{plane.flag} {plane.country}</strong>
-                  </div>
-                  <div className="flex justify-between text-stone-500">
-                    <span>Airframe Time:</span>
-                    <strong className="font-mono text-[#041D12]">{plane.hours}</strong>
-                  </div>
-                  <div className="flex justify-between text-stone-500">
-                    <span>Engine Program:</span>
-                    <strong className="text-[#041D12] truncate max-w-[160px]">{plane.engineProgram}</strong>
-                  </div>
-
-                  <div className="p-3 bg-[#041D12] text-white rounded-lg border border-[#C6A15B]/30 flex items-center justify-between mt-3">
-                    <span className="text-[10px] uppercase font-mono tracking-wider text-stone-400">
-                      Asking Price
-                    </span>
-                    <span className="font-serif text-lg font-bold text-[#DFC07E]">
-                      {plane.priceINR} ({plane.priceUSD})
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-5 pt-0">
+              <div className="pt-4">
                 <Link
                   href="/aviation/sales"
-                  className="w-full py-2.5 rounded bg-[#041D12] hover:bg-[#0A3A25] text-[#DFC07E] font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow"
+                  className="inline-flex items-center gap-3 px-6 py-3 border border-white/40 hover:border-white text-white text-xs tracking-[0.2em] uppercase transition-all group"
                 >
-                  <span>Acquisition Dossier</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
+                  <span>Explore Our Fleet</span>
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                </Link>
+              </div>
+
+            </div>
+          </div>
+
+          {/* Right: VIP Boarding Photo */}
+          <div className="relative min-h-[380px] sm:min-h-[500px] overflow-hidden">
+            <img 
+              src="/vip_boarding.jpg"
+              alt="PlaneDekho India VIP Boarding Experience"
+              className="absolute inset-0 w-full h-full object-cover object-center"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+            <div className="absolute bottom-6 left-6 right-6 p-4 bg-black/60 backdrop-blur-md border border-white/20 text-xs text-stone-300">
+              <strong className="text-white block font-medium uppercase tracking-wider mb-0.5">Sovereign Airside Protocol</strong>
+              <span>Direct tarmac escort, red-carpet boarding, and executive lounges across Indian and international FBOs.</span>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+
+      {/* 3. OUR SERVICES / "What We Offer" (PlaneDekho Alternating Split Blocks) */}
+      <section className="bg-white text-[#1A1A1A] py-16 sm:py-24">
+        
+        {/* Header with Vertical Line */}
+        <div className="max-w-[1280px] mx-auto px-6 sm:px-12 mb-16">
+          <div className="border-l-2 border-[#1A1A1A] pl-4">
+            <span className="text-[11px] uppercase tracking-[0.3em] font-medium text-stone-500 block mb-1">
+              OUR SERVICES
+            </span>
+            <h2 className="text-2xl sm:text-4xl font-normal tracking-[0.1em] text-[#1A1A1A]">
+              What We Offer
+            </h2>
+          </div>
+        </div>
+
+        {/* Block 1: AIRCRAFT ACQUISITION */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 border-t border-stone-200">
+          <div className="p-8 sm:p-14 lg:p-20 flex flex-col justify-center bg-[#FAFBF8] order-2 lg:order-1">
+            <div className="max-w-xl space-y-6">
+              <h3 className="text-2xl sm:text-3xl font-light tracking-[0.18em] uppercase text-[#1A1A1A]">
+                AIRCRAFT <br />
+                <span className="font-semibold">ACQUISITION</span>
+              </h3>
+              <p className="text-sm sm:text-base text-stone-600 font-light leading-[1.85]">
+                We provide exceptional aircraft acquisition services, connecting you with the perfect aircraft through a transparent and seamless sales process. Our diverse inventory is designed to meet every client’s unique needs, ensuring a smooth ownership experience from start to finish. Click below to explore our available aircraft.
+              </p>
+              <div>
+                <Link
+                  href="/aviation/sales"
+                  className="inline-flex items-center gap-3 px-6 py-3 border border-stone-800 hover:border-black text-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-white transition-all text-xs tracking-[0.2em] uppercase group"
+                >
+                  <span>Explore Inventory</span>
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                 </Link>
               </div>
             </div>
-          ))}
-        </div>
-      </section>
+          </div>
 
-      {/* 6. BEST DEALS & EMPTY LEGS BANNER */}
-      <section className="max-w-[1440px] mx-auto px-6 sm:px-10 py-10">
-        <div className="bg-[#041D12] text-[#FCFBF7] border border-[#C6A15B]/40 rounded-2xl p-8 sm:p-12 shadow-2xl relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-8">
-          <div className="space-y-3 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-amber-500/20 text-amber-300 border border-amber-400/40 text-[11px] font-mono font-bold uppercase tracking-wider">
-              <Zap className="w-3.5 h-3.5 fill-amber-400" />
-              <span>Empty Legs & Ferry Flights Desk</span>
+          <div className="relative min-h-[360px] sm:min-h-[460px] order-1 lg:order-2 overflow-hidden">
+            <img 
+              src="/g700_flagship.jpg"
+              alt="Aircraft Acquisition Fleet"
+              className="absolute inset-0 w-full h-full object-cover object-center"
+            />
+          </div>
+        </div>
+
+        {/* Block 2: EXCLUSIVE ACCESS (UAM / eVTOL) */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 border-t border-stone-200">
+          <div className="relative min-h-[360px] sm:min-h-[460px] overflow-hidden">
+            <img 
+              src="/empty_leg.jpg"
+              alt="Exclusive Access to Advanced Air Mobility"
+              className="absolute inset-0 w-full h-full object-cover object-center"
+            />
+          </div>
+
+          <div className="p-8 sm:p-14 lg:p-20 flex flex-col justify-center bg-[#FAFBF8]">
+            <div className="max-w-xl space-y-6">
+              <h3 className="text-2xl sm:text-3xl font-light tracking-[0.18em] uppercase text-[#1A1A1A]">
+                EXCLUSIVE <br />
+                <span className="font-semibold">ACCESS</span>
+              </h3>
+              <p className="text-sm sm:text-base text-stone-600 font-light leading-[1.85]">
+                Get early access to the future of Urban Air Mobility (UAM) and Advanced Air Mobility (AAM) in India. Partnering with us gives you priority access to the latest eVTOL innovations and expert insights in the rapidly evolving aviation landscape.
+              </p>
+              <div>
+                <Link
+                  href="/charters"
+                  className="inline-flex items-center gap-3 px-6 py-3 border border-stone-800 hover:border-black text-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-white transition-all text-xs tracking-[0.2em] uppercase group"
+                >
+                  <span>Learn More</span>
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                </Link>
+              </div>
             </div>
-            <h3 className="font-serif text-2xl sm:text-4xl font-bold text-white">
-              Repositioning Sectors at Up to 65% Preferential Rates
-            </h3>
-            <p className="text-sm text-stone-300 font-light leading-relaxed">
-              Lock full-cabin executive jet charters between Mumbai, Delhi, Goa, London, Nice, and Dubai on pre-confirmed empty positioning flights.
-            </p>
+          </div>
+        </div>
+
+        {/* Block 3: PERSONALIZED EXPERIENCE */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 border-t border-b border-stone-200">
+          <div className="p-8 sm:p-14 lg:p-20 flex flex-col justify-center bg-[#FAFBF8] order-2 lg:order-1">
+            <div className="max-w-xl space-y-6">
+              <h3 className="text-2xl sm:text-3xl font-light tracking-[0.18em] uppercase text-[#1A1A1A]">
+                PERSONALIZED <br />
+                <span className="font-semibold">EXPERIENCE</span>
+              </h3>
+              <p className="text-sm sm:text-base text-stone-600 font-light leading-[1.85]">
+                Experience effortless aircraft ownership with our expert management services. We turn your aviation dreams into reality through a flexible and customized range of services. From acquisition to operations, we’re with you every step of the way.
+              </p>
+              <div>
+                <Link
+                  href="/aviation/sales"
+                  className="inline-flex items-center gap-3 px-6 py-3 border border-stone-800 hover:border-black text-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-white transition-all text-xs tracking-[0.2em] uppercase group"
+                >
+                  <span>Our Services</span>
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                </Link>
+              </div>
+            </div>
           </div>
 
-          <Link
-            href="/deals"
-            className="px-8 py-4 rounded bg-gradient-to-r from-[#C6A15B] to-[#DFC07E] hover:from-[#DFC07E] hover:to-[#C6A15B] text-[#041D12] font-bold text-xs uppercase tracking-widest transition-all shadow-xl whitespace-nowrap hover:-translate-y-0.5"
-          >
-            Explore Best Deals Desk
-          </Link>
+          <div className="relative min-h-[360px] sm:min-h-[460px] order-1 lg:order-2 overflow-hidden">
+            <img 
+              src="/jet_interior.jpg"
+              alt="Personalized Luxury Cabin Experience"
+              className="absolute inset-0 w-full h-full object-cover object-center"
+            />
+          </div>
+        </div>
+
+      </section>
+
+
+      {/* 4. WHY CHOOSE US (Exact User-Requested Section & Typography) */}
+      <section className="bg-[#FAFBF8] py-20 sm:py-28 border-b border-stone-200">
+        <div className="max-w-[1280px] mx-auto px-6 sm:px-12">
+          
+          <div className="max-w-3xl mb-14 space-y-4">
+            <span className="text-xs uppercase tracking-[0.3em] font-medium text-stone-500 block">
+              WHY CHOOSE US
+            </span>
+            <h2 className="text-2xl sm:text-4xl lg:text-5xl font-light tracking-[0.06em] text-[#1A1A1A] leading-tight">
+              Exceptional Service, <br className="hidden sm:inline" />
+              <span className="font-semibold">Unmatched Experience</span>
+            </h2>
+            <div className="w-16 h-0.5 bg-[#C6A15B] my-4" />
+            <p className="text-sm sm:text-base lg:text-lg text-stone-700 font-light leading-[1.9]">
+              At PlaneDekho India, we take a holistic approach to aviation that extends beyond simple aircraft transactions. We pride ourselves on a boutique philosophy, tailoring every detail to your specific needs while adapting to the evolving market landscape. With us, your journey is a unique experience designed to meet your expectations and navigate the current market effectively.
+            </p>
+
+            <div className="pt-2">
+              <Link
+                href="/aviation/sales"
+                className="inline-flex items-center gap-3 px-7 py-3.5 bg-[#1A1A1A] hover:bg-black text-white text-xs tracking-[0.2em] uppercase transition-all shadow-md group"
+              >
+                <span>Discover More</span>
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+            </div>
+          </div>
+
+          {/* Boutique Philosophy Pillars */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 pt-6">
+            
+            <div className="p-8 bg-white border border-stone-200/80 rounded-sm shadow-sm hover:shadow-md transition-shadow space-y-3">
+              <span className="text-xs font-mono font-bold text-[#C6A15B] tracking-widest block">01 / PHILOSOPHY</span>
+              <h3 className="text-lg font-medium text-[#1A1A1A] uppercase tracking-wide">Boutique Tailoring</h3>
+              <p className="text-xs sm:text-sm text-stone-600 font-light leading-relaxed">
+                Every acquisition is customized to your specific operational envelope, passenger requirements, and regional flight corridors.
+              </p>
+            </div>
+
+            <div className="p-8 bg-white border border-stone-200/80 rounded-sm shadow-sm hover:shadow-md transition-shadow space-y-3">
+              <span className="text-xs font-mono font-bold text-[#C6A15B] tracking-widest block">02 / APPROACH</span>
+              <h3 className="text-lg font-medium text-[#1A1A1A] uppercase tracking-wide">Holistic Stewardship</h3>
+              <p className="text-xs sm:text-sm text-stone-600 font-light leading-relaxed">
+                Comprehensive lifecycle advisory from borescope engine audits and DGCA title verification to hangarage and Part 135 operations.
+              </p>
+            </div>
+
+            <div className="p-8 bg-white border border-stone-200/80 rounded-sm shadow-sm hover:shadow-md transition-shadow space-y-3">
+              <span className="text-xs font-mono font-bold text-[#C6A15B] tracking-widest block">03 / INTELLIGENCE</span>
+              <h3 className="text-lg font-medium text-[#1A1A1A] uppercase tracking-wide">Market Adaptability</h3>
+              <p className="text-xs sm:text-sm text-stone-600 font-light leading-relaxed">
+                Real-time aviation intelligence and verified off-market listings protect your capital in dynamic global market cycles.
+              </p>
+            </div>
+
+            <div className="p-8 bg-white border border-stone-200/80 rounded-sm shadow-sm hover:shadow-md transition-shadow space-y-3">
+              <span className="text-xs font-mono font-bold text-[#C6A15B] tracking-widest block">04 / DISCRETION</span>
+              <h3 className="text-lg font-medium text-[#1A1A1A] uppercase tracking-wide">Unmatched Experience</h3>
+              <p className="text-xs sm:text-sm text-stone-600 font-light leading-relaxed">
+                24/7 dedicated aviation concierge, bilateral non-disclosure agreements, and sovereign escrow facilities ensuring seamless privacy.
+              </p>
+            </div>
+
+          </div>
+
         </div>
       </section>
 
-      {/* 7. SOVEREIGN ESCROW PROTOCOL */}
-      <section className="max-w-[1440px] mx-auto px-6 sm:px-10 py-16 border-t border-stone-200">
-        <div className="text-center max-w-2xl mx-auto mb-12 space-y-2">
-          <span className="text-xs uppercase font-mono tracking-[0.25em] text-[#065E38] font-bold">
-            Fiduciary Standard
-          </span>
-          <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#041D12]">
-            The Royendison Acquisition Protocol
-          </h2>
-          <p className="text-sm text-stone-600 font-light">
-            Every transaction follows rigorous legal, technical, and escrow protocols to safeguard capital and ensure unencumbered title delivery.
-          </p>
+
+      {/* 5. IN NUMBERS SECTION (PlaneDekho India In Numbers) */}
+      <section className="bg-[#141414] text-white py-20 sm:py-24 border-b border-white/10">
+        <div className="max-w-[1280px] mx-auto px-6 sm:px-12">
+          
+          <div className="border-l-2 border-[#C6A15B] pl-4 mb-14">
+            <span className="text-[11px] uppercase tracking-[0.3em] font-medium text-[#C6A15B] block mb-1">
+              PROVEN METRICS
+            </span>
+            <h2 className="text-2xl sm:text-4xl font-normal tracking-[0.1em] uppercase text-white">
+              PlaneDekho India In Numbers
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {numbersData.map((item, index) => (
+              <div 
+                key={item.label}
+                className="p-8 bg-[#1A1A1A] border border-white/10 rounded-sm space-y-2 hover:border-[#C6A15B]/50 transition-colors"
+              >
+                <div className="text-3xl sm:text-4xl lg:text-5xl font-light text-[#DFC07E] font-mono tracking-tight">
+                  {item.value}
+                </div>
+                <div className="text-xs font-semibold uppercase tracking-[0.2em] text-white pt-2">
+                  {item.label}
+                </div>
+                <div className="text-xs text-stone-400 font-light">
+                  {item.sub}
+                </div>
+              </div>
+            ))}
+          </div>
+
         </div>
+      </section>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="p-6 bg-white border border-[#041D12]/15 rounded-xl space-y-3">
-            <span className="font-mono text-2xl font-bold text-[#C6A15B]">01</span>
-            <h3 className="font-serif text-lg font-bold text-[#041D12]">Borescope & Logbook Audit</h3>
-            <p className="text-xs text-stone-600 leading-relaxed font-light">
-              Independent technical pre-purchase inspection (PPI) including turbine borescope, avionics flight test, and FAA/DGCA title verification.
+
+      {/* 6. FEATURED AIRCRAFTS FOR SALE */}
+      <section className="py-20 sm:py-24 bg-white border-b border-stone-200">
+        <div className="max-w-[1280px] mx-auto px-6 sm:px-12">
+          
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-14">
+            <div className="border-l-2 border-[#1A1A1A] pl-4">
+              <span className="text-[11px] uppercase tracking-[0.3em] font-medium text-stone-500 block mb-1">
+                VERIFIED INVENTORY
+              </span>
+              <h2 className="text-2xl sm:text-4xl font-normal tracking-[0.1em] text-[#1A1A1A]">
+                Aircrafts For Sale
+              </h2>
+            </div>
+
+            <Link
+              href="/aviation/sales"
+              className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-stone-900 hover:text-[#065E38] transition-colors group"
+            >
+              <span>View All Available Aircraft</span>
+              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {featuredAircraft.map((plane) => (
+              <div
+                key={plane.registration}
+                className="bg-[#FAFBF8] border border-stone-200 hover:border-stone-400 rounded-sm overflow-hidden transition-all duration-300 flex flex-col justify-between group"
+              >
+                <div>
+                  <div className="relative h-56 bg-stone-900 overflow-hidden">
+                    <img
+                      src={plane.imageUrl}
+                      alt={plane.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                    
+                    <div className="absolute top-3 left-3">
+                      <span className="px-2.5 py-1 bg-black/80 backdrop-blur-md border border-white/20 text-white font-mono text-[11px] font-bold">
+                        REG: {plane.registration}
+                      </span>
+                    </div>
+
+                    <div className="absolute bottom-3 left-4 right-4">
+                      <span className="text-[10px] font-mono uppercase tracking-widest text-[#DFC07E] block mb-0.5">
+                        {plane.category}
+                      </span>
+                      <h3 className="text-lg font-medium text-white">
+                        {plane.name}
+                      </h3>
+                    </div>
+                  </div>
+
+                  <div className="p-6 space-y-3 text-xs">
+                    <div className="flex justify-between text-stone-500 border-b border-stone-200/60 pb-2">
+                      <span>Base Corridor:</span>
+                      <strong className="text-stone-900 font-medium">{plane.flag} {plane.country}</strong>
+                    </div>
+                    <div className="flex justify-between text-stone-500 border-b border-stone-200/60 pb-2">
+                      <span>Airframe Hours:</span>
+                      <strong className="font-mono text-stone-900">{plane.hours}</strong>
+                    </div>
+                    <div className="flex justify-between text-stone-500 border-b border-stone-200/60 pb-2">
+                      <span>Powerplant Program:</span>
+                      <strong className="text-stone-900 truncate max-w-[170px]">{plane.engineProgram}</strong>
+                    </div>
+
+                    <div className="pt-2 flex items-center justify-between">
+                      <span className="text-[10px] uppercase font-mono tracking-wider text-stone-500">
+                        Asking Price
+                      </span>
+                      <span className="font-mono text-base font-bold text-[#065E38]">
+                        {plane.priceINR} <span className="text-xs text-stone-500 font-normal">({plane.priceUSD})</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-6 pt-0">
+                  <Link
+                    href="/aviation/sales"
+                    className="w-full py-3 border border-stone-800 hover:border-black text-stone-900 hover:bg-[#1A1A1A] hover:text-white font-medium text-xs uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 group/btn"
+                  >
+                    <span>View Specifications</span>
+                    <ArrowRight className="w-3.5 h-3.5 transition-transform group-btn-hover:translate-x-1" />
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+
+        </div>
+      </section>
+
+
+      {/* 7. DOMESTIC & INTERNATIONAL CORRIDORS */}
+      <section className="py-20 sm:py-24 bg-[#FAFBF8] border-b border-stone-200">
+        <div className="max-w-[1280px] mx-auto px-6 sm:px-12">
+          
+          <div className="max-w-2xl mb-14">
+            <span className="text-[11px] uppercase tracking-[0.3em] font-medium text-stone-500 block mb-1">
+              OPERATIONAL REACH
+            </span>
+            <h2 className="text-2xl sm:text-4xl font-normal tracking-[0.1em] text-[#1A1A1A]">
+              Primary Aviation Corridors
+            </h2>
+            <p className="text-sm text-stone-600 font-light mt-2">
+              Dedicated airside FBO handling, expedited customs clearance, and sovereign apron management.
             </p>
           </div>
 
-          <div className="p-6 bg-white border border-[#041D12]/15 rounded-xl space-y-3">
-            <span className="font-mono text-2xl font-bold text-[#C6A15B]">02</span>
-            <h3 className="font-serif text-lg font-bold text-[#041D12]">Bilateral LOI & Escrow</h3>
-            <p className="text-xs text-stone-600 leading-relaxed font-light">
-              Funds deposited into neutral Swiss or UK banking escrow facilities under bilateral Non-Disclosure and Purchase Agreements.
-            </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {aviationHubs.map((hub) => (
+              <div
+                key={hub.city}
+                className="p-6 bg-white border border-stone-200 rounded-sm space-y-2 hover:border-stone-400 transition-colors"
+              >
+                <div className="flex justify-between items-center">
+                  <span className="text-xs font-mono font-bold text-[#065E38]">{hub.code}</span>
+                  <span className="text-[10px] uppercase font-mono tracking-wider text-stone-400">{hub.type}</span>
+                </div>
+                <h3 className="text-lg font-medium text-[#1A1A1A]">{hub.city}</h3>
+                <p className="text-xs text-stone-500 font-mono">{hub.terminal}</p>
+              </div>
+            ))}
           </div>
 
-          <div className="p-6 bg-white border border-[#041D12]/15 rounded-xl space-y-3">
-            <span className="font-mono text-2xl font-bold text-[#C6A15B]">03</span>
-            <h3 className="font-serif text-lg font-bold text-[#041D12]">Export C of A & Deregistration</h3>
-            <p className="text-xs text-stone-600 leading-relaxed font-light">
-              Civil aviation authority title clearance, Export Certificate of Airworthiness, and unencumbered sovereign flag transfer.
-            </p>
-          </div>
+        </div>
+      </section>
 
-          <div className="p-6 bg-white border border-[#041D12]/15 rounded-xl space-y-3">
-            <span className="font-mono text-2xl font-bold text-[#C6A15B]">04</span>
-            <h3 className="font-serif text-lg font-bold text-[#041D12]">Turnkey Ferry Delivery</h3>
-            <p className="text-xs text-stone-600 leading-relaxed font-light">
-              Full-service international ferry flight crew, custom interior detailing, and direct delivery to your home hangar apron.
-            </p>
+
+      {/* 8. CONTACT & CONSULTATION (PlaneDekho Direct Advisory Desk) */}
+      <section className="py-20 sm:py-28 bg-[#141414] text-white">
+        <div className="max-w-[1280px] mx-auto px-6 sm:px-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+            
+            <div className="space-y-6">
+              <div className="border-l-2 border-[#C6A15B] pl-4">
+                <span className="text-[11px] uppercase tracking-[0.3em] font-medium text-[#C6A15B] block mb-1">
+                  GET IN TOUCH
+                </span>
+                <h2 className="text-2xl sm:text-4xl font-light tracking-[0.08em] uppercase text-white leading-tight">
+                  Start Your <br />
+                  <span className="font-semibold">Aviation Journey</span>
+                </h2>
+              </div>
+
+              <p className="text-sm sm:text-base text-stone-300 font-light leading-[1.85] max-w-lg">
+                Whether you are seeking to acquire an executive business jet, evaluate off-market listings, or structure fleet management, our boutique advisory team is at your disposal.
+              </p>
+
+              <div className="space-y-3 pt-2 text-xs sm:text-sm">
+                <div className="flex items-center gap-3 text-stone-300">
+                  <PhoneCall className="w-4 h-4 text-[#C6A15B]" />
+                  <span>VIP Concierge: +91 7981994870</span>
+                </div>
+                <div className="flex items-center gap-3 text-stone-300">
+                  <Mail className="w-4 h-4 text-[#C6A15B]" />
+                  <span>Desk: concierge@planedekhoindia.com / acquisitions@royendison.com</span>
+                </div>
+                <div className="flex items-center gap-3 text-stone-300">
+                  <Clock className="w-4 h-4 text-[#C6A15B]" />
+                  <span>24/7 Global AOG & Mission Dispatch Support</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Direct Consultation Form */}
+            <div className="bg-[#1A1A1A] border border-white/10 p-8 sm:p-10 rounded-sm">
+              <h3 className="text-lg uppercase tracking-wider font-medium text-white mb-6">
+                Request Private Consultation
+              </h3>
+
+              {submitted ? (
+                <div className="p-6 bg-[#065E38]/30 border border-[#25D366]/50 rounded text-center space-y-2">
+                  <CheckCircle2 className="w-8 h-8 text-[#25D366] mx-auto" />
+                  <h4 className="text-white font-medium text-sm">Inquiry Dispatched</h4>
+                  <p className="text-xs text-stone-300">
+                    Your requisition has been forwarded to our aviation desk. Our senior advisor will respond promptly.
+                  </p>
+                </div>
+              ) : (
+                <form onSubmit={handleInquirySubmit} className="space-y-4">
+                  <div>
+                    <label className="block text-[11px] uppercase tracking-wider text-stone-400 mb-1">
+                      Full Name / Entity
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={inquiryName}
+                      onChange={(e) => setInquiryName(e.target.value)}
+                      placeholder="e.g. Adani Capital / Sharma Family Office"
+                      className="w-full px-4 py-3 bg-[#121212] border border-white/15 focus:border-[#C6A15B] text-white text-xs outline-none transition-colors"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] uppercase tracking-wider text-stone-400 mb-1">
+                      Direct Telephone / WhatsApp
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={inquiryPhone}
+                      onChange={(e) => setInquiryPhone(e.target.value)}
+                      placeholder="+91 "
+                      className="w-full px-4 py-3 bg-[#121212] border border-white/15 focus:border-[#C6A15B] text-white text-xs outline-none transition-colors"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] uppercase tracking-wider text-stone-400 mb-1">
+                      Aircraft Requirement / Mission Profile
+                    </label>
+                    <textarea
+                      rows={3}
+                      value={inquiryMessage}
+                      onChange={(e) => setInquiryMessage(e.target.value)}
+                      placeholder="e.g. Seeking Gulfstream G700 / Bombardier Global acquisition or charter advisory..."
+                      className="w-full px-4 py-3 bg-[#121212] border border-white/15 focus:border-[#C6A15B] text-white text-xs outline-none transition-colors resize-none"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full py-3.5 bg-[#C6A15B] hover:bg-[#DFC07E] text-[#041D12] font-semibold text-xs uppercase tracking-[0.2em] transition-all shadow-md"
+                  >
+                    Dispatch Consultation Request
+                  </button>
+                </form>
+              )}
+            </div>
+
           </div>
         </div>
       </section>
