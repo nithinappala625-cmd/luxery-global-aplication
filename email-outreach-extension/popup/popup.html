@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Outreach</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Top Header -->
+    <header class="header">
+      <div class="brand">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+        </div>
+        <div class="brand-text">
+          <h1>Email Outreach</h1>
+          <span class="sub-text">Automated 1-by-1 Cold Sender</span>
+        </div>
+      </div>
+      <div id="status-pill" class="status-pill idle">
+        <span class="status-dot"></span>
+        <span id="status-text">Idle</span>
+      </div>
+    </header>
+
+    <!-- Campaign Category Selector -->
+    <div class="category-bar">
+      <div class="category-header">
+        <span>Active Category:</span>
+        <span id="active-category-name" class="cat-pill">🛥️ Maritime Marine</span>
+      </div>
+      <div class="category-buttons">
+        <button type="button" class="cat-btn active" id="cat-maritime-btn" data-category="maritime">
+          🛥️ Maritime Marine (429)
+        </button>
+        <button type="button" class="cat-btn" id="cat-aviation-btn" data-category="aviation">
+          ✈️ Aviation Charters (135)
+        </button>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="tabs">
+      <button class="tab-btn active" data-tab="compose-tab">
+        <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+        Compose
+      </button>
+      <button class="tab-btn" data-tab="recipients-tab">
+        <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+        Leads (<span id="leads-count-badge">0</span>)
+      </button>
+      <button class="tab-btn" data-tab="logs-tab">
+        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+        Logs & Progress
+      </button>
+      <button class="tab-btn" data-tab="settings-tab">
+        <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+        Settings
+      </button>
+    </nav>
+
+    <!-- TAB 1: COMPOSE -->
+    <main id="compose-tab" class="tab-pane active">
+      <div class="form-group">
+        <label for="template-subject">
+          Subject Line
+          <span class="label-hint">Dynamic tags supported</span>
+        </label>
+        <input type="text" id="template-subject" placeholder="Quick question regarding {{company}}...">
+      </div>
+
+      <div class="tags-toolbar">
+        <span class="tags-label">Insert Tag:</span>
+        <button class="tag-chip" data-tag="{{name}}">{{name}}</button>
+        <button class="tag-chip" data-tag="{{company}}">{{company}}</button>
+        <button class="tag-chip" data-tag="{{role}}">{{role}}</button>
+        <button class="tag-chip" data-tag="{{email}}">{{email}}</button>
+        <button class="tag-chip spintax" data-tag="{Hi|Hello|Hey}">{Spintax}</button>
+      </div>
+
+      <div class="form-group">
+        <label for="template-body">
+          Email Body
+          <span class="label-hint">Sent 1-by-1 to each recipient</span>
+        </label>
+        <textarea id="template-body" rows="7" placeholder="Hi {{name}},&#10;&#10;I noticed your impressive work at {{company}} and wanted to reach out..."></textarea>
+      </div>
+
+      <div class="campaign-actions">
+        <button id="preview-btn" class="btn btn-secondary">
+          <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+          Preview Next
+        </button>
+        <button id="start-btn" class="btn btn-primary">
+          <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+          Start Outreach
+        </button>
+      </div>
+    </main>
+
+    <!-- TAB 2: RECIPIENTS / LEADS -->
+    <main id="recipients-tab" class="tab-pane">
+      <div class="recipients-toolbar">
+        <button id="load-maritime-btn" class="btn btn-sm btn-primary">⚡ Load Maritime (429)</button>
+        <button id="load-charter-btn" class="btn btn-sm btn-ghost">✈️ Aviation (135)</button>
+        <button id="load-sample-btn" class="btn btn-sm btn-ghost">Demo Leads</button>
+        <button id="clear-leads-btn" class="btn btn-sm btn-ghost danger">Clear All</button>
+      </div>
+
+      <div class="form-group">
+        <label for="leads-input">
+          Paste Leads (One per line)
+          <span class="label-hint">Format: email or name, email, company, role</span>
+        </label>
+        <textarea id="leads-input" rows="5" placeholder="elon@tesla.com&#10;Tim Cook, tim@apple.com, Apple, CEO&#10;satya@microsoft.com, Microsoft"></textarea>
+      </div>
+
+      <div class="file-dropzone" id="file-dropzone">
+        <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
+        <p>Drop CSV file here or <span>browse file</span></p>
+        <input type="file" id="csv-file-input" accept=".csv,.txt" style="display:none">
+      </div>
+
+      <div class="leads-table-wrapper">
+        <div class="leads-table-header">
+          <span>Parsed Leads (<span id="parsed-count">0</span>)</span>
+        </div>
+        <div class="leads-list" id="leads-list">
+          <div class="empty-leads">No leads loaded yet. Paste leads above or click "Load Demo Leads".</div>
+        </div>
+      </div>
+    </main>
+
+    <!-- TAB 3: LOGS & PROGRESS -->
+    <main id="logs-tab" class="tab-pane">
+      <!-- Live Status & Controls Card -->
+      <div class="control-card">
+        <div class="progress-info">
+          <div>
+            <span class="stat-label">Progress:</span>
+            <span id="stat-progress-text" class="stat-value">0 / 0</span>
+          </div>
+          <div id="stat-timer" class="stat-timer">Ready</div>
+        </div>
+        <div class="progress-bar-bg">
+          <div id="progress-bar-fill" class="progress-bar-fill" style="width: 0%"></div>
+        </div>
+        <div class="stats-row">
+          <div class="stat-pill success">
+            <span class="num" id="stat-sent">0</span> Sent
+          </div>
+          <div class="stat-pill failed">
+            <span class="num" id="stat-failed">0</span> Failed
+          </div>
+          <div class="stat-pill remaining">
+            <span class="num" id="stat-remaining">0</span> Queued
+          </div>
+        </div>
+
+        <div class="live-action-btns">
+          <button id="pause-btn" class="btn btn-secondary" disabled>Pause</button>
+          <button id="stop-btn" class="btn btn-danger" disabled>Stop</button>
+          <button id="reset-btn" class="btn btn-ghost">Reset</button>
+        </div>
+      </div>
+
+      <div class="logs-header">
+        <span>Activity Log</span>
+        <button id="export-csv-btn" class="btn btn-sm btn-ghost">Export CSV</button>
+      </div>
+      <div id="logs-container" class="logs-container">
+        <div class="empty-logs">No activity yet. Logs will appear here during send.</div>
+      </div>
+    </main>
+
+    <!-- TAB 4: SETTINGS -->
+    <main id="settings-tab" class="tab-pane">
+      <div class="setting-item">
+        <div class="setting-label">
+          <strong>Pacing Delay (Seconds)</strong>
+          <span>Randomized delay between each email to protect Gmail limits</span>
+        </div>
+        <div class="delay-inputs">
+          <input type="number" id="setting-min-delay" min="3" max="120" value="8">
+          <span>to</span>
+          <input type="number" id="setting-max-delay" min="5" max="300" value="15">
+          <span>sec</span>
+        </div>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-label">
+          <strong>Dry Run / Test Mode</strong>
+          <span>Simulate outreach without actually clicking send in Gmail</span>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="setting-dry-run">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-label">
+          <strong>Append Custom Signature</strong>
+          <span>Automatically attach your sign-off at bottom of each email</span>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="setting-use-sig">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="form-group" id="sig-group" style="display: none;">
+        <textarea id="setting-signature" rows="3" placeholder="Best regards,&#10;Your Name&#10;Founder & CEO"></textarea>
+      </div>
+
+      <div class="setting-item">
+        <div class="setting-label">
+          <strong>Launch Gmail Tab</strong>
+          <span>Open or switch to your active Gmail workspace</span>
+        </div>
+        <button id="open-gmail-btn" class="btn btn-secondary btn-sm">Open Gmail</button>
+      </div>
+    </main>
+
+    <!-- PREVIEW MODAL -->
+    <div id="preview-modal" class="modal-backdrop">
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <h3>Outreach Preview</h3>
+          <button id="close-modal-btn" class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="preview-field">
+            <span class="field-label">To:</span>
+            <span id="preview-to" class="field-value highlight">john@example.com</span>
+          </div>
+          <div class="preview-field">
+            <span class="field-label">Subject:</span>
+            <span id="preview-subject" class="field-value">Exciting partnership opportunity</span>
+          </div>
+          <div class="preview-body-container">
+            <div class="field-label">Message:</div>
+            <div id="preview-body" class="preview-body-text"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="modal-ok-btn" class="btn btn-primary">Looks Good</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="charter_leads_data.js"></script>
+  <script src="maritime_leads_data.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

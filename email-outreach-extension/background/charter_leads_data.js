@@ -1,0 +1,812 @@
+self.CHARTER_LEADS_DATA = [
+  {
+    "company": "Aerokalinga Aviation",
+    "email": "capt.sandeepmishra@gmail.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Afcom Holdings",
+    "email": "deepak@afcomcargo.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Air Charters Services",
+    "email": "sunil@aircharterservices.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Airports Authority of India (Flight Inspection Unit)",
+    "email": "fiuops@aai.aero",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Aman Aviation & Aerospace Solutions",
+    "email": "am@amanaviation.in",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Aone Helicopters",
+    "email": "ceo@aonehelicopters.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "AR Airways",
+    "email": "radhey.gautam@cluboneair.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Aryan Aviation",
+    "email": "gm@aryanaviation.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Arrow Aircrafts Sales & Charters",
+    "email": "shailendra@arrowaircraft.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Aurea Aviation",
+    "email": "rajesh@aureaaviation.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Avenor Aviation LLP",
+    "email": "accountablemanager@avenoraviation.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Aviation Connectivity & Infrastructure Developers",
+    "email": "ceo@flyairtaxi.in",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Bajaj Aviation",
+    "email": "srisanth@bajajaviation.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Baramati Agro",
+    "email": "aviation@baramatiagro.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Bativala M Bhagvati Flying Charters LLP",
+    "email": "am@flyingcharters.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "B.G. Shirke Construction Technology",
+    "email": "phalkedhananjay@gmail.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Bluecraft Aviation",
+    "email": "info@bluecraftaviation.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Carewell Aviation India",
+    "email": "pawan@carewellaviation.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Charlie Foxtrot Aviation Service",
+    "email": "am@charliefoxtrot.in",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Chipsan Aviation",
+    "email": "am@chipsan.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Dadachanji Aviation",
+    "email": "am@dadachanjiaviation.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Davangere Sugar Company",
+    "email": "ratnarajcp.dscl@gmail.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Deccan Charters",
+    "email": "am@deccanair.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Dhillon Aviation",
+    "email": "dhillon.aviation1@gmail.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Dunes Aviation",
+    "email": "am@dunesair.in",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "E-Factor Adventure Tourism",
+    "email": "samit@efactor4u.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "EHA Aviation",
+    "email": "operations@ehaaviation.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "EIH Ltd.",
+    "email": "director.aviation@oberoigroup.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Empire Aircraft Management Services",
+    "email": "qualityind@empire.aero",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "EMSOS Aviation",
+    "email": "am@emsosav.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Everdeliver Logistics",
+    "email": "operations@everdeliver.in",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Falcon Aviation Services",
+    "email": "am@faspl.co.in",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Fairwinds Aviation",
+    "email": "fairwinds.ldh@gmail.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Fern Aviation India",
+    "email": "info@fernaviation.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "FLYSBS Aviation",
+    "email": "kannan@sbsaviation.in",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Forum I Aviation",
+    "email": "harry@forum1aviation.net",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Freedom Charter Services",
+    "email": "am@flyfreedom.in",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Global Vectra Helicorp",
+    "email": "maneesh@gvhl.net",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Ghodawat Enterprises",
+    "email": "suresh.karelam@starair.in",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "GMR Aviation",
+    "email": "ashok.gopinath@gmrgroup.in",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Golden Baritone (Jatayu)",
+    "email": "accountablemanager@jetayou.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Golden Crane Aviation",
+    "email": "am@goldencrane.in",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "GSEC Aviation",
+    "email": "naveen.kumar@gsecaviation.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Heligo Charters",
+    "email": "am@heligo.in",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Heritage Aviation",
+    "email": "rohit.mathur@heritageaviation.in",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Himalayan Heli Services",
+    "email": "operations@himalayanheli.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Himalyaputra Aviation",
+    "email": "julian.dsouza@adani.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Himanad Management Services",
+    "email": "contact@himanad.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "HN Safal Aviation",
+    "email": "ops@hnsafal.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Hyderabad Airlines",
+    "email": "info@hyderabadairlines.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Indo Pacific Aviation",
+    "email": "accountable.manager@indopacific.in",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Indocopters",
+    "email": "info@indocopters.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "India Flysafe Aviation",
+    "email": "am@indiaflysafe.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Innxt Aviation",
+    "email": "innxtaviation@gmail.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "IRM Pvt. Ltd.",
+    "email": "alekh.jain@irmltd.co.in",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Jet Serve Aviation",
+    "email": "srola@jetaviation.co.in",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Jhankar Aviation",
+    "email": "jhankaraviationops@gmail.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Joyalukkas India",
+    "email": "am@joyalukkas.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Kainos Aviation",
+    "email": "info@kainosaviation.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Kairamya Aviation",
+    "email": "info@kairamyaair.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Kakini Enterprises",
+    "email": "ceo@bluhorse-kepl.in",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "KAN Aerofoil",
+    "email": "am@kanaero.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Karnavati Aviation",
+    "email": "julian.dsouza@adani.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Kelachandra Logistics",
+    "email": "uksharma@kelachandragroup.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Kestrel Aviation",
+    "email": "am@kestrel-aviation.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Khazana Jewellery",
+    "email": "am@kingjets.in",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Kingscraft Aviation",
+    "email": "am@flykings.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Kyathi Climate Modification Consultants LLP",
+    "email": "am@flykings.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Lakeworkoffice Club",
+    "email": "abhinavtripathi@lakeworkoffice.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "LCL Aviation (Ecojet)",
+    "email": "am@lclaviation.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "LMCS Infra Holdings",
+    "email": "acctmgr@flylotus.aero",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "L & T Aviation Services",
+    "email": "ashutosh.v@larsentoubro.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "MAB Aviation",
+    "email": "areez.vakil@mabaviation.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Maharaja Aviation",
+    "email": "info@maharajaaviation.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Mahindra Airways",
+    "email": "nisal.nitin@mahindra.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Malhotra Helikopters",
+    "email": "ops@mhpl.in",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Mandke and Mandke Infrastructure",
+    "email": "info@sudhirmandke.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Media House DND",
+    "email": "am.dndmedia@gmail.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Modifi Aviations",
+    "email": "am@modifiaviations.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "MSPL Ltd.",
+    "email": "accountablemanager@mspllimited.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Mytri Aviation",
+    "email": "am@mytriaviation.in",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Navdurga Aviation",
+    "email": "am@navdurgaaviation.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "NIBE Aeronautics",
+    "email": "sourabh.jangid@nibeaeronautics.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Niraant Aviation",
+    "email": "shamsher.sindhu@uskcapital.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "OSS Air Management",
+    "email": "sr.solanki@ossair.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Pawan Hans",
+    "email": "jitendra.negi@pawanhans.co.in",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Pilgrimage Aviation",
+    "email": "info.pilgrimageaviation@gmail.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Pinnacle Air",
+    "email": "ceo@pinnacleair.in",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Pioneer Flying Academy",
+    "email": "rajesh@pioneerflyingacademy.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Poonawalla Aviation",
+    "email": "poonawallaops@poonawallaaviation.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Pradhaan Air Express",
+    "email": "am@pradhaanair.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Property Ventures (India)",
+    "email": "sudeep.singh@skylightairways.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Rajas Aerosports and Adventures (Air Safari)",
+    "email": "am@rajasaero.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Rajhans Infracon (India)",
+    "email": "priyanshi.nair@rajhans.co.in",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Raymond Ltd. (Aviation Division)",
+    "email": "raymond.accmgr@raymond.in",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Redbird Airways",
+    "email": "opc@redbirdairways.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Redbird Flight Training Academy",
+    "email": "coo@redbirdaviation.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Reliance Commercial Dealers",
+    "email": "k.unni@ril.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Reliance Transport & Travels",
+    "email": "ajay.kapur@reliancegroupindia.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Rithwik Green Power and Aviation",
+    "email": "rithwikgreenpoweraviation@gmail.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "RPS Aviation",
+    "email": "info@skysuites.in",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "RPSG Resources",
+    "email": "ravi.dargan@rpsg.in",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Saarthi Airways",
+    "email": "info@saarthiairways.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Saffron Strokes",
+    "email": "accountablemanager@saffronstrokes.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Sai Construction",
+    "email": "aviation@sbalangroup.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Sapphire Airlines",
+    "email": "am@sapphireair.in",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Shraddha Energy and Infraprojects",
+    "email": "aviation@shraddhagroup.org",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Shivan Aadithya Air Services",
+    "email": "jees.george@goldeneagle.aero",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Span Air",
+    "email": "mail@span-air.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Skyblue Aviation Services",
+    "email": "am@skyblue.aero",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Sky One Airways",
+    "email": "cdrram@skyoneairways.in",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "SkyJets International",
+    "email": "am@aviaman.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Smart Wings Aviation",
+    "email": "am@smartwingsaviation.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Sparzana Aviation",
+    "email": "am@sparzana.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "SKB Infracons",
+    "email": "am.skbinfracons@gmail.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Sobha Puravankara Aviation",
+    "email": "dhakshanamoorthi.s@spal.co.in",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Sreeji Aviation",
+    "email": "aviation@shreeji.in",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Steamhouse India",
+    "email": "sndpmsh@outlook.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Suhan Aviation",
+    "email": "rsasan@suhanaviation.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Syandan Aviation",
+    "email": "am@syandanaviation.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "TAI Jets",
+    "email": "manoj@titanaviation.aero",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Taj Air",
+    "email": "mehernosh.kapadia@tajhotels.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Tara Aviation Services",
+    "email": "am@taraaviation.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Target Air Services",
+    "email": "info@targetairservices.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Thumby Aviation",
+    "email": "captkingnair@yahoo.co.in",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Trans Bharat Aviation",
+    "email": "accm@transbharat.in",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Transworld Jets",
+    "email": "aks@transworld.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "United Helicharters",
+    "email": "prakash@uhpl.in",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Universal Airways",
+    "email": "rj@universalairways.in",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Vijayanand Travels",
+    "email": "vtplgmavn@gmail.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Vimaan Airlines",
+    "email": "accountablemgr@vimaanairlines.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Ventura Airconnect",
+    "email": "am@flyairconnect.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "VSR Ventures",
+    "email": "vk@vsraviation.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Wings Aviation",
+    "email": "qc.wings@gmail.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  },
+  {
+    "company": "Zest Aviation",
+    "email": "sudeep@zestaviation.com",
+    "name": "Team",
+    "role": "Aviation Operations / Charters"
+  }
+];
